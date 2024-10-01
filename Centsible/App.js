@@ -1,53 +1,75 @@
+import { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, Image } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
- 
 import Button from './components/Button';
 import ImageViewer from './components/ImageViewer';
- 
+
 const PlaceholderImage = require('./assets/background-img.png');
- 
+
 export default function App() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 3000); // Display splash screen for 3 seconds
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isLoading) {
+    return (
+      <View style={styles.splashContainer}>
+        <View style={styles.imageContainer}>
+          <ImageViewer placeholderImageSource={PlaceholderImage} />
+        </View>
+        <View style={styles.textContainer}>
+          <Text style={styles.welcomeText}>Welcome to Centsible!</Text>
+        </View>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-      <View style={styles.imageContainer}>
-        <ImageViewer placeholderImageSource={PlaceholderImage} />
-      </View>
-      <View style={styles.text}>
-      <Text style= {{color: 'purple', fontSize:'55'}}>Welcome to Centsible!</Text>
-      </View>
       <View style={styles.footerContainer}>
         <Button theme="primary" label="Sign up" />
         <Button theme="primary" label="Login" />
       </View>
- 
       <StatusBar style="auto" />
     </View>
   );
 }
- 
+
 const styles = StyleSheet.create({
+  splashContainer: {
+    flex: 1,
+    backgroundColor: 'purple',
+    alignItems: 'center',
+    justifyContent: 'flex-start', // Align items at the start
+  },
   container: {
     flex: 1,
-    backgroundColor: '#2529e',
+    backgroundColor: 'white',
     alignItems: 'center',
     justifyContent: 'center',
-    height: '100%',
-    width: '100%'
   },
   imageContainer: {
-    flex: 1,
+    flex: 0.8, // Adjust this to control image height
     justifyContent: 'center',
     alignItems: 'center',
-    top: '10%',
+    paddingTop: 50, 
   },
-  text: {
-    position: 'absolute',
-    top: '10%',
-    alignItems: 'center',
-    alignContent: 'center',
+  textContainer: {
+    alignItems: 'center', // Center horizontally
+    marginTop: 20, // Add some margin for spacing
+  },
+  welcomeText: {
+    color: 'white', // Change text color for better visibility
+    fontSize: 55,
+    textAlign: 'center', // Center text alignment
   },
   footerContainer: {
     alignItems: 'center',
   },
 });
-
