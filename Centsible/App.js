@@ -32,7 +32,15 @@ function ReportScreen() {
       <Text>Reports</Text>
     </View>
   );
+
+}function ProfileScreen() {
+  return (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Text>Profile</Text>
+    </View>
+  );
 }
+
 
 function MyTabBar({ state, descriptors, navigation }) {
   return (
@@ -116,6 +124,7 @@ export default function App() {
             <Tab.Screen name="Transactions" component={TransactionScreen} />
             <Tab.Screen name="Goals" component={GoalsScreen} />
             <Tab.Screen name="Reports" component={ReportScreen} />
+            <Tab.Screen name="Profile" component={ProfileScreen} />
           </Tab.Navigator>
           <StatusBar style="auto" />
     </NavigationContainer>
