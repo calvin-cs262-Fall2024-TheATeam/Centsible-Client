@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import ImageViewer from './components/ImageViewer';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {NavigationContainer} from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/FontAwesome'; 
 
 import { globalStyles } from './styles/globalStyles';
 import TransactionScreen from './screens/transaction';
@@ -43,10 +44,42 @@ export default function App() {
   return (
     <NavigationContainer>
           <Tab.Navigator>
-            <Tab.Screen name="Transactions" component={TransactionScreen} />
-            <Tab.Screen name="Goals" component={GoalsScreen} />
-            <Tab.Screen name="Reports" component={ReportScreen} />
-            <Tab.Screen name="Profile" component={ProfileScreen} />
+            <Tab.Screen 
+              name="Transactions" 
+              component={TransactionScreen} 
+              options={{
+                  tabBarIcon: ({ color, size }) => (
+                    <Icon name="credit-cardg" color={color} size={size} />
+                  ),
+                }} 
+              />
+            <Tab.Screen 
+              name="Goals" 
+              component={GoalsScreen} 
+              options={{
+                tabBarIcon: ({ color, size }) => (
+                  <Icon name="dollar" color={color} size={size} />
+                ),
+              }} 
+            />
+            <Tab.Screen 
+              name="Reports" 
+              component={ReportScreen} 
+              options={{
+                tabBarIcon: ({ color, size }) => (
+                  <Icon name="pie-chart" color={color} size={size} />
+                ),
+              }} 
+            />
+            <Tab.Screen 
+              name="Profile" 
+              component={ProfileScreen} 
+              options={{
+                tabBarIcon: ({ color, size }) => (
+                  <Icon name="user" color={color} size={size} />
+                ),
+              }} 
+            />
           </Tab.Navigator>
           <StatusBar style="auto" />
     </NavigationContainer>
