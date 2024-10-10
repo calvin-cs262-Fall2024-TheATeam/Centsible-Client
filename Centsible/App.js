@@ -49,7 +49,7 @@ export default function App() {
               component={TransactionScreen} 
               options={{
                   tabBarIcon: ({ color, size }) => (
-                    <Icon name="credit-cardg" color={color} size={size} />
+                    <Icon name="credit-card" color={color} size={size} />
                   ),
                 }} 
               />
