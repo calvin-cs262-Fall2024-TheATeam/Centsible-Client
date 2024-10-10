@@ -12,7 +12,6 @@ import GoalsScreen from './screens/goals';
 import ReportScreen from './screens/reports';
 import ProfileScreen from './screens/profile';
 
-
 const PlaceholderImage = require('./assets/background-img.png');
 
 const Tab = createBottomTabNavigator();
