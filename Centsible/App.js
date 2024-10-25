@@ -63,7 +63,7 @@ export default function App() {
         component={GoalsScreen}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <Icon name="bullseye" color={color} size={size} />
+            <Icon name="dollar" color={color} size={size} />
           ),
         }}
       />
