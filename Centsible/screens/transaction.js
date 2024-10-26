@@ -125,7 +125,7 @@ export default function TransactionScreen() {
 
       <FlatList
         style={styles.flatList}
-        data={transactions}
+        data={transactions.slice().reverse()}
         keyExtractor={(item, index) => index.toString()} // Unique key for each item
         renderItem={({ item }) => {
           const options = { month: 'short', day: 'numeric', year: 'numeric' };
