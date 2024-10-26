@@ -32,7 +32,7 @@ export default function TransactionScreen() {
     setTransactions([...transactions, { amount: parsedAmount, category, type, date }]);
     setAmount('');
     setCategory('');
-    setType('');
+    setType('expense');
     setDate(new Date());
     setModalVisible(false);
   };
