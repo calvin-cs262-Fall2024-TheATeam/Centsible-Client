@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Text, View, TouchableOpacity, Modal, TextInput, Button, Alert, FlatList } from 'react-native';
+import { useState, useEffect } from 'react';
+import { Text, View, TouchableOpacity, Modal, TextInput, Button, Alert, FlatList, StyleSheet } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { globalStyles } from '../styles/globalStyles';
 
@@ -12,6 +12,16 @@ export default function TransactionScreen() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [transactions, setTransactions] = useState([]);
 
+  //hard coded transactions
+  useEffect(() => {
+    const initialTransactions = [
+      { amount: 50, category: 'Groceries', type: 'expense', date: new Date(2024, 10, 15) },
+      { amount: 200, category: 'Salary', type: 'income', date: new Date(2024, 10, 10) },
+      { amount: 30, category: 'Utilities', type: 'expense', date: new Date(2024, 10, 12) },
+    ];
+    setTransactions(initialTransactions);
+  }, []);
+
   const handleAddTransaction = () => {
     const parsedAmount = parseFloat(amount);
     if (isNaN(parsedAmount) || parsedAmount <= 0) {
@@ -22,20 +32,20 @@ export default function TransactionScreen() {
     setTransactions([...transactions, { amount: parsedAmount, category, type, date }]);
     setAmount('');
     setCategory('');
-    setType('');
+    setType('expense');
     setDate(new Date());
     setModalVisible(false);
   };
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <TouchableOpacity 
+      <TouchableOpacity
         style={globalStyles.button}
         onPress={() => setModalVisible(true)}
-        >
-        <Text 
+      >
+        <Text
           style={globalStyles.buttonText}>
-            Add a transaction
+          Add a transaction
         </Text>
       </TouchableOpacity>
 
@@ -80,8 +90,8 @@ export default function TransactionScreen() {
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity 
-            style={globalStyles.button} 
+          <TouchableOpacity
+            style={globalStyles.button}
             onPress={() => setShowDatePicker(true)}
           >
             <Text style={globalStyles.buttonText}>{`Select Date: ${date.toLocaleDateString()}`}</Text>
@@ -101,30 +111,70 @@ export default function TransactionScreen() {
               }}
             />
           )}
-          
+
           <TouchableOpacity
-                style={globalStyles.button}
-                onPress={handleAddTransaction} >
-                <Text style={globalStyles.buttonText}>
-                    Add
-                </Text>
-            </TouchableOpacity>
+            style={globalStyles.button}
+            onPress={handleAddTransaction} >
+            <Text style={globalStyles.buttonText}>
+              Add
+            </Text>
+          </TouchableOpacity>
           <Button title="Cancel" onPress={() => setModalVisible(false)} color="red" />
         </View>
       </Modal>
 
       <FlatList
-      data={transactions}
-      keyExtractor={(item, index) => index.toString()} // Unique key for each item
-      renderItem={({ item }) => (
-        <View style={{ padding: 10 }}>
-          <Text>{`Amount: $${item.amount.toFixed(2)}`}</Text>
-          <Text>{`Category: ${item.category}`}</Text>
-          <Text>{`Type: ${item.type}`}</Text>
-          <Text>{`Date: ${item.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}</Text>
-        </View>
-      )}
-    />
+        style={styles.flatList}
+        data={transactions.slice().reverse()}
+        keyExtractor={(item, index) => index.toString()} // Unique key for each item
+        renderItem={({ item }) => {
+          const options = { month: 'short', day: 'numeric', year: 'numeric' };
+          const formattedDate = item.date.toLocaleDateString('en-US', options).replace(',', '');
+
+          return (
+            <View>
+            <View style={styles.itemContainer}>
+              <View>
+                <Text style={styles.dateText}>
+                  {formattedDate.toUpperCase()}
+                </Text>
+                <Text>{item.category}</Text>
+              </View>
+              <Text style={[styles.amountText, { color: item.type === 'income' ? 'green' : 'red' }]}>
+                {item.type === 'income' ? `+${item.amount.toFixed(2)}` : `-${item.amount.toFixed(2)}`}
+              </Text>
+            </View>
+            <View style={styles.divider} />
+            </View>
+          );
+        }}
+      />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  flatList: {
+    paddingHorizontal: 15,
+  },
+  itemContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 5,
+    alignItems: 'center',
+    width: '100%',
+  },
+  dateText: {
+    fontWeight: '500',
+    paddingTop: 4,
+  },
+  amountText: {
+    fontWeight: 'bold',
+  },
+  divider: {
+    height: 1.5,
+    backgroundColor: '#ccc', // Adjust color as needed
+    marginTop: 4, // Space between amount and divider
+    width: '100%', // Full width
+  },
+});
