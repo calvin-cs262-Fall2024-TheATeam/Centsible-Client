@@ -61,4 +61,27 @@ export const globalStyles = StyleSheet.create({
       borderRadius: 5,
       marginBottom: 15,
     },
+
+    // expense/income seg control tab
+    sctContainer: {
+      width: 200,
+      marginBottom: 15,
+    },
+    
+    tabStyle: {
+      backgroundColor: 'white',
+      borderColor: 'gray',
+      padding: 3,
+    },
+  
+    // expense/income seg control tab
+    activeTabStyle: {
+      backgroundColor: 'purple',
+      borderColor: 'purple',
+    },
+  
+    // expense/income seg control tab
+    tabTextStyle: {
+      color: 'gray',
+    },
   });

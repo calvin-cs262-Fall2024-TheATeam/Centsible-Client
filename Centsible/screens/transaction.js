@@ -3,6 +3,9 @@ import { Text, View, TouchableOpacity, Modal, TextInput, Button, Alert, FlatList
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { globalStyles } from '../styles/globalStyles';
 
+import SegmentedControlTab from "react-native-segmented-control-tab"; // me
+// may need to use command "npm install react-native-segmented-control-tab"
+
 export default function TransactionScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [amount, setAmount] = useState('');
@@ -37,6 +40,21 @@ export default function TransactionScreen() {
     setModalVisible(false);
   };
 
+  // set state for expense/income segmented control tab
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
+  // default sct to expense when opened
+  useEffect(() => {
+    setSelectedIndex(0);
+  }, []);
+  
+  // handles switching expense/income tabs in transaction
+  const handleIndexChange = (index) => {
+    setSelectedIndex(index);
+    if (index === 0) { setType('expense') };
+    if (index === 1) { setType('income') };
+  };
+
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       <TouchableOpacity
@@ -56,7 +74,19 @@ export default function TransactionScreen() {
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={globalStyles.modalContainer}>
-          <Text style={globalStyles.modalTitle}>Add Transaction Amount</Text>
+          <Text style={globalStyles.modalTitle}>Add transaction</Text>
+
+          {/* Expense/income segmented control tab */}
+          <View style={globalStyles.sctContainer}>
+            <SegmentedControlTab 
+              values={['Expense', 'Income']}
+              selectedIndex={selectedIndex}
+              tabStyle={globalStyles.tabStyle}
+              activeTabStyle={globalStyles.activeTabStyle}
+              tabTextStyle={globalStyles.tabTextStyle}
+              onTabPress={handleIndexChange}
+            />
+          </View>
 
           <TextInput
             placeholder="Enter amount"
@@ -74,21 +104,6 @@ export default function TransactionScreen() {
             style={globalStyles.input}
             placeholderTextColor="#888"
           />
-
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15 }}>
-            <TouchableOpacity
-              style={[globalStyles.button, type === 'expense' && { backgroundColor: 'lightgray' }]}
-              onPress={() => setType('expense')}
-            >
-              <Text style={globalStyles.buttonText}>Expense</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[globalStyles.button, type === 'income' && { backgroundColor: 'lightgray' }]}
-              onPress={() => setType('income')}
-            >
-              <Text style={globalStyles.buttonText}>Income</Text>
-            </TouchableOpacity>
-          </View>
 
           <TouchableOpacity
             style={globalStyles.button}
