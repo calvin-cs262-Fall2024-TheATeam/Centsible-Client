@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 
 export default function LoginScreen({ route, navigation }) {
   const { setIsLoggedIn } = route.params; // Get the setter for login state
@@ -41,6 +41,11 @@ export default function LoginScreen({ route, navigation }) {
       />
 
       <Button title={isLoading ? 'Logging in...' : 'Login'} onPress={handleLogin} />
+
+      {/* Link to Create Account Screen */}
+      <TouchableOpacity onPress={() => navigation.navigate('CreateAccount')}>
+        <Text style={styles.createAccountText}>Don't have an account? Create one</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -65,5 +70,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 16,
     fontSize: 18,
+  },
+  createAccountText: {
+    color: 'blue',
+    marginTop: 20,
+    textAlign: 'center',
   },
 });

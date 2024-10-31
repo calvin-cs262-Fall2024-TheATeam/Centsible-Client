@@ -11,6 +11,7 @@ import GoalsScreen from './screens/goals';
 import ReportScreen from './screens/reports';
 import ProfileScreen from './screens/profile';
 import LoginScreen from './screens/LoginScreen';
+import CreateAccountScreen from './screens/CreateAccountScreen';
 import ImageViewer from './components/ImageViewer';
 
 const PlaceholderImage = require('./assets/background-img.png');
@@ -77,27 +78,34 @@ export default function App() {
         }}
       />
       <Tab.Screen
-        name="Profile"
-        component={ProfileScreen}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="user" color={color} size={size} />
-          ),
-        }}
-      />
-    </Tab.Navigator>
+      name="Profile"
+      children={() => <ProfileScreen setIsLoggedIn={setIsLoggedIn} />}
+      options={{
+        tabBarIcon: ({ color, size }) => (
+          <Icon name="user" color={color} size={size} />
+        ),
+      }}
+    />
+  </Tab.Navigator>
   );
 
   return (
     <NavigationContainer>
       <Stack.Navigator>
         {!isLoggedIn ? (
-          <Stack.Screen
-            name="Login"
-            component={LoginScreen}
-            options={{ headerShown: false }}
-            initialParams={{ setIsLoggedIn }} // Pass setIsLoggedIn to LoginScreen
-          />
+          <>
+            <Stack.Screen
+              name="Login"
+              component={LoginScreen}
+              options={{ headerShown: false }}
+              initialParams={{ setIsLoggedIn }}
+            />
+            <Stack.Screen
+              name="CreateAccount"
+              component={CreateAccountScreen} 
+              options={{ title: 'Create Account' }}
+            />
+          </>
         ) : (
           <Stack.Screen
             name="Home"
