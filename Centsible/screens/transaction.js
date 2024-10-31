@@ -12,7 +12,7 @@ export default function TransactionScreen() {
   const [date, setDate] = useState(new Date());
   const [category, setCategory] = useState('');
   const [type, setType] = useState('expense'); //setting the default to say expense
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(true);
   const [transactions, setTransactions] = useState([]);
 
   //hard coded transactions
@@ -62,8 +62,8 @@ export default function TransactionScreen() {
         onPress={() => setModalVisible(true)}
       >
         <Text
-          style={globalStyles.buttonText}>
-          Add a transaction
+          style={globalStyles.createTransactionText}>
+          + Add a transaction
         </Text>
       </TouchableOpacity>
 
@@ -73,8 +73,33 @@ export default function TransactionScreen() {
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
+        
+        <View style={globalStyles.transactionHeader}>
+            <Button 
+              title="Cancel" 
+              onPress={() => setModalVisible(false)} 
+              color="red" 
+              style={globalStyles.cancelTransaction}
+            />
+            <Text style={globalStyles.transactionHeaderText}>Add a transaction</Text>
+            
+            {/* less preferred option but working for now */} 
+            <Button 
+              title="Add" 
+              onPress={handleAddTransaction} 
+              color="purple" 
+              style={globalStyles.addTransaction}
+            />
+            
+            {/* TO FIX: Add button but as touchable opacity. 
+                Would prefer to use this but haven't figured out styling */}
+            {/* <TouchableOpacity onPress={handleAddTransaction}>
+                <Text style={globalStyles.addTransaction}>Add</Text>
+            </TouchableOpacity> */}
+        </View>
+        
         <View style={globalStyles.modalContainer}>
-          <Text style={globalStyles.modalTitle}>Add transaction</Text>
+          {/* <Text style={globalStyles.modalTitle}>Add transaction</Text> */}
 
           {/* Expense/income segmented control tab */}
           <View style={globalStyles.sctContainer}>
@@ -88,6 +113,22 @@ export default function TransactionScreen() {
             />
           </View>
 
+          <View style={globalStyles.dateContainer}>
+            <Text style={globalStyles.setDateText}>Date of transaction: </Text>
+            <DateTimePicker
+              style={globalStyles.datePicker}
+              value={date}
+              mode="date"
+              display="default"
+              onChange={(event, selectedDate) => {
+                // setShowDatePicker(true);
+                if (selectedDate) {
+                  setDate(selectedDate);
+                }
+              }}
+            />
+          </View>
+
           <TextInput
             placeholder="Enter amount"
             value={amount}
@@ -97,6 +138,8 @@ export default function TransactionScreen() {
             placeholderTextColor="#888"
             autoFocus={true} // Automatically focus the input when modal opens
           />
+          
+          {/* Ideally this will become a dropdown of previously created categories? */}
           <TextInput
             placeholder="Enter category"
             value={category}
@@ -105,36 +148,6 @@ export default function TransactionScreen() {
             placeholderTextColor="#888"
           />
 
-          <TouchableOpacity
-            style={globalStyles.button}
-            onPress={() => setShowDatePicker(true)}
-          >
-            <Text style={globalStyles.buttonText}>{`Select Date: ${date.toLocaleDateString()}`}</Text>
-          </TouchableOpacity>
-
-          {/* DatePicker */}
-          {showDatePicker && (
-            <DateTimePicker
-              value={date}
-              mode="date"
-              display="default"
-              onChange={(event, selectedDate) => {
-                setShowDatePicker(false);
-                if (selectedDate) {
-                  setDate(selectedDate);
-                }
-              }}
-            />
-          )}
-
-          <TouchableOpacity
-            style={globalStyles.button}
-            onPress={handleAddTransaction} >
-            <Text style={globalStyles.buttonText}>
-              Add
-            </Text>
-          </TouchableOpacity>
-          <Button title="Cancel" onPress={() => setModalVisible(false)} color="red" />
         </View>
       </Modal>
 
