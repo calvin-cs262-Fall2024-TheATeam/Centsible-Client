@@ -7,6 +7,7 @@ import TransactionModal from '../transactionComponents/transactionModal'; // Imp
 import TransactionItem from '../transactionComponents/transactionItem'; // Import the transaction item component
 import { globalStyles } from '../styles/globalStyles';
 import { SwipeListView } from 'react-native-swipe-list-view';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 
 export default function TransactionScreen() {
@@ -112,10 +113,19 @@ export default function TransactionScreen() {
       <View style={styles.rowBack}>
         <Text> Left</Text>
         <TouchableOpacity style={[styles.backRightBtn, styles.backRightBtnLeft]} onPress={onClose}>
-          <Text>Close</Text>
+        <MaterialCommunityIcons
+              name="close-circle-outline"
+              size={25}
+              style={styles.trash}
+              color="#fff"
+            />
         </TouchableOpacity>
         <TouchableOpacity style={[styles.backRightBtn, styles.backRightBtnRight]} onPress={onDelete}>
-          <Text>Delete</Text>
+        <MaterialCommunityIcons
+                  name="trash-can-outline"
+                  size={25}
+                  color="#fff"
+                />
         </TouchableOpacity>
       </View>
     )
@@ -212,13 +222,10 @@ const styles = {
   rowBack: {
     alignItems: 'center',
     backgroundColor: '#DDD',
-    flex: 1,
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingLeft: 15,
-    margin: 0,
-    marginBottom: 15,
+    marginBottom: 5,
     borderRadius: 5,
+    height: 50,
   },
   backRightBtn: {
     alignItems: 'flex-end',
@@ -228,16 +235,17 @@ const styles = {
     top: 0,
     width: 75,
     paddingRight: 17,
-    height: 50,
   },
   backRightBtnRight: {
     backgroundColor: 'red',
     right: 0,
     borderTopRightRadius: 5,
     borderBottomRightRadius: 5,
+    height: 50,
   },
   backRightBtnLeft: {
     backgroundColor: '#1f65ff',
     right: 75,
+    height: 50,
   },
 };
