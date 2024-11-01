@@ -91,20 +91,20 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        {/* {!isLoggedIn ? (                  // UNCOMMENT!!!
+        {!isLoggedIn ? (                  
           <Stack.Screen
             name="Login"
             component={LoginScreen}
             options={{ headerShown: false }}
             initialParams={{ setIsLoggedIn }} // Pass setIsLoggedIn to LoginScreen
           />
-        ) : ( */}
+        ) : (
           <Stack.Screen
             name="Home"
             component={HomeTabs}
             options={{ headerShown: false }} // No header for the home tabs
           />
-        {/* )}                                  UNCOMMENT!!! */}
+        )}                                  
       </Stack.Navigator>
     </NavigationContainer>
   );
