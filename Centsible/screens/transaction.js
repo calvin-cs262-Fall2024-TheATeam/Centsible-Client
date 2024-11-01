@@ -92,7 +92,7 @@ export default function TransactionScreen() {
     );
   };
 
-  const closeRow  = (rowMap, rowKey) => {
+  const closeRow = (rowMap, rowKey) => {
     if (rowMap[rowKey]) {
       rowMap[rowKey].closeRow();
     }
@@ -107,25 +107,35 @@ export default function TransactionScreen() {
   };
 
   const HiddenItemWithActions = props => {
-    const { onClose, onDelete } = props;
+    const { swipeAnimatedValue, onClose, onDelete } = props;
 
     return (
       <View style={styles.rowBack}>
         <Text> Left</Text>
         <TouchableOpacity style={[styles.backRightBtn, styles.backRightBtnLeft]} onPress={onClose}>
-        <MaterialCommunityIcons
-              name="close-circle-outline"
-              size={25}
-              style={styles.trash}
-              color="#fff"
-            />
+          <MaterialCommunityIcons
+            name="close-circle-outline"
+            size={25}
+            style={styles.trash}
+            color="#fff"
+          />
         </TouchableOpacity>
         <TouchableOpacity style={[styles.backRightBtn, styles.backRightBtnRight]} onPress={onDelete}>
-        <MaterialCommunityIcons
-                  name="trash-can-outline"
-                  size={25}
-                  color="#fff"
-                />
+          <Animated.View
+            style={[styles.trash, {
+              transform: [{
+                scale: swipeAnimatedValue.interpolate({
+                  inputRange: [-90, -45],
+                  outputRange: [1, 0],
+                  extrapolate: 'clamp',
+                }), }, ],
+            }, ]}>
+            <MaterialCommunityIcons
+              name="trash-can-outline"
+              size={25}
+              color="#fff"
+            />
+          </Animated.View>
         </TouchableOpacity>
       </View>
     )
@@ -188,6 +198,11 @@ const styles = {
   },
 
   //TODO fix this
+  trash: {
+    height: 25,
+    width: 25,
+    marginRight: 7,
+  },
   rowFrontVisible: {
     backgroundColor: '#FFF',
     borderRadius: 5,
