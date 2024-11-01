@@ -2,7 +2,7 @@ import React from 'react';
 import { Modal, TextInput, TouchableOpacity, Text, View, Button } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { globalStyles } from '../styles/globalStyles';
-
+//TODO get rid of unneeded global styles that shouldn't be found there
 const TransactionModal = ({ visible, onClose, onAdd, amount, setAmount, category, setCategory, type, setType, date, setDate, showDatePicker, setShowDatePicker }) => {
     return (
         <Modal
