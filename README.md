@@ -10,5 +10,5 @@ It is part of a larger project, with the data service stored in a separate repos
 - yarn add expo
 
 ### To run
-- Git clone the repo
+- git clone <repository url>
 - npx expo start
