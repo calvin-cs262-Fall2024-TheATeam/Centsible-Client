@@ -12,7 +12,6 @@ export default function TransactionScreen() {
   const [date, setDate] = useState(new Date());
   const [category, setCategory] = useState('');
   const [type, setType] = useState('expense'); //setting the default to say expense
-  const [showDatePicker, setShowDatePicker] = useState(true);
   const [transactions, setTransactions] = useState([]);
 
   //hard coded transactions
