@@ -1,14 +1,11 @@
 import { useState, useEffect } from 'react';
 import {
-  View, Text, StyleSheet, Animated, TouchableHighlight, TouchableOpacity, StatusBar,
-  FlatList
+  View, Text, Animated, TouchableHighlight, TouchableOpacity
 } from 'react-native';
 import TransactionModal from '../transactionComponents/transactionModal'; // Import the modal component
-import TransactionItem from '../transactionComponents/transactionItem'; // Import the transaction item component
 import { globalStyles } from '../styles/globalStyles';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-
 
 export default function TransactionScreen() {
   const [modalVisible, setModalVisible] = useState(false);
@@ -32,11 +29,13 @@ export default function TransactionScreen() {
 
   const handleAddTransaction = () => {
     const parsedAmount = parseFloat(amount);
+    // Validate that the amount is a positive number
     if (isNaN(parsedAmount) || parsedAmount <= 0) {
       Alert.alert("Invalid amount", "Please enter a valid amount greater than zero.");
       return;
     }
 
+    // Create a new transaction object
     const newTransaction = {
       key: transactions.length.toString(),
       amount: parsedAmount,
@@ -49,6 +48,7 @@ export default function TransactionScreen() {
     resetForm();
   };
 
+  // Resets the form fields and closes the modal
   const resetForm = () => {
     setAmount('');
     setCategory('');
@@ -57,13 +57,8 @@ export default function TransactionScreen() {
     setModalVisible(false);
   };
 
-  const deleteTransaction = (rowKey) => {
-    const newData = transactions.filter(item => item.key !== rowKey);
-    setTransactions(newData);
-  };
-
-  const TransactionItem = props => {
-    const { data } = props;
+  // Renders a single transaction item with correct layout 
+  const TransactionItem = ({ data }) => {
     const options = { month: 'short', day: 'numeric', year: 'numeric' };
     const formattedDate = data.item.date.toLocaleDateString('en-US', options).replace(',', '');
 
@@ -86,7 +81,8 @@ export default function TransactionScreen() {
     );
   };
 
-  const renderItem = (data, rowMap) => {
+  // Render function for individual transaction items
+  const renderItem = (data) => {
     return (
       <TransactionItem data={data} />
     );
@@ -98,29 +94,19 @@ export default function TransactionScreen() {
     }
   };
 
-  const deleteRow = (rowMap, rowKey) => {
-    closeRow(rowMap, rowKey);
-    const newData = [...transactions];
-    const prevIndex = transactions.findIndex(item => item.key === rowKey);
-    newData.splice(prevIndex, 1);
-    setTransactions(newData);
+  const deleteTransaction = (rowMap, rowKey) => {
+    closeRow(rowMap, rowKey); // Close the row before deletion
+    const newData = [...transactions]; // Copy current transactions
+    const prevIndex = transactions.findIndex(item => item.key === rowKey); // Find the index of the transaction to delete
+    newData.splice(prevIndex, 1); // Remove the transaction from the list
+    setTransactions(newData); // Update state with the new list
   };
 
-  const HiddenItemWithActions = props => {
-    const { swipeAnimatedValue, onClose, onDelete } = props;
+  const HiddenItemWithActions = ({ swipeAnimatedValue, onDelete }) => {
 
     return (
       <View style={styles.rowBack}>
-        <Text> Left</Text>
-        <TouchableOpacity style={[styles.backRightBtn, styles.backRightBtnLeft]} onPress={onClose}>
-          <MaterialCommunityIcons
-            name="close-circle-outline"
-            size={25}
-            style={styles.trash}
-            color="#fff"
-          />
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.backRightBtn, styles.backRightBtnRight]} onPress={onDelete}>
+        <TouchableOpacity style={styles.trashBtn} onPress={onDelete}>
           <Animated.View
             style={[styles.trash, {
               transform: [{
@@ -141,12 +127,13 @@ export default function TransactionScreen() {
     )
   }
 
+  // Render the hidden item when swiped
   const renderHiddenItem = (data, rowMap) => {
     return (
       <HiddenItemWithActions
         data={data}
         rowMap={rowMap}
-        onDelete={() => deleteRow(rowMap, data.item.key)}
+        onDelete={() => deleteTransaction(rowMap, data.item.key)}
       />
     );
   };
@@ -155,15 +142,15 @@ export default function TransactionScreen() {
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       <TouchableOpacity
         style={globalStyles.button}
-        onPress={() => setModalVisible(true)}
+        onPress={() => setModalVisible(true)} // Open the modal to add a transaction
       >
         <Text style={globalStyles.buttonText}>Add a transaction</Text>
       </TouchableOpacity>
 
       <TransactionModal
         visible={modalVisible}
-        onClose={() => setModalVisible(false)}
-        onAdd={handleAddTransaction}
+        onClose={() => setModalVisible(false)} // Close the modal
+        onAdd={handleAddTransaction} // Add transaction when modal submits
         amount={amount}
         setAmount={setAmount}
         category={category}
@@ -181,8 +168,7 @@ export default function TransactionScreen() {
           data={transactions}
           renderItem={renderItem}
           renderHiddenItem={renderHiddenItem}
-          leftOpenValue={75}
-          rightOpenValue={-150}
+          rightOpenValue={-75}
           disableRightSwipe
         />
       </View>
@@ -196,8 +182,6 @@ const styles = {
     paddingHorizontal: 15,
     flex: 1
   },
-
-  //TODO fix this
   trash: {
     height: 25,
     width: 25,
@@ -218,7 +202,6 @@ const styles = {
     width: '100%', // Ensures it takes the full width,
   },
   textContainer: {
-    flexDirection: 'column',
     justifyContent: 'center',
   },
   dateText: {
@@ -227,13 +210,12 @@ const styles = {
   },
   categoryText: {
     fontWeight: '400',
-    color: '#666', // Optional: for better readability
+    color: '#666', 
   },
   amountText: {
     fontWeight: 'bold',
-    textAlign: 'right', // Align amount text to the right
+    textAlign: 'right', 
   },
-
   rowBack: {
     alignItems: 'center',
     backgroundColor: '#DDD',
@@ -242,7 +224,7 @@ const styles = {
     borderRadius: 5,
     height: 50,
   },
-  backRightBtn: {
+  trashBtn: {
     alignItems: 'flex-end',
     bottom: 0,
     justifyContent: 'center',
@@ -250,17 +232,10 @@ const styles = {
     top: 0,
     width: 75,
     paddingRight: 17,
-  },
-  backRightBtnRight: {
     backgroundColor: 'red',
     right: 0,
     borderTopRightRadius: 5,
     borderBottomRightRadius: 5,
-    height: 50,
-  },
-  backRightBtnLeft: {
-    backgroundColor: '#1f65ff',
-    right: 75,
     height: 50,
   },
 };
