@@ -7,7 +7,8 @@ It is part of a larger project, with the data service stored in a separate repos
 ## Expo 
 - install npm
 - install yarn (npm i -g yarn)
+- yarn add expo
 
 ### To run
-- Git clone the repo
+- git clone [repository url]
 - npx expo start
