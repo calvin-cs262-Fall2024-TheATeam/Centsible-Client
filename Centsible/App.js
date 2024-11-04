@@ -112,7 +112,7 @@ export default function App() {
             component={HomeTabs}
             options={{ headerShown: false }} // No header for the home tabs
           />
-        )}
+        )}                                  
       </Stack.Navigator>
     </NavigationContainer>
   );
