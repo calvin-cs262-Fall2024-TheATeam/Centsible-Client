@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import {
-  View, Text, Animated, TouchableHighlight, TouchableOpacity
+  View, Text, Animated, TouchableHighlight, TouchableOpacity, Alert
 } from 'react-native';
 import TransactionModal from '../transactionComponents/transactionModal'; // Import the modal component
 import { globalStyles } from '../styles/globalStyles';
@@ -12,9 +12,9 @@ export default function TransactionScreen() {
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState(new Date());
   const [category, setCategory] = useState('');
-  const [type, setType] = useState('expense');
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [type, setType] = useState('expense'); //setting the default to say expense
   const [transactions, setTransactions] = useState([]);
+  const [selectedIndex, setSelectedIndex] = useState(0); // set state for expense/income segmented control tab
 
   //temporary hard-coded transactions
   useEffect(() => {
@@ -55,6 +55,13 @@ export default function TransactionScreen() {
     setType('expense');
     setDate(new Date());
     setModalVisible(false);
+  };
+
+  // handles switching expense/income tabs in transaction
+  const handleIndexChange = (index) => {
+    setSelectedIndex(index);
+    if (index === 0) { setType('expense') };
+    if (index === 1) { setType('income') };
   };
 
   // Renders a single transaction item with correct layout 
@@ -136,16 +143,19 @@ export default function TransactionScreen() {
         onDelete={() => deleteTransaction(rowMap, data.item.key)}
       />
     );
-  };
-
+  }
+  
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       <TouchableOpacity
-        style={globalStyles.button}
-        onPress={() => setModalVisible(true)} // Open the modal to add a transaction
-      >
-        <Text style={globalStyles.buttonText}>Add a transaction</Text>
-      </TouchableOpacity>
+         style={globalStyles.button}
+         onPress={() => setModalVisible(true)}
+       >
+         <Text
+           style={globalStyles.createTransactionText}>
+           + Add a transaction
+         </Text>
+       </TouchableOpacity>
 
       <TransactionModal
         visible={modalVisible}
@@ -159,8 +169,9 @@ export default function TransactionScreen() {
         setType={setType}
         date={date}
         setDate={setDate}
-        showDatePicker={showDatePicker}
-        setShowDatePicker={setShowDatePicker}
+        onRequestClose={() => setModalVisible(false)}
+        selectedIndex={selectedIndex}
+        handleIndexChange={handleIndexChange}
       />
 
       <View style={styles.container}>
