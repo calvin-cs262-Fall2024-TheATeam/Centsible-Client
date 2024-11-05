@@ -120,26 +120,17 @@ export const globalStyles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: 60,
     backgroundColor: '#fff',
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
-  }, 
+    paddingHorizontal: 5,  // Ensure there's padding on the sides
+    marginBottom: 10
+  },
 
   transactionHeaderText: {
     fontSize: 18,
     fontWeight: '600',
     color: '#333',
-    justifyContent: 'center',
-  },
-
-  cancelTransaction: {
-    position: 'absolute',
-    left: 15,
-  },
-
-  addTransaction: {
-    position: 'absolute',
-    right: 15,
+    textAlign: 'center',  // Center the text within the header
   },
 });
