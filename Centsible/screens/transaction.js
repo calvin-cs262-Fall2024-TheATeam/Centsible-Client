@@ -159,7 +159,7 @@ export default function TransactionScreen({ navigation }) {
           style={styles.addButton} // Adjust padding for placement
           onPress={() => setModalVisible(true)} // Show the modal when pressed
         >
-          <MaterialCommunityIcons name="plus" size={30} color="black" />
+          <MaterialCommunityIcons name="plus" size={30} color="white" />
         </TouchableOpacity>
       ),
     });
