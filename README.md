@@ -8,7 +8,6 @@ It is part of a larger project, with the data service stored in a separate repos
 - install npm
 - install yarn (npm i -g yarn)
 - yarn add expo
-- install react-native-chart-kit
 
 ### To run
 - git clone [repository url]
