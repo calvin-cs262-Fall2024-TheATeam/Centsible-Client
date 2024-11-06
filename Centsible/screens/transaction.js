@@ -78,14 +78,10 @@ export default function TransactionScreen({ navigation }) {
     const formattedDate = data.item.date.toLocaleDateString('en-US', options).replace(',', '');
 
     return (
-      <TouchableHighlight
-        style={styles.rowFrontVisible}
-      >
+      <TouchableHighlight style={styles.rowFrontVisible}>
         <View style={styles.itemContainer}>
-          <View style={styles.textContainer}>
-            <Text style={styles.dateText}>
-              {formattedDate.toUpperCase()}
-            </Text>
+          <View>
+            <Text style={styles.dateText}>{formattedDate.toUpperCase()}</Text>
             <Text style={styles.categoryText}>{data.item.category}</Text>
           </View>
           <Text style={[styles.amountText, { color: data.item.type === 'income' ? 'green' : 'black' }]}>
@@ -93,6 +89,7 @@ export default function TransactionScreen({ navigation }) {
           </Text>
         </View>
       </TouchableHighlight>
+
     );
   };
 
@@ -169,7 +166,8 @@ export default function TransactionScreen({ navigation }) {
   }, [navigation]);
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+    <View style={styles.container}>
+    {/* <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}> */}
       {/* Balance Section */}
       <View style={styles.balanceContainer}>
         <Text style={styles.balanceText}>Current Balance: ${calculateBalance()}</Text>
@@ -192,7 +190,7 @@ export default function TransactionScreen({ navigation }) {
         handleIndexChange={handleIndexChange}
       />
 
-      <View style={styles.container}>
+      <View style={styles.transactionTableContainer}>
         <SwipeListView
           data={transactions}
           renderItem={renderItem}
@@ -207,14 +205,18 @@ export default function TransactionScreen({ navigation }) {
 }
 
 const styles = {
+  //entire screen 
   container: {
-    paddingHorizontal: 15,
-    flex: 1
+    backgroundColor: '#e8d0f4',
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center' 
   },
-  trash: {
-    height: 25,
-    width: 25,
-    marginRight: 7,
+
+  //transaction table styles
+  transactionTableContainer: {
+    paddingHorizontal: 10,
+    flex: 1
   },
   rowFrontVisible: {
     backgroundColor: '#FFF',
@@ -228,10 +230,6 @@ const styles = {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    width: '100%', // Ensures it takes the full width,
-  },
-  textContainer: {
-    justifyContent: 'center',
   },
   dateText: {
     fontWeight: '500',
@@ -245,6 +243,8 @@ const styles = {
     fontWeight: 'bold',
     textAlign: 'right',
   },
+
+  //styles for when you swipe on a transaction
   rowBack: {
     alignItems: 'center',
     backgroundColor: '#DDD',
@@ -267,12 +267,21 @@ const styles = {
     borderBottomRightRadius: 5,
     height: 50,
   },
+  trash: {
+    height: 25,
+    width: 25,
+    marginRight: 7,
+  },
+
+  //add transaction button
   addButton: {
     padding: 2,
     backgroundColor: 'purple',
     borderRadius: 5,
     marginRight: 16,
   },
+
+  //current balance
   balanceContainer: {
     padding: 10,
     backgroundColor: 'purple',
