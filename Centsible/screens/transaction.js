@@ -167,12 +167,13 @@ export default function TransactionScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-    {/* <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}> */}
       {/* Balance Section */}
       <View style={styles.balanceContainer}>
-        <Text style={styles.balanceText}>Current Balance: ${calculateBalance()}</Text>
+        <Text style={styles.balanceText}>Current Balance:</Text>
+        <Text style={styles.balanceAmount}>${calculateBalance()}</Text>
       </View>
 
+      {/* Input Transaction Screen */}
       <TransactionModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)} // Close the modal
@@ -190,6 +191,7 @@ export default function TransactionScreen({ navigation }) {
         handleIndexChange={handleIndexChange}
       />
 
+      {/* Transaction Table */}
       <View style={styles.transactionTableContainer}>
         <SwipeListView
           data={transactions}
@@ -208,15 +210,16 @@ const styles = {
   //entire screen 
   container: {
     backgroundColor: '#e8d0f4',
-    flex: 1, 
-    justifyContent: 'center', 
-    alignItems: 'center' 
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
   },
 
   //transaction table styles
   transactionTableContainer: {
     paddingHorizontal: 10,
-    flex: 1
+    flex: 1,
+    marginTop: 7,
   },
   rowFrontVisible: {
     backgroundColor: '#FFF',
@@ -285,13 +288,21 @@ const styles = {
   balanceContainer: {
     padding: 10,
     backgroundColor: 'purple',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    width: '100%'
+    width: '100%',
+    flexDirection: 'row',
+    paddingLeft: 14,
+    paddingRight: 14,
   },
   balanceText: {
-    color: 'white',
-    fontSize: 20,
+    fontSize: 18,
+    color: 'white', // Color for the text
+    fontWeight: 'bold', // Adjust as needed
+  },
+  balanceAmount: {
+    fontSize: 18,
+    color: 'white', // Adjust based on how you want the amount to look
     fontWeight: 'bold',
   },
 };
