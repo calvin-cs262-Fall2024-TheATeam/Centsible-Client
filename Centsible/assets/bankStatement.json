@@ -1,0 +1,205 @@
+{
+    "account": "Student Checking",
+    "statementPeriod": "2023-10-01 to 2024-10-31",
+    "transactions": [
+      {
+        "date": "2023-10-05",
+        "description": "Part-time Job Paycheck",
+        "category": "Income",
+        "amount": 520
+      },
+      {
+        "date": "2023-10-10",
+        "description": "Rent Payment",
+        "category": "Rent",
+        "amount": -650
+      },
+      {
+        "date": "2023-10-15",
+        "description": "Grocery Store",
+        "category": "Groceries",
+        "amount": -90
+      },
+      {
+        "date": "2023-10-20",
+        "description": "Textbook Purchase",
+        "category": "Education",
+        "amount": -120
+      },
+      
+    
+      {
+        "date": "2023-11-03",
+        "description": "Streaming Subscription",
+        "category": "Entertainment",
+        "amount": -12.99
+      },
+      {
+        "date": "2023-11-10",
+        "description": "Coffee Shop",
+        "category": "Food & Drink",
+        "amount": -8.5
+      },
+      {
+        "date": "2023-11-25",
+        "description": "Utility Bill - Electricity",
+        "category": "Utilities",
+        "amount": -50
+      },
+  
+
+      {
+        "date": "2023-12-01",
+        "description": "Holiday Gifts",
+        "category": "Gifts",
+        "amount": -75
+      },
+      {
+        "date": "2023-12-15",
+        "description": "Part-time Job Paycheck",
+        "category": "Income",
+        "amount": 540
+      },
+  
+     
+      {
+        "date": "2024-01-10",
+        "description": "Rent Payment",
+        "category": "Rent",
+        "amount": -650
+      },
+      {
+        "date": "2024-01-12",
+        "description": "Grocery Store",
+        "category": "Groceries",
+        "amount": -85.5
+      },
+  
+ 
+      {
+        "date": "2024-02-01",
+        "description": "Tuition Payment",
+        "category": "Education",
+        "amount": -1500
+      },
+      {
+        "date": "2024-02-15",
+        "description": "Phone Bill",
+        "category": "Utilities",
+        "amount": -30
+      },
+  
+     
+      {
+        "date": "2024-03-05",
+        "description": "Textbook Purchase",
+        "category": "Education",
+        "amount": -95
+      },
+      {
+        "date": "2024-03-20",
+        "description": "Coffee Shop",
+        "category": "Food & Drink",
+        "amount": -7
+      },
+  
+ 
+      {
+        "date": "2024-04-05",
+        "description": "Part-time Job Paycheck",
+        "category": "Income",
+        "amount": 560
+      },
+      {
+        "date": "2024-04-15",
+        "description": "Clothing Purchase",
+        "category": "Shopping",
+        "amount": -120
+      },
+  
+  
+      {
+        "date": "2024-05-01",
+        "description": "Rent Payment",
+        "category": "Rent",
+        "amount": -650
+      },
+      {
+        "date": "2024-05-20",
+        "description": "Streaming Subscription",
+        "category": "Entertainment",
+        "amount": -12.99
+      },
+  
+
+      {
+        "date": "2024-06-18",
+        "description": "Utility Bill - Internet",
+        "category": "Utilities",
+        "amount": -40
+      },
+      {
+        "date": "2024-06-20",
+        "description": "Grocery Store",
+        "category": "Groceries",
+        "amount": -95
+      },
+  
+
+      {
+        "date": "2024-07-05",
+        "description": "Part-time Job Paycheck",
+        "category": "Income",
+        "amount": 580
+      },
+      {
+        "date": "2024-07-20",
+        "description": "Public Transportation Pass",
+        "category": "Transportation",
+        "amount": -30
+      },
+  
+   
+      {
+        "date": "2024-08-15",
+        "description": "Rent Payment",
+        "category": "Rent",
+        "amount": -650
+      },
+      {
+        "date": "2024-08-25",
+        "description": "Back-to-School Supplies",
+        "category": "Education",
+        "amount": -60
+      },
+  
+ 
+      {
+        "date": "2024-09-10",
+        "description": "Gym Membership",
+        "category": "Health & Wellness",
+        "amount": -25
+      },
+      {
+        "date": "2024-09-15",
+        "description": "Grocery Store",
+        "category": "Groceries",
+        "amount": -88
+      },
+  
+   
+      {
+        "date": "2024-10-10",
+        "description": "Part-time Job Paycheck",
+        "category": "Income",
+        "amount": 600
+      },
+      {
+        "date": "2024-10-15",
+        "description": "Restaurant",
+        "category": "Food & Drink",
+        "amount": -45
+      }
+    ]
+  }
+  

@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Text, View, TouchableOpacity, Modal, TextInput, Button, Alert, FlatList, StyleSheet } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import {
+  View, Text, Animated, TouchableHighlight, TouchableOpacity, Alert
+} from 'react-native';
+import TransactionModal from '../transactionComponents/transactionModal'; // Import the modal component
 import { globalStyles } from '../styles/globalStyles';
+import { SwipeListView } from 'react-native-swipe-list-view';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export default function TransactionScreen() {
   const [modalVisible, setModalVisible] = useState(false);
@@ -9,27 +13,43 @@ export default function TransactionScreen() {
   const [date, setDate] = useState(new Date());
   const [category, setCategory] = useState('');
   const [type, setType] = useState('expense'); //setting the default to say expense
-  const [showDatePicker, setShowDatePicker] = useState(false);
   const [transactions, setTransactions] = useState([]);
+  const [selectedIndex, setSelectedIndex] = useState(0); // set state for expense/income segmented control tab
 
-  //hard coded transactions
+  //temporary hard-coded transactions
   useEffect(() => {
     const initialTransactions = [
-      { amount: 50, category: 'Groceries', type: 'expense', date: new Date(2024, 10, 15) },
-      { amount: 200, category: 'Salary', type: 'income', date: new Date(2024, 10, 10) },
-      { amount: 30, category: 'Utilities', type: 'expense', date: new Date(2024, 10, 12) },
+      { key: 1, amount: 50, category: 'Groceries', type: 'expense', date: new Date(2024, 10, 15) },
+      { key: 2, amount: 200, category: 'Salary', type: 'income', date: new Date(2024, 10, 10) },
+      { key: 3, amount: 30, category: 'Utilities', type: 'expense', date: new Date(2024, 10, 12) },
     ];
+
     setTransactions(initialTransactions);
   }, []);
 
   const handleAddTransaction = () => {
     const parsedAmount = parseFloat(amount);
+    // Validate that the amount is a positive number
     if (isNaN(parsedAmount) || parsedAmount <= 0) {
       Alert.alert("Invalid amount", "Please enter a valid amount greater than zero.");
       return;
     }
 
-    setTransactions([...transactions, { amount: parsedAmount, category, type, date }]);
+    // Create a new transaction object
+    const newTransaction = {
+      key: transactions.length.toString(),
+      amount: parsedAmount,
+      category,
+      type,
+      date,
+    };
+
+    setTransactions([newTransaction, ...transactions]);
+    resetForm();
+  };
+
+  // Resets the form fields and closes the modal
+  const resetForm = () => {
     setAmount('');
     setCategory('');
     setType('expense');
@@ -37,144 +57,196 @@ export default function TransactionScreen() {
     setModalVisible(false);
   };
 
+  // handles switching expense/income tabs in transaction
+  const handleIndexChange = (index) => {
+    setSelectedIndex(index);
+    if (index === 0) { setType('expense') };
+    if (index === 1) { setType('income') };
+  };
+
+  // Renders a single transaction item with correct layout 
+  const TransactionItem = ({ data }) => {
+    const options = { month: 'short', day: 'numeric', year: 'numeric' };
+    const formattedDate = data.item.date.toLocaleDateString('en-US', options).replace(',', '');
+
+    return (
+      <TouchableHighlight
+        style={styles.rowFrontVisible}
+      >
+        <View style={styles.itemContainer}>
+          <View style={styles.textContainer}>
+            <Text style={styles.dateText}>
+              {formattedDate.toUpperCase()}
+            </Text>
+            <Text style={styles.categoryText}>{data.item.category}</Text>
+          </View>
+          <Text style={[styles.amountText, { color: data.item.type === 'income' ? 'green' : 'black' }]}>
+            {data.item.type === 'income' ? `+${data.item.amount.toFixed(2)}` : `-${data.item.amount.toFixed(2)}`}
+          </Text>
+        </View>
+      </TouchableHighlight>
+    );
+  };
+
+  // Render function for individual transaction items
+  const renderItem = (data) => {
+    return (
+      <TransactionItem data={data} />
+    );
+  };
+
+  const closeRow = (rowMap, rowKey) => {
+    if (rowMap[rowKey]) {
+      rowMap[rowKey].closeRow();
+    }
+  };
+
+  const deleteTransaction = (rowMap, rowKey) => {
+    closeRow(rowMap, rowKey); // Close the row before deletion
+    const newData = [...transactions]; // Copy current transactions
+    const prevIndex = transactions.findIndex(item => item.key === rowKey); // Find the index of the transaction to delete
+    newData.splice(prevIndex, 1); // Remove the transaction from the list
+    setTransactions(newData); // Update state with the new list
+  };
+
+  const HiddenItemWithActions = ({ swipeAnimatedValue, onDelete }) => {
+
+    return (
+      <View style={styles.rowBack}>
+        <TouchableOpacity style={styles.trashBtn} onPress={onDelete}>
+          <Animated.View
+            style={[styles.trash, {
+              transform: [{
+                scale: swipeAnimatedValue.interpolate({
+                  inputRange: [-90, -45],
+                  outputRange: [1, 0],
+                  extrapolate: 'clamp',
+                }), }, ],
+            }, ]}>
+            <MaterialCommunityIcons
+              name="trash-can-outline"
+              size={25}
+              color="#fff"
+            />
+          </Animated.View>
+        </TouchableOpacity>
+      </View>
+    )
+  }
+
+  // Render the hidden item when swiped
+  const renderHiddenItem = (data, rowMap) => {
+    return (
+      <HiddenItemWithActions
+        data={data}
+        rowMap={rowMap}
+        onDelete={() => deleteTransaction(rowMap, data.item.key)}
+      />
+    );
+  }
+  
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       <TouchableOpacity
-        style={globalStyles.button}
-        onPress={() => setModalVisible(true)}
-      >
-        <Text
-          style={globalStyles.buttonText}>
-          Add a transaction
-        </Text>
-      </TouchableOpacity>
+         style={globalStyles.button}
+         onPress={() => setModalVisible(true)}
+       >
+         <Text
+           style={globalStyles.createTransactionText}>
+           + Add a transaction
+         </Text>
+       </TouchableOpacity>
 
-      <Modal
-        transparent={true}
-        animationType="slide"
+      <TransactionModal
         visible={modalVisible}
+        onClose={() => setModalVisible(false)} // Close the modal
+        onAdd={handleAddTransaction} // Add transaction when modal submits
+        amount={amount}
+        setAmount={setAmount}
+        category={category}
+        setCategory={setCategory}
+        type={type}
+        setType={setType}
+        date={date}
+        setDate={setDate}
         onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={globalStyles.modalContainer}>
-          <Text style={globalStyles.modalTitle}>Add Transaction Amount</Text>
-
-          <TextInput
-            placeholder="Enter amount"
-            value={amount}
-            onChangeText={setAmount}
-            keyboardType="numeric"
-            style={globalStyles.input}
-            placeholderTextColor="#888"
-            autoFocus={true} // Automatically focus the input when modal opens
-          />
-          <TextInput
-            placeholder="Enter category"
-            value={category}
-            onChangeText={setCategory}
-            style={globalStyles.input}
-            placeholderTextColor="#888"
-          />
-
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15 }}>
-            <TouchableOpacity
-              style={[globalStyles.button, type === 'expense' && { backgroundColor: 'lightgray' }]}
-              onPress={() => setType('expense')}
-            >
-              <Text style={globalStyles.buttonText}>Expense</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[globalStyles.button, type === 'income' && { backgroundColor: 'lightgray' }]}
-              onPress={() => setType('income')}
-            >
-              <Text style={globalStyles.buttonText}>Income</Text>
-            </TouchableOpacity>
-          </View>
-
-          <TouchableOpacity
-            style={globalStyles.button}
-            onPress={() => setShowDatePicker(true)}
-          >
-            <Text style={globalStyles.buttonText}>{`Select Date: ${date.toLocaleDateString()}`}</Text>
-          </TouchableOpacity>
-
-          {/* DatePicker */}
-          {showDatePicker && (
-            <DateTimePicker
-              value={date}
-              mode="date"
-              display="default"
-              onChange={(event, selectedDate) => {
-                setShowDatePicker(false);
-                if (selectedDate) {
-                  setDate(selectedDate);
-                }
-              }}
-            />
-          )}
-
-          <TouchableOpacity
-            style={globalStyles.button}
-            onPress={handleAddTransaction} >
-            <Text style={globalStyles.buttonText}>
-              Add
-            </Text>
-          </TouchableOpacity>
-          <Button title="Cancel" onPress={() => setModalVisible(false)} color="red" />
-        </View>
-      </Modal>
-
-      <FlatList
-        style={styles.flatList}
-        data={transactions.slice().reverse()}
-        keyExtractor={(item, index) => index.toString()} // Unique key for each item
-        renderItem={({ item }) => {
-          const options = { month: 'short', day: 'numeric', year: 'numeric' };
-          const formattedDate = item.date.toLocaleDateString('en-US', options).replace(',', '');
-
-          return (
-            <View>
-            <View style={styles.itemContainer}>
-              <View>
-                <Text style={styles.dateText}>
-                  {formattedDate.toUpperCase()}
-                </Text>
-                <Text>{item.category}</Text>
-              </View>
-              <Text style={[styles.amountText, { color: item.type === 'income' ? 'green' : 'red' }]}>
-                {item.type === 'income' ? `+${item.amount.toFixed(2)}` : `-${item.amount.toFixed(2)}`}
-              </Text>
-            </View>
-            <View style={styles.divider} />
-            </View>
-          );
-        }}
+        selectedIndex={selectedIndex}
+        handleIndexChange={handleIndexChange}
       />
+
+      <View style={styles.container}>
+        <SwipeListView
+          data={transactions}
+          renderItem={renderItem}
+          renderHiddenItem={renderHiddenItem}
+          rightOpenValue={-75}
+          disableRightSwipe
+        />
+      </View>
+
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  flatList: {
+const styles = {
+  container: {
     paddingHorizontal: 15,
+    flex: 1
+  },
+  trash: {
+    height: 25,
+    width: 25,
+    marginRight: 7,
+  },
+  rowFrontVisible: {
+    backgroundColor: '#FFF',
+    borderRadius: 5,
+    height: 50,
+    marginBottom: 5,
+    padding: 10,
+    width: '100%', // Full width for the item
   },
   itemContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 5,
     alignItems: 'center',
-    width: '100%',
+    width: '100%', // Ensures it takes the full width,
+  },
+  textContainer: {
+    justifyContent: 'center',
   },
   dateText: {
     fontWeight: '500',
-    paddingTop: 4,
+    paddingBottom: 2, // Space between date and category
+  },
+  categoryText: {
+    fontWeight: '400',
+    color: '#666', 
   },
   amountText: {
     fontWeight: 'bold',
+    textAlign: 'right', 
   },
-  divider: {
-    height: 1.5,
-    backgroundColor: '#ccc', // Adjust color as needed
-    marginTop: 4, // Space between amount and divider
-    width: '100%', // Full width
+  rowBack: {
+    alignItems: 'center',
+    backgroundColor: '#DDD',
+    flexDirection: 'row',
+    marginBottom: 5,
+    borderRadius: 5,
+    height: 50,
   },
-});
+  trashBtn: {
+    alignItems: 'flex-end',
+    bottom: 0,
+    justifyContent: 'center',
+    position: 'absolute',
+    top: 0,
+    width: 75,
+    paddingRight: 17,
+    backgroundColor: 'red',
+    right: 0,
+    borderTopRightRadius: 5,
+    borderBottomRightRadius: 5,
+    height: 50,
+  },
+};
