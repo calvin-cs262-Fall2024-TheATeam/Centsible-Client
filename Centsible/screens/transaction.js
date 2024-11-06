@@ -63,6 +63,15 @@ export default function TransactionScreen({ navigation }) {
     if (index === 1) { setType('income') };
   };
 
+  // Calculate current balance
+  const calculateBalance = () => {
+    return transactions.reduce((balance, transaction) => {
+      return transaction.type === 'income'
+        ? balance + transaction.amount
+        : balance - transaction.amount;
+    }, 0).toFixed(2); // Keep it two decimals
+  };
+
   // Renders a single transaction item with correct layout 
   const TransactionItem = ({ data }) => {
     const options = { month: 'short', day: 'numeric', year: 'numeric' };
@@ -161,6 +170,10 @@ export default function TransactionScreen({ navigation }) {
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      {/* Balance Section */}
+      <View style={styles.balanceContainer}>
+        <Text style={styles.balanceText}>Current Balance: ${calculateBalance()}</Text>
+      </View>
 
       <TransactionModal
         visible={modalVisible}
@@ -259,5 +272,17 @@ const styles = {
     backgroundColor: 'purple',
     borderRadius: 5,
     marginRight: 16,
+  },
+  balanceContainer: {
+    padding: 10,
+    backgroundColor: 'purple',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%'
+  },
+  balanceText: {
+    color: 'white',
+    fontSize: 20,
+    fontWeight: 'bold',
   },
 };
