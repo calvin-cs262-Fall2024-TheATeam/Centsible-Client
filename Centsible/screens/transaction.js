@@ -3,11 +3,10 @@ import {
   View, Text, Animated, TouchableHighlight, TouchableOpacity, Alert
 } from 'react-native';
 import TransactionModal from '../transactionComponents/transactionModal'; // Import the modal component
-import { globalStyles } from '../styles/globalStyles';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-export default function TransactionScreen() {
+export default function TransactionScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState(new Date());
@@ -81,7 +80,7 @@ export default function TransactionScreen() {
             <Text style={styles.categoryText}>{data.item.category}</Text>
           </View>
           <Text style={[styles.amountText, { color: data.item.type === 'income' ? 'green' : 'black' }]}>
-            {data.item.type === 'income' ? `+${data.item.amount.toFixed(2)}` : `-${data.item.amount.toFixed(2)}`}
+            {data.item.type === 'income' ? `+$${data.item.amount.toFixed(2)}` : `-$${data.item.amount.toFixed(2)}`}
           </Text>
         </View>
       </TouchableHighlight>
@@ -121,8 +120,9 @@ export default function TransactionScreen() {
                   inputRange: [-90, -45],
                   outputRange: [1, 0],
                   extrapolate: 'clamp',
-                }), }, ],
-            }, ]}>
+                }),
+              },],
+            },]}>
             <MaterialCommunityIcons
               name="trash-can-outline"
               size={25}
@@ -144,18 +144,23 @@ export default function TransactionScreen() {
       />
     );
   }
-  
+
+  // Set headerRight option dynamically
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          style={styles.addButton} // Adjust padding for placement
+          onPress={() => setModalVisible(true)} // Show the modal when pressed
+        >
+          <MaterialCommunityIcons name="plus" size={30} color="black" />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
+
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <TouchableOpacity
-         style={globalStyles.button}
-         onPress={() => setModalVisible(true)}
-       >
-         <Text
-           style={globalStyles.createTransactionText}>
-           + Add a transaction
-         </Text>
-       </TouchableOpacity>
 
       <TransactionModal
         visible={modalVisible}
@@ -221,11 +226,11 @@ const styles = {
   },
   categoryText: {
     fontWeight: '400',
-    color: '#666', 
+    color: '#666',
   },
   amountText: {
     fontWeight: 'bold',
-    textAlign: 'right', 
+    textAlign: 'right',
   },
   rowBack: {
     alignItems: 'center',
@@ -248,5 +253,11 @@ const styles = {
     borderTopRightRadius: 5,
     borderBottomRightRadius: 5,
     height: 50,
+  },
+  addButton: {
+    padding: 2,
+    backgroundColor: 'purple',
+    borderRadius: 5,
+    marginRight: 16,
   },
 };
