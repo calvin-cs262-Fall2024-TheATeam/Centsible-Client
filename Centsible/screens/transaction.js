@@ -37,7 +37,7 @@ export default function TransactionScreen() {
 
     // Create a new transaction object
     const newTransaction = {
-      key: transactions.length.toString(),
+      key: Date.now().toString(), // Use Date.now() to generate a unique key
       amount: parsedAmount,
       category,
       type,
@@ -105,8 +105,11 @@ export default function TransactionScreen() {
     closeRow(rowMap, rowKey); // Close the row before deletion
     const newData = [...transactions]; // Copy current transactions
     const prevIndex = transactions.findIndex(item => item.key === rowKey); // Find the index of the transaction to delete
-    newData.splice(prevIndex, 1); // Remove the transaction from the list
-    setTransactions(newData); // Update state with the new list
+    
+    if (prevIndex !== -1) {
+      newData.splice(prevIndex, 1); // Remove the transaction from the list
+      setTransactions(newData); // Update state with the new list
+    }
   };
 
   const HiddenItemWithActions = ({ swipeAnimatedValue, onDelete }) => {
