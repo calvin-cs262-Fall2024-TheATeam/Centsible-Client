@@ -66,7 +66,7 @@ export default function App() {
           headerTitleStyle: {
             fontSize: 22,
             fontWeight: 'bold',
-            color: 'purple',
+            color: 'black',
           },
         }}
       />
@@ -81,7 +81,7 @@ export default function App() {
           headerTitleStyle: {
             fontSize: 22,
             fontWeight: 'bold',
-            color: 'purple',
+            color: 'black',
           },
         }}
       />
@@ -96,7 +96,7 @@ export default function App() {
           headerTitleStyle: {
             fontSize: 22,
             fontWeight: 'bold',
-            color: 'purple',
+            color: 'black',
           },
         }}
       />
@@ -111,7 +111,7 @@ export default function App() {
           headerTitleStyle: {
             fontSize: 22,
             fontWeight: 'bold',
-            color: 'purple',
+            color: 'black',
           },
         }}
       />
