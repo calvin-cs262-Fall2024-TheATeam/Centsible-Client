@@ -1,6 +1,6 @@
 {
     "account": "Student Checking",
-    "statementPeriod": "2023-10-01 to 2024-10-31",
+    "statementPeriod": "2023-10-01 to 2024-10-31", 
     "transactions": [
       {
         "date": "2023-10-05",

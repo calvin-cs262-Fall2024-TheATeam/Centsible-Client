@@ -8,17 +8,19 @@ export default function ReportsScreen() {
   const [chartData, setChartData] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [details, setDetails] = useState({});
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
 
   const colors = ['#f39c12', '#3498db', '#e74c3c', '#9b59b6', '#1abc9c', '#2ecc71', '#e67e22', '#d35400'];
-
   const getColor = (index) => colors[index % colors.length];
 
   const processData = () => {
     const categoryTotals = {};
 
     bankData.transactions.forEach((transaction) => {
-      const { category, amount } = transaction;
-      if (amount < 0) { // Consider only expenses
+      const { category, amount, date } = transaction;
+      const transactionDate = new Date(date);
+      
+      if (amount < 0 && transactionDate.getMonth() === selectedMonth) { 
         if (!categoryTotals[category]) {
           categoryTotals[category] = 0;
         }
@@ -44,7 +46,11 @@ export default function ReportsScreen() {
     const categoryDetails = {};
     bankData.transactions.forEach((transaction) => {
       const { category, description, amount, date } = transaction;
-      if (amount < 0) { // Consider only expenses
+      const transactionDate = new Date(date);
+      const transactionMonth = transactionDate.getMonth() + 1;
+
+      // Monthly
+      if (amount < 0 && transactionMonth === selectedMonth) {
         if (!categoryDetails[category]) {
           categoryDetails[category] = [];
         }
@@ -53,14 +59,25 @@ export default function ReportsScreen() {
     });
 
     setDetails(categoryDetails);
-  }, []);
+  }, [selectedMonth]);
 
-  const handleCategoryPress = (category) => {
-    setSelectedCategory(category === selectedCategory ? null : category);
-  };
+  // const handleCategoryPress = (category) => {
+  //   setSelectedCategory(category === selectedCategory ? null : category);
+  // };
 
   return (
+    
     <View style={styles.container}>
+      <View style={styles.monthSelector}>
+      {Array.from({ length: 12 }, (_, i) => (
+        <TouchableOpacity key={i} onPress={() => setSelectedMonth(i + 1)}>
+          <Text style={selectedMonth === i + 1 ? styles.selectedMonthText : styles.monthText}>
+            {new Date(0, i).toLocaleString('default', { month: 'short' })}
+          </Text>
+        </TouchableOpacity>
+      ))}
+    </View>
+      
       <PieChart
         data={chartData}
         width={screenWidth}
@@ -105,6 +122,7 @@ export default function ReportsScreen() {
         ))}
       </View>
     </View>
+    
   );
 }
 
@@ -155,5 +173,31 @@ const styles = StyleSheet.create({
   },
   legendText: {
     fontSize: 14,
+    fontWeight: 'bold',
+  },
+  monthSelector: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  monthText: {
+    fontSize: 16,
+    color: '#878787',
+    fontWeight: 'bold',
+    marginHorizontal: 8,
+    paddingVertical: 5,
+  },
+  selectedMonthText: {
+    fontSize: 16,
+    marginHorizontal: 8,
+    borderRadius: 6, 
+    paddingVertical: 5,
+    paddingHorizontal: 10, 
+    color: '#B19CD9',
+    fontWeight: 'bold',
+    borderWidth: 1, 
+    borderColor: '#B19CD9', 
+    backgroundColor: '#f5f5f5',
   },
 });
