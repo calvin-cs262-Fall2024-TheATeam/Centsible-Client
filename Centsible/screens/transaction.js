@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Text, View, TouchableOpacity, Modal, TextInput, Button, Alert, FlatList } from 'react-native';
+import { Text, View, TouchableOpacity, Modal, TextInput, Alert, FlatList, ScrollView } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { globalStyles } from '../styles/globalStyles';
 
@@ -8,123 +8,103 @@ export default function TransactionScreen() {
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState(new Date());
   const [category, setCategory] = useState('');
-  const [type, setType] = useState('expense'); //setting the default to say expense
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [transactions, setTransactions] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
-  const handleAddTransaction = () => {
+  const categories = ['Food', 'Personal', 'Lifestyle', 'Pet Care', 'Child Care'];
+  const budgetRemaining = 260; // Example remaining budget
+
+  const currentMonthYear = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric', day: '2-digit' });
+
+
+  const handleAddTransaction = (category) => {
     const parsedAmount = parseFloat(amount);
     if (isNaN(parsedAmount) || parsedAmount <= 0) {
       Alert.alert("Invalid amount", "Please enter a valid amount greater than zero.");
       return;
     }
 
-    setTransactions([...transactions, { amount: parsedAmount, category, type, date }]);
+    setTransactions([...transactions, { amount: parsedAmount, category, date }]);
     setAmount('');
-    setCategory('');
-    setType('');
+    setSelectedCategory(null);
     setDate(new Date());
-    setModalVisible(false);
   };
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <TouchableOpacity 
-        style={globalStyles.button}
-        onPress={() => setModalVisible(true)}
-        >
-        <Text 
-          style={globalStyles.buttonText}>
-            Add a transaction
-        </Text>
-      </TouchableOpacity>
+    <View style={{ flex: 1, backgroundColor: '#f2f2f2' }}>
+      {/* Header with month */}
+      <View style={{flexDirection: 'row', justifyContent: 'space-around', backgroundColor: 'purple', padding: 20 }}>
+        <Text style={{ color: 'white', fontSize: 32, fontWeight: 'bold' , align: 'center'}}>{currentMonthYear}</Text>
+      </View>
 
-      <Modal
-        transparent={true}
-        animationType="slide"
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={globalStyles.modalContainer}>
-          <Text style={globalStyles.modalTitle}>Add Transaction Amount</Text>
+      {/* Tabs for Expenses */}
+      <View style={{ flexDirection: 'row', justifyContent: 'space-around', backgroundColor: 'purple', paddingVertical: 10 }}>
+        <Text style={{ color: 'white', fontSize: 20 }}>Expenses</Text>
+      </View>
 
-          <TextInput
-            placeholder="Enter amount"
-            value={amount}
-            onChangeText={setAmount}
-            keyboardType="numeric"
-            style={globalStyles.input}
-            placeholderTextColor="#888"
-            autoFocus={true} // Automatically focus the input when modal opens
-          />
-          <TextInput
-            placeholder="Enter category"
-            value={category}
-            onChangeText={setCategory}
-            style={globalStyles.input}
-            placeholderTextColor="#888"
-          />
+      {/* Remaining budget */}
+      <Text style={{ textAlign: 'center', fontSize: 20, marginVertical: 10, fontWeight: 'bold' }}>
+        ${budgetRemaining.toFixed(2)} left to spend
+      </Text>
 
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15 }}>
-            <TouchableOpacity
-              style={[globalStyles.button, type === 'expense' && { backgroundColor: 'lightgray' }]}
-              onPress={() => setType('expense')}
-            >
-              <Text style={globalStyles.buttonText}>Expense</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[globalStyles.button, type === 'income' && { backgroundColor: 'lightgray' }]}
-              onPress={() => setType('income')}
-            >
-              <Text style={globalStyles.buttonText}>Income</Text>
-            </TouchableOpacity>
-          </View>
-
-          <TouchableOpacity 
-            style={globalStyles.button} 
-            onPress={() => setShowDatePicker(true)}
-          >
-            <Text style={globalStyles.buttonText}>{`Select Date: ${date.toLocaleDateString()}`}</Text>
-          </TouchableOpacity>
-
-          {/* DatePicker */}
-          {showDatePicker && (
-            <DateTimePicker
-              value={date}
-              mode="date"
-              display="default"
-              onChange={(event, selectedDate) => {
-                setShowDatePicker(false);
-                if (selectedDate) {
-                  setDate(selectedDate);
-                }
-              }}
-            />
-          )}
-          
-          <TouchableOpacity
-                style={globalStyles.button}
-                onPress={handleAddTransaction} >
-                <Text style={globalStyles.buttonText}>
-                    Add
+      {/* Category List with Add Expense Input */}
+      <ScrollView style={{ marginHorizontal: 20 }}>
+      {categories.map((cat) => (
+            <View key={cat} style={{ paddingVertical: 15, borderBottomWidth: 1, borderBottomColor: '#ddd' }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <Text style={{ fontSize: 18 }}>{cat}</Text>
+                <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
+                  ${transactions.filter((t) => t.category === cat).reduce((sum, t) => sum + t.amount, 0).toFixed(2)}
                 </Text>
-            </TouchableOpacity>
-          <Button title="Cancel" onPress={() => setModalVisible(false)} color="red" />
-        </View>
-      </Modal>
+              </View>
 
-      <FlatList
-      data={transactions}
-      keyExtractor={(item, index) => index.toString()} // Unique key for each item
-      renderItem={({ item }) => (
-        <View style={{ padding: 10 }}>
-          <Text>{`Amount: $${item.amount.toFixed(2)}`}</Text>
-          <Text>{`Category: ${item.category}`}</Text>
-          <Text>{`Type: ${item.type}`}</Text>
-          <Text>{`Date: ${item.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}</Text>
-        </View>
+              {/* Add Expense Section for Each Category */}
+              {selectedCategory === cat ? (
+                <View style={{ marginTop: 10 }}>
+                  <TextInput
+                    placeholder="Enter amount"
+                    value={amount}
+                    onChangeText={setAmount}
+                    keyboardType="numeric"
+                    style={globalStyles.input}
+                    placeholderTextColor="#888"
+                  />
+                  <TouchableOpacity 
+                    style={globalStyles.button} 
+                    onPress={() => handleAddTransaction(cat)}
+                  >
+                    <Text style={globalStyles.buttonText}>Add Expense</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => setSelectedCategory(null)}>
+                    <Text style={{ color: 'red', marginTop: 5, textAlign: 'center' }}>Cancel</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 10 }}>
+                  <TouchableOpacity onPress={() => setSelectedCategory(cat)}>
+                    <Text style={{ color: 'purple' }}>Add Amount</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
+          ))}
+      </ScrollView>
+
+      {/* Date Picker Modal */}
+      {showDatePicker && (
+        <DateTimePicker
+          value={date}
+          mode="date"
+          display="default"
+          onChange={(event, selectedDate) => {
+            setShowDatePicker(false);
+            if (selectedDate) {
+              setDate(selectedDate);
+            }
+          }}
+        />
       )}
-    />
     </View>
   );
 }
