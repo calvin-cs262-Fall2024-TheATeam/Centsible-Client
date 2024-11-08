@@ -1,10 +1,10 @@
-import { Text, View } from 'react-native';
+import { Text, View} from 'react-native';
 import { globalStyles } from '../styles/globalStyles';
 
-export default function ReportScreen() {
+export default function GoalsScreen() {
     return (
       <View style={globalStyles.screenText}>
-        <Text>Reports</Text>
+        <Text>Goals</Text>
       </View>
     );
-}
+  }

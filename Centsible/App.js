@@ -49,7 +49,16 @@ export default function App() {
 
   // Home tab screens
   const HomeTabs = () => (
-    <Tab.Navigator>
+    <Tab.Navigator initialRouteName="Reports">
+      <Tab.Screen
+        name="Reports"
+        component={ReportScreen}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Icon name="line-chart" color={color} size={size} />
+          ),
+        }}
+      />
       <Tab.Screen
         name="Transactions"
         component={TransactionScreen}
@@ -65,15 +74,6 @@ export default function App() {
         options={{
           tabBarIcon: ({ color, size }) => (
             <Icon name="dollar" color={color} size={size} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Reports"
-        component={ReportScreen}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="line-chart" color={color} size={size} />
           ),
         }}
       />
