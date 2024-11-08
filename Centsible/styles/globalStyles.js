@@ -39,11 +39,14 @@ export const globalStyles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 5,
-    margin: 10,
+    marginHorizontal: 10,
+    marginVertical: 5,
   },
   buttonText:{
     color: 'white',
     fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
   modalContainer: {
     flex: 1,

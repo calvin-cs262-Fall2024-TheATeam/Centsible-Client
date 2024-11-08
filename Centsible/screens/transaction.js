@@ -3,11 +3,10 @@ import {
   View, Text, Animated, TouchableHighlight, TouchableOpacity, Alert
 } from 'react-native';
 import TransactionModal from '../transactionComponents/transactionModal'; // Import the modal component
-import { globalStyles } from '../styles/globalStyles';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-export default function TransactionScreen() {
+export default function TransactionScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState(new Date());
@@ -37,7 +36,7 @@ export default function TransactionScreen() {
 
     // Create a new transaction object
     const newTransaction = {
-      key: transactions.length.toString(),
+      key: Date.now().toString(), // To generate unique key
       amount: parsedAmount,
       category,
       type,
@@ -54,6 +53,7 @@ export default function TransactionScreen() {
     setCategory('');
     setType('expense');
     setDate(new Date());
+    setSelectedIndex(0); //Resets to "Expense" (index 0)
     setModalVisible(false);
   };
 
@@ -64,27 +64,33 @@ export default function TransactionScreen() {
     if (index === 1) { setType('income') };
   };
 
+  // Calculate current balance
+  const calculateBalance = () => {
+    return transactions.reduce((balance, transaction) => {
+      return transaction.type === 'income'
+        ? balance + transaction.amount
+        : balance - transaction.amount;
+    }, 0).toFixed(2); // Keep it two decimals
+  };
+
   // Renders a single transaction item with correct layout 
   const TransactionItem = ({ data }) => {
     const options = { month: 'short', day: 'numeric', year: 'numeric' };
     const formattedDate = data.item.date.toLocaleDateString('en-US', options).replace(',', '');
 
     return (
-      <TouchableHighlight
-        style={styles.rowFrontVisible}
-      >
+      <TouchableHighlight style={styles.rowFrontVisible}>
         <View style={styles.itemContainer}>
-          <View style={styles.textContainer}>
-            <Text style={styles.dateText}>
-              {formattedDate.toUpperCase()}
-            </Text>
+          <View>
+            <Text style={styles.dateText}>{formattedDate.toUpperCase()}</Text>
             <Text style={styles.categoryText}>{data.item.category}</Text>
           </View>
           <Text style={[styles.amountText, { color: data.item.type === 'income' ? 'green' : 'black' }]}>
-            {data.item.type === 'income' ? `+${data.item.amount.toFixed(2)}` : `-${data.item.amount.toFixed(2)}`}
+            {data.item.type === 'income' ? `+$${data.item.amount.toFixed(2)}` : `-$${data.item.amount.toFixed(2)}`}
           </Text>
         </View>
       </TouchableHighlight>
+
     );
   };
 
@@ -121,8 +127,9 @@ export default function TransactionScreen() {
                   inputRange: [-90, -45],
                   outputRange: [1, 0],
                   extrapolate: 'clamp',
-                }), }, ],
-            }, ]}>
+                }),
+              },],
+            },]}>
             <MaterialCommunityIcons
               name="trash-can-outline"
               size={25}
@@ -144,19 +151,30 @@ export default function TransactionScreen() {
       />
     );
   }
-  
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <TouchableOpacity
-         style={globalStyles.button}
-         onPress={() => setModalVisible(true)}
-       >
-         <Text
-           style={globalStyles.createTransactionText}>
-           + Add a transaction
-         </Text>
-       </TouchableOpacity>
 
+  // Set headerRight option dynamically
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          style={styles.addButton} // Adjust padding for placement
+          onPress={() => setModalVisible(true)} // Show the modal when pressed
+        >
+          <MaterialCommunityIcons name="plus" size={30} color="white" />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
+
+  return (
+    <View style={styles.container}>
+      {/* Balance Section */}
+      <View style={styles.balanceContainer}>
+        <Text style={styles.balanceText}>Current Balance:</Text>
+        <Text style={styles.balanceAmount}>${calculateBalance()}</Text>
+      </View>
+
+      {/* Input Transaction Screen */}
       <TransactionModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)} // Close the modal
@@ -174,7 +192,8 @@ export default function TransactionScreen() {
         handleIndexChange={handleIndexChange}
       />
 
-      <View style={styles.container}>
+      {/* Transaction Table */}
+      <View style={styles.transactionTableContainer}>
         <SwipeListView
           data={transactions}
           renderItem={renderItem}
@@ -189,14 +208,19 @@ export default function TransactionScreen() {
 }
 
 const styles = {
+  //entire screen 
   container: {
-    paddingHorizontal: 15,
-    flex: 1
+    backgroundColor: '#e8d0f4',
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
   },
-  trash: {
-    height: 25,
-    width: 25,
-    marginRight: 7,
+
+  //transaction table styles
+  transactionTableContainer: {
+    paddingHorizontal: 10,
+    flex: 1,
+    marginTop: 7,
   },
   rowFrontVisible: {
     backgroundColor: '#FFF',
@@ -210,10 +234,8 @@ const styles = {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    width: '100%', // Ensures it takes the full width,
-  },
-  textContainer: {
-    justifyContent: 'center',
+    width: '100%',
+    flex: 1,
   },
   dateText: {
     fontWeight: '500',
@@ -221,12 +243,14 @@ const styles = {
   },
   categoryText: {
     fontWeight: '400',
-    color: '#666', 
+    color: '#666',
   },
   amountText: {
     fontWeight: 'bold',
-    textAlign: 'right', 
+    textAlign: 'right',
   },
+
+  //styles for when you swipe on a transaction
   rowBack: {
     alignItems: 'center',
     backgroundColor: '#DDD',
@@ -248,5 +272,40 @@ const styles = {
     borderTopRightRadius: 5,
     borderBottomRightRadius: 5,
     height: 50,
+  },
+  trash: {
+    height: 25,
+    width: 25,
+    marginRight: 7,
+  },
+
+  //add transaction button
+  addButton: {
+    padding: 2,
+    backgroundColor: 'purple',
+    borderRadius: 5,
+    marginRight: 16,
+  },
+
+  //current balance
+  balanceContainer: {
+    padding: 10,
+    backgroundColor: 'purple',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    flexDirection: 'row',
+    paddingLeft: 14,
+    paddingRight: 14,
+  },
+  balanceText: {
+    fontSize: 18,
+    color: 'white', // Color for the text
+    fontWeight: 'bold', // Adjust as needed
+  },
+  balanceAmount: {
+    fontSize: 18,
+    color: 'white', // Adjust based on how you want the amount to look
+    fontWeight: 'bold',
   },
 };
