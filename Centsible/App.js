@@ -49,7 +49,7 @@ export default function App() {
 
   // Home tab screens
   const HomeTabs = () => (
-    <Tab.Navigator initialRouteName="Reports">
+    <Tab.Navigator initialRouteName="Reports"
     screenOptions={{
       tabBarStyle: { backgroundColor: 'white' }, // Optional: Set the background color of the tab bar
       tabBarActiveTintColor: 'purple', // Active icon and label color
