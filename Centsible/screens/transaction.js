@@ -3,7 +3,7 @@ import { Text, View, TouchableOpacity, Modal, TextInput, Alert, FlatList, Scroll
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { globalStyles } from '../styles/globalStyles';
 
-export default function TransactionScreen() {
+export default function TransactionScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState(new Date());
@@ -20,6 +20,7 @@ export default function TransactionScreen() {
 
   const handleAddTransaction = (category) => {
     const parsedAmount = parseFloat(amount);
+    // Validate that the amount is a positive number
     if (isNaN(parsedAmount) || parsedAmount <= 0) {
       Alert.alert("Invalid amount", "Please enter a valid amount greater than zero.");
       return;
@@ -108,3 +109,106 @@ export default function TransactionScreen() {
     </View>
   );
 }
+
+const styles = {
+  //entire screen 
+  container: {
+    backgroundColor: '#e8d0f4',
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+
+  //transaction table styles
+  transactionTableContainer: {
+    paddingHorizontal: 10,
+    flex: 1,
+    marginTop: 7,
+  },
+  rowFrontVisible: {
+    backgroundColor: '#FFF',
+    borderRadius: 5,
+    height: 50,
+    marginBottom: 5,
+    padding: 10,
+    width: '100%', // Full width for the item
+  },
+  itemContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    flex: 1,
+  },
+  dateText: {
+    fontWeight: '500',
+    paddingBottom: 2, // Space between date and category
+  },
+  categoryText: {
+    fontWeight: '400',
+    color: '#666',
+  },
+  amountText: {
+    fontWeight: 'bold',
+    textAlign: 'right',
+  },
+
+  //styles for when you swipe on a transaction
+  rowBack: {
+    alignItems: 'center',
+    backgroundColor: '#DDD',
+    flexDirection: 'row',
+    marginBottom: 5,
+    borderRadius: 5,
+    height: 50,
+  },
+  trashBtn: {
+    alignItems: 'flex-end',
+    bottom: 0,
+    justifyContent: 'center',
+    position: 'absolute',
+    top: 0,
+    width: 75,
+    paddingRight: 17,
+    backgroundColor: 'red',
+    right: 0,
+    borderTopRightRadius: 5,
+    borderBottomRightRadius: 5,
+    height: 50,
+  },
+  trash: {
+    height: 25,
+    width: 25,
+    marginRight: 7,
+  },
+
+  //add transaction button
+  addButton: {
+    padding: 2,
+    backgroundColor: 'purple',
+    borderRadius: 5,
+    marginRight: 16,
+  },
+
+  //current balance
+  balanceContainer: {
+    padding: 10,
+    backgroundColor: 'purple',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    flexDirection: 'row',
+    paddingLeft: 14,
+    paddingRight: 14,
+  },
+  balanceText: {
+    fontSize: 18,
+    color: 'white', // Color for the text
+    fontWeight: 'bold', // Adjust as needed
+  },
+  balanceAmount: {
+    fontSize: 18,
+    color: 'white', // Adjust based on how you want the amount to look
+    fontWeight: 'bold',
+  },
+};
