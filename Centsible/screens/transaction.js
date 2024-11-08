@@ -53,6 +53,7 @@ export default function TransactionScreen({ navigation }) {
     setCategory('');
     setType('expense');
     setDate(new Date());
+    setSelectedIndex(0); //Resets to "Expense" (index 0)
     setModalVisible(false);
   };
 
