@@ -36,7 +36,7 @@ export default function TransactionScreen({ navigation }) {
 
     // Create a new transaction object
     const newTransaction = {
-      key: transactions.length.toString(),
+      key: Date.now().toString(), // To generate unique key
       amount: parsedAmount,
       category,
       type,
