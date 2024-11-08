@@ -49,12 +49,27 @@ export default function App() {
 
   // Home tab screens
   const HomeTabs = () => (
-    <Tab.Navigator
+    <Tab.Navigator initialRouteName="Reports">
     screenOptions={{
       tabBarStyle: { backgroundColor: 'white' }, // Optional: Set the background color of the tab bar
       tabBarActiveTintColor: 'purple', // Active icon and label color
       tabBarInactiveTintColor: 'gray', // Inactive icon and label color
     }}>
+      <Tab.Screen
+        name="Reports"
+        component={ReportScreen}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Icon name="line-chart" color={color} size={size} />
+          ),
+          headerTitle: 'Transactions',  
+          headerTitleStyle: {
+            fontSize: 22,
+            fontWeight: 'bold',
+            color: 'black',
+          },
+        }}
+      />
       <Tab.Screen
         name="Transactions"
         component={TransactionScreen}
@@ -62,7 +77,7 @@ export default function App() {
           tabBarIcon: ({ color, size }) => (
             <Icon name="credit-card" color={color} size={size} />
           ),
-          headerTitle: 'Transactions',  
+          headerTitle: 'Goals',  
           headerTitleStyle: {
             fontSize: 22,
             fontWeight: 'bold',
@@ -76,21 +91,6 @@ export default function App() {
         options={{
           tabBarIcon: ({ color, size }) => (
             <Icon name="dollar" color={color} size={size} />
-          ),
-          headerTitle: 'Goals',  
-          headerTitleStyle: {
-            fontSize: 22,
-            fontWeight: 'bold',
-            color: 'black',
-          },
-        }}
-      />
-      <Tab.Screen
-        name="Reports"
-        component={ReportScreen}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="line-chart" color={color} size={size} />
           ),
           headerTitle: 'Reports',  
           headerTitleStyle: {
