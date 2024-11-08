@@ -59,6 +59,8 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: 'bold',
+    fontStyle: 'italic',
+    color: 'purple',
     marginBottom: 24,
     textAlign: 'center',
   },

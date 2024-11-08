@@ -22,7 +22,7 @@ export default function LoginScreen({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
+      <Text style={styles.title}>Centsible</Text>
 
       <TextInput
         style={styles.input}
@@ -59,6 +59,8 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: 'bold',
+    fontStyle: 'italic',
+    color: 'purple',
     marginBottom: 24,
     textAlign: 'center',
   },
