@@ -49,7 +49,6 @@ export default function ReportsScreen() {
       const transactionDate = new Date(date);
       const transactionMonth = transactionDate.getMonth() + 1;
 
-      // Monthly
       if (amount < 0 && transactionMonth === selectedMonth) {
         if (!categoryDetails[category]) {
           categoryDetails[category] = [];
