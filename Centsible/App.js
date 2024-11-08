@@ -62,7 +62,7 @@ export default function App() {
           tabBarIcon: ({ color, size }) => (
             <Icon name="line-chart" color={color} size={size} />
           ),
-          headerTitle: 'Transactions',  
+          headerTitle: 'Reports',  
           headerTitleStyle: {
             fontSize: 22,
             fontWeight: 'bold',
@@ -77,7 +77,7 @@ export default function App() {
           tabBarIcon: ({ color, size }) => (
             <Icon name="credit-card" color={color} size={size} />
           ),
-          headerTitle: 'Goals',  
+          headerTitle: 'Transactions',  
           headerTitleStyle: {
             fontSize: 22,
             fontWeight: 'bold',
@@ -92,7 +92,7 @@ export default function App() {
           tabBarIcon: ({ color, size }) => (
             <Icon name="dollar" color={color} size={size} />
           ),
-          headerTitle: 'Reports',  
+          headerTitle: 'Goals',  
           headerTitleStyle: {
             fontSize: 22,
             fontWeight: 'bold',

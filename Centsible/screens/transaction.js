@@ -1,24 +1,32 @@
-import { useState } from 'react';
-import { Text, View, TouchableOpacity, Modal, TextInput, Alert, FlatList, ScrollView } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { globalStyles } from '../styles/globalStyles';
+import { useState, useEffect } from 'react';
+import {
+  View, Text, Animated, TouchableHighlight, TouchableOpacity, Alert
+} from 'react-native';
+import TransactionModal from '../transactionComponents/transactionModal'; // Import the modal component
+import { SwipeListView } from 'react-native-swipe-list-view';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export default function TransactionScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState(new Date());
   const [category, setCategory] = useState('');
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [type, setType] = useState('expense'); //setting the default to say expense
   const [transactions, setTransactions] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedIndex, setSelectedIndex] = useState(0); // set state for expense/income segmented control tab
 
-  const categories = ['Food', 'Personal', 'Lifestyle', 'Pet Care', 'Child Care'];
-  const budgetRemaining = 260; // Example remaining budget
+  //temporary hard-coded transactions
+  useEffect(() => {
+    const initialTransactions = [
+      { key: 1, amount: 50, category: 'Groceries', type: 'expense', date: new Date(2024, 10, 15) },
+      { key: 2, amount: 200, category: 'Salary', type: 'income', date: new Date(2024, 10, 10) },
+      { key: 3, amount: 30, category: 'Utilities', type: 'expense', date: new Date(2024, 10, 12) },
+    ];
 
-  const currentMonthYear = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric', day: '2-digit' });
+    setTransactions(initialTransactions);
+  }, []);
 
-
-  const handleAddTransaction = (category) => {
+  const handleAddTransaction = () => {
     const parsedAmount = parseFloat(amount);
     // Validate that the amount is a positive number
     if (isNaN(parsedAmount) || parsedAmount <= 0) {
@@ -26,86 +34,175 @@ export default function TransactionScreen({ navigation }) {
       return;
     }
 
-    setTransactions([...transactions, { amount: parsedAmount, category, date }]);
-    setAmount('');
-    setSelectedCategory(null);
-    setDate(new Date());
+    // Create a new transaction object
+    const newTransaction = {
+      key: Date.now().toString(), // To generate unique key
+      amount: parsedAmount,
+      category,
+      type,
+      date,
+    };
+
+    setTransactions([newTransaction, ...transactions]);
+    resetForm();
   };
 
+  // Resets the form fields and closes the modal
+  const resetForm = () => {
+    setAmount('');
+    setCategory('');
+    setType('expense');
+    setDate(new Date());
+    setSelectedIndex(0); //Resets to "Expense" (index 0)
+    setModalVisible(false);
+  };
+
+  // handles switching expense/income tabs in transaction
+  const handleIndexChange = (index) => {
+    setSelectedIndex(index);
+    if (index === 0) { setType('expense') };
+    if (index === 1) { setType('income') };
+  };
+
+  // Calculate current balance
+  const calculateBalance = () => {
+    return transactions.reduce((balance, transaction) => {
+      return transaction.type === 'income'
+        ? balance + transaction.amount
+        : balance - transaction.amount;
+    }, 0).toFixed(2); // Keep it two decimals
+  };
+
+  // Renders a single transaction item with correct layout 
+  const TransactionItem = ({ data }) => {
+    const options = { month: 'short', day: 'numeric', year: 'numeric' };
+    const formattedDate = data.item.date.toLocaleDateString('en-US', options).replace(',', '');
+
+    return (
+      <TouchableHighlight style={styles.rowFrontVisible}>
+        <View style={styles.itemContainer}>
+          <View>
+            <Text style={styles.dateText}>{formattedDate.toUpperCase()}</Text>
+            <Text style={styles.categoryText}>{data.item.category}</Text>
+          </View>
+          <Text style={[styles.amountText, { color: data.item.type === 'income' ? 'green' : 'black' }]}>
+            {data.item.type === 'income' ? `+$${data.item.amount.toFixed(2)}` : `-$${data.item.amount.toFixed(2)}`}
+          </Text>
+        </View>
+      </TouchableHighlight>
+
+    );
+  };
+
+  // Render function for individual transaction items
+  const renderItem = (data) => {
+    return (
+      <TransactionItem data={data} />
+    );
+  };
+
+  const closeRow = (rowMap, rowKey) => {
+    if (rowMap[rowKey]) {
+      rowMap[rowKey].closeRow();
+    }
+  };
+
+  const deleteTransaction = (rowMap, rowKey) => {
+    closeRow(rowMap, rowKey); // Close the row before deletion
+    const newData = [...transactions]; // Copy current transactions
+    const prevIndex = transactions.findIndex(item => item.key === rowKey); // Find the index of the transaction to delete
+    newData.splice(prevIndex, 1); // Remove the transaction from the list
+    setTransactions(newData); // Update state with the new list
+  };
+
+  const HiddenItemWithActions = ({ swipeAnimatedValue, onDelete }) => {
+
+    return (
+      <View style={styles.rowBack}>
+        <TouchableOpacity style={styles.trashBtn} onPress={onDelete}>
+          <Animated.View
+            style={[styles.trash, {
+              transform: [{
+                scale: swipeAnimatedValue.interpolate({
+                  inputRange: [-90, -45],
+                  outputRange: [1, 0],
+                  extrapolate: 'clamp',
+                }),
+              },],
+            },]}>
+            <MaterialCommunityIcons
+              name="trash-can-outline"
+              size={25}
+              color="#fff"
+            />
+          </Animated.View>
+        </TouchableOpacity>
+      </View>
+    )
+  }
+
+  // Render the hidden item when swiped
+  const renderHiddenItem = (data, rowMap) => {
+    return (
+      <HiddenItemWithActions
+        data={data}
+        rowMap={rowMap}
+        onDelete={() => deleteTransaction(rowMap, data.item.key)}
+      />
+    );
+  }
+
+  // Set headerRight option dynamically
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          style={styles.addButton} // Adjust padding for placement
+          onPress={() => setModalVisible(true)} // Show the modal when pressed
+        >
+          <MaterialCommunityIcons name="plus" size={30} color="white" />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
+
   return (
-    <View style={{ flex: 1, backgroundColor: '#f2f2f2' }}>
-      {/* Header with month */}
-      <View style={{flexDirection: 'row', justifyContent: 'space-around', backgroundColor: 'purple', padding: 20 }}>
-        <Text style={{ color: 'white', fontSize: 32, fontWeight: 'bold' , align: 'center'}}>{currentMonthYear}</Text>
+    <View style={styles.container}>
+      {/* Balance Section */}
+      <View style={styles.balanceContainer}>
+        <Text style={styles.balanceText}>Current Balance:</Text>
+        <Text style={styles.balanceAmount}>${calculateBalance()}</Text>
       </View>
 
-      {/* Tabs for Expenses */}
-      <View style={{ flexDirection: 'row', justifyContent: 'space-around', backgroundColor: 'purple', paddingVertical: 10 }}>
-        <Text style={{ color: 'white', fontSize: 20 }}>Expenses</Text>
-      </View>
+      {/* Input Transaction Screen */}
+      <TransactionModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)} // Close the modal
+        onAdd={handleAddTransaction} // Add transaction when modal submits
+        amount={amount}
+        setAmount={setAmount}
+        category={category}
+        setCategory={setCategory}
+        type={type}
+        setType={setType}
+        date={date}
+        setDate={setDate}
+        onRequestClose={() => setModalVisible(false)}
+        selectedIndex={selectedIndex}
+        handleIndexChange={handleIndexChange}
+      />
 
-      {/* Remaining budget */}
-      <Text style={{ textAlign: 'center', fontSize: 20, marginVertical: 10, fontWeight: 'bold' }}>
-        ${budgetRemaining.toFixed(2)} left to spend
-      </Text>
-
-      {/* Category List with Add Expense Input */}
-      <ScrollView style={{ marginHorizontal: 20 }}>
-      {categories.map((cat) => (
-            <View key={cat} style={{ paddingVertical: 15, borderBottomWidth: 1, borderBottomColor: '#ddd' }}>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <Text style={{ fontSize: 18 }}>{cat}</Text>
-                <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
-                  ${transactions.filter((t) => t.category === cat).reduce((sum, t) => sum + t.amount, 0).toFixed(2)}
-                </Text>
-              </View>
-
-              {/* Add Expense Section for Each Category */}
-              {selectedCategory === cat ? (
-                <View style={{ marginTop: 10 }}>
-                  <TextInput
-                    placeholder="Enter amount"
-                    value={amount}
-                    onChangeText={setAmount}
-                    keyboardType="numeric"
-                    style={globalStyles.input}
-                    placeholderTextColor="#888"
-                  />
-                  <TouchableOpacity 
-                    style={globalStyles.button} 
-                    onPress={() => handleAddTransaction(cat)}
-                  >
-                    <Text style={globalStyles.buttonText}>Add Expense</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => setSelectedCategory(null)}>
-                    <Text style={{ color: 'red', marginTop: 5, textAlign: 'center' }}>Cancel</Text>
-                  </TouchableOpacity>
-                </View>
-              ) : (
-                <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 10 }}>
-                  <TouchableOpacity onPress={() => setSelectedCategory(cat)}>
-                    <Text style={{ color: 'purple' }}>Add Amount</Text>
-                  </TouchableOpacity>
-                </View>
-              )}
-            </View>
-          ))}
-      </ScrollView>
-
-      {/* Date Picker Modal */}
-      {showDatePicker && (
-        <DateTimePicker
-          value={date}
-          mode="date"
-          display="default"
-          onChange={(event, selectedDate) => {
-            setShowDatePicker(false);
-            if (selectedDate) {
-              setDate(selectedDate);
-            }
-          }}
+      {/* Transaction Table */}
+      <View style={styles.transactionTableContainer}>
+        <SwipeListView
+          data={transactions}
+          renderItem={renderItem}
+          renderHiddenItem={renderHiddenItem}
+          rightOpenValue={-75}
+          disableRightSwipe
         />
-      )}
+      </View>
+
     </View>
   );
 }
