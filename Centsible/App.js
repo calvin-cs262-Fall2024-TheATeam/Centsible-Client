@@ -63,11 +63,11 @@ export default function App() {
             <Icon name="line-chart" color={color} size={size} />
           ),
           headerTitle: 'Reports',  
-          headerTitleStyle: {
-            fontSize: 22,
-            fontWeight: 'bold',
-            color: 'black',
-          },
+          // headerTitleStyle: {
+          //   fontSize: 20,
+          //   fontWeight: 'bold',
+          //   color: 'black',
+          // },
         }}
       />
       <Tab.Screen
@@ -78,11 +78,11 @@ export default function App() {
             <Icon name="credit-card" color={color} size={size} />
           ),
           headerTitle: 'Transactions',  
-          headerTitleStyle: {
-            fontSize: 22,
-            fontWeight: 'bold',
-            color: 'black',
-          },
+          // headerTitleStyle: {
+          //   fontSize: 20,
+          //   fontWeight: 'bold',
+          //   color: 'black',
+          // },
         }}
       />
       <Tab.Screen
@@ -93,11 +93,11 @@ export default function App() {
             <Icon name="dollar" color={color} size={size} />
           ),
           headerTitle: 'Goals',  
-          headerTitleStyle: {
-            fontSize: 22,
-            fontWeight: 'bold',
-            color: 'black',
-          },
+          // headerTitleStyle: {
+          //   fontSize: 20,
+          //   fontWeight: 'bold',
+          //   color: 'black',
+          // },
         }}
       />
       <Tab.Screen
@@ -108,11 +108,11 @@ export default function App() {
             <Icon name="user" color={color} size={size} />
           ),
           headerTitle: 'Profile',  
-          headerTitleStyle: {
-            fontSize: 22,
-            fontWeight: 'bold',
-            color: 'black',
-          },
+          // headerTitleStyle: {
+          //   fontSize: 20,
+          //   fontWeight: 'bold',
+          //   color: 'black',
+          // },
         }}
       />
     </Tab.Navigator>
