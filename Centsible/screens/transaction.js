@@ -191,7 +191,7 @@ export default function TransactionScreen({ navigation }) {
     const isExpanded = expandedTransaction === data.item.key;
     return (
       <View style={[styles.rowBack, { height: isExpanded ? 70 : 60 }]}>
-        <TouchableOpacity style={styles.trashBtn} onPress={onDelete}>
+        <TouchableOpacity style={[styles.trashBtn, { height: isExpanded ? 70 : 60 }]} onPress={onDelete}>
           <Animated.View
             style={[styles.trash, {
               transform: [{
@@ -204,7 +204,7 @@ export default function TransactionScreen({ navigation }) {
             },]}>
             <MaterialCommunityIcons
               name="trash-can-outline"
-              size={25}
+              size={35}
               color="#fff"
             />
           </Animated.View>
@@ -359,9 +359,9 @@ const styles = {
     height: 50,
   },
   trash: {
-    height: 25,
-    width: 25,
-    marginRight: 7,
+    height: 35,
+    width: 35,
+    marginRight: 3,
   },
 
   //add transaction button
