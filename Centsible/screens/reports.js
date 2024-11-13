@@ -35,7 +35,7 @@ export default function ReportsScreen() {
       name: category,
       population: categoryTotals[category],
       color: getColor(index),
-      legendFontColor: '#333',
+      legendFontColor: '#000',
       legendFontSize: 12,
       percentage: ((categoryTotals[category] / totalSpending) * 100).toFixed(1),
     }));
@@ -65,54 +65,24 @@ export default function ReportsScreen() {
   }, [selectedMonth]);
 
   return (
-    <ScrollView style={styles.container}>
-      {/* Month Selector Dropdown */}
-      <Picker
-        selectedValue={selectedMonth}
-        onValueChange={(itemValue) => setSelectedMonth(itemValue)}
-        style={styles.picker}
-      >
-        {Array.from({ length: 12 }, (_, i) => (
-          <Picker.Item
-            key={i}
-            label={new Date(0, i).toLocaleString('default', { month: 'long' })}
-            value={i + 1}
-          />
-        ))}
-      </Picker>
+    <View style={styles.container}>
+      <PieChart
+        data={chartData}
+        width={screenWidth}
+        height={220}
+        chartConfig={{
+          backgroundColor: '#1cc910',
+          backgroundGradientFrom: '#eff3ff',
+          backgroundGradientTo: '#efefef',
+          color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+          labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+        }}
+        accessor="population"
+        backgroundColor="transparent"
+        paddingLeft="15"
+        absolute
+      />
 
-      {/* Donut Chart Section */}
-      <View style={styles.chartContainer}>
-        <Text style={styles.chartTitle}>Spending Breakdown for {new Date(0, selectedMonth - 1).toLocaleString('default', { month: 'long' })}</Text>
-        <PieChart
-          data={chartData}
-          width={screenWidth - 40}
-          height={220}
-          chartConfig={{
-            backgroundColor: '#fff',
-            color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-          }}
-          accessor="population"
-          backgroundColor="transparent"
-          paddingLeft="15"
-          hasLegend={false}
-          center={[50, 0]}
-          absolute
-        />
-        <FlatList
-          data={chartData}
-          keyExtractor={(item) => item.name}
-          renderItem={({ item }) => (
-            <View style={styles.legendItem}>
-              <View style={[styles.legendColor, { backgroundColor: item.color }]} />
-              <Text style={styles.legendText}>{item.name}: {item.percentage}%</Text>
-            </View>
-          )}
-        />
-      </View>
-
-      {/* Details Section */}
       {selectedCategory && (
         <View style={styles.detailsContainer}>
           <Text style={styles.detailsTitle}>Details for {selectedCategory}</Text>
@@ -155,15 +125,7 @@ const styles = StyleSheet.create({
   legendItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 5,
-  },
-  legendColor: {
-    width: 16,
-    height: 16,
-    marginRight: 8,
-  },
-  legendText: {
-    fontSize: 14,
+    paddingTop: 20,
   },
   detailsContainer: {
     padding: 20,

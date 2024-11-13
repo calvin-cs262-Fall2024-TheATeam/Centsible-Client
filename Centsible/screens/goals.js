@@ -74,7 +74,7 @@ const SubCategoryList = ({ subcategories, onAddTransaction, transactions, onAddS
                 autoFocus
               />
             ) : (
-              <Text style={styles.amountText}>
+              <Text style={styles.subAmountText}>
                 ${parseFloat(amounts[subcat] || '0').toFixed(2)} {/* Show amount with two decimals */}
               </Text>
             )}
@@ -199,24 +199,30 @@ const styles = {
   container: {
     backgroundColor: '#e8d0f4',
     flex: 1,
-    paddingHorizontal: 10,
   },
+  
+  // header and headerText are purple bar at the top
   header: {
-    padding: 20,
+    padding: 10,
+    marginLeft: 0,
     backgroundColor: 'purple',
-    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    flexDirection: 'row',
+    paddingLeft: 14,
+    paddingRight: 14,
   },
   headerText: {
+    fontSize: 18,
     color: 'white',
-    fontSize: 28,
     fontWeight: 'bold',
   },
   remainingBudgetText: {
     color: 'purple',
     fontSize: 20,
-    textAlign: 'center',
+    textAlign: 'left',
     fontWeight: 'bold',
-    marginVertical: 15,
+    margin: 15,
   },
   warningText: {
     color: 'red',
@@ -228,7 +234,9 @@ const styles = {
     flex: 1,
   },
   categoryContainer: {
-    marginBottom: 20,
+    marginBottom: 10,
+    marginRight: 10,
+    marginLeft: 10,
     padding: 10,
     borderWidth: 1,
     borderColor: '#ddd',
@@ -243,14 +251,19 @@ const styles = {
     marginBottom: 10,
   },
   categoryTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#333',
   },
   amountText: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#333',
+  },
+  subAmountText: {
     color: 'purple',
+    fontSize: 18,
+    // fontWeight: '',
   },
   subCategoryContainer: {
     paddingLeft: 10,
