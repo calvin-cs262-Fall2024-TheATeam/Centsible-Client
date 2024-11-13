@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, FlatList, ScrollView } from 'react-native';
 import { PieChart } from 'react-native-chart-kit';
 import bankData from '../assets/bankStatement.json';
+import { Picker } from '@react-native-picker/picker';
 
 export default function ReportsScreen() {
   const screenWidth = Dimensions.get('window').width;
@@ -15,12 +16,12 @@ export default function ReportsScreen() {
 
   const processData = () => {
     const categoryTotals = {};
-
     bankData.transactions.forEach((transaction) => {
       const { category, amount, date } = transaction;
       const transactionDate = new Date(date);
-      
-      if (amount < 0 && transactionDate.getMonth() === selectedMonth) { 
+      const transactionMonth = transactionDate.getMonth() + 1;
+
+      if (amount < 0 && transactionMonth === selectedMonth) {
         if (!categoryTotals[category]) {
           categoryTotals[category] = 0;
         }
@@ -28,12 +29,15 @@ export default function ReportsScreen() {
       }
     });
 
+    const totalSpending = Object.values(categoryTotals).reduce((sum, value) => sum + value, 0);
+
     const chartData = Object.keys(categoryTotals).map((category, index) => ({
       name: category,
       population: categoryTotals[category],
       color: getColor(index),
       legendFontColor: '#333',
       legendFontSize: 12,
+      percentage: ((categoryTotals[category] / totalSpending) * 100).toFixed(1),
     }));
 
     return chartData;
@@ -60,105 +64,93 @@ export default function ReportsScreen() {
     setDetails(categoryDetails);
   }, [selectedMonth]);
 
-  // const handleCategoryPress = (category) => {
-  //   setSelectedCategory(category === selectedCategory ? null : category);
-  // };
-
   return (
-    
-    <View style={styles.container}>
-      <View style={styles.monthSelector}>
-      {Array.from({ length: 12 }, (_, i) => (
-        <TouchableOpacity key={i} onPress={() => setSelectedMonth(i + 1)}>
-          <Text style={selectedMonth === i + 1 ? styles.selectedMonthText : styles.monthText}>
-            {new Date(0, i).toLocaleString('default', { month: 'short' })}
-          </Text>
-        </TouchableOpacity>
-      ))}
-    </View>
-      
-      <PieChart
-        data={chartData}
-        width={screenWidth}
-        height={220}
-        chartConfig={{
-          backgroundColor: '#1cc910',
-          backgroundGradientFrom: '#eff3ff',
-          backgroundGradientTo: '#efefef',
-          color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-          labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-        }}
-        accessor="population"
-        backgroundColor="transparent"
-        paddingLeft="15"
-        absolute
-      />
+    <ScrollView style={styles.container}>
+      {/* Month Selector Dropdown */}
+      <Picker
+        selectedValue={selectedMonth}
+        onValueChange={(itemValue) => setSelectedMonth(itemValue)}
+        style={styles.picker}
+      >
+        {Array.from({ length: 12 }, (_, i) => (
+          <Picker.Item
+            key={i}
+            label={new Date(0, i).toLocaleString('default', { month: 'long' })}
+            value={i + 1}
+          />
+        ))}
+      </Picker>
 
+      {/* Donut Chart Section */}
+      <View style={styles.chartContainer}>
+        <Text style={styles.chartTitle}>Spending Breakdown for {new Date(0, selectedMonth - 1).toLocaleString('default', { month: 'long' })}</Text>
+        <PieChart
+          data={chartData}
+          width={screenWidth - 40}
+          height={220}
+          chartConfig={{
+            backgroundColor: '#fff',
+            color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+          }}
+          accessor="population"
+          backgroundColor="transparent"
+          paddingLeft="15"
+          hasLegend={false}
+          center={[50, 0]}
+          absolute
+        />
+        <FlatList
+          data={chartData}
+          keyExtractor={(item) => item.name}
+          renderItem={({ item }) => (
+            <View style={styles.legendItem}>
+              <View style={[styles.legendColor, { backgroundColor: item.color }]} />
+              <Text style={styles.legendText}>{item.name}: {item.percentage}%</Text>
+            </View>
+          )}
+        />
+      </View>
+
+      {/* Details Section */}
       {selectedCategory && (
         <View style={styles.detailsContainer}>
-          <Text style={styles.detailsTitle}>What You Spent on {selectedCategory}</Text>
+          <Text style={styles.detailsTitle}>Details for {selectedCategory}</Text>
           <FlatList
             data={details[selectedCategory]}
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item }) => (
               <View style={styles.detailItem}>
-                <Text style={styles.description}>{item.description}       {item.date}</Text>
+                <Text style={styles.description}>{item.description} - {item.date}</Text>
                 <Text style={styles.amount}>${item.amount.toFixed(2)}</Text>
               </View>
             )}
           />
         </View>
       )}
-
-      <View style={styles.legendContainer}>
-        {chartData.map((item, index) => (
-          <TouchableOpacity key={index} onPress={() => handleCategoryPress(item.name)}>
-            <View style={styles.legendItem}>
-              <View style={[styles.legendColor, { backgroundColor: item.color }]} />
-              <Text style={styles.legendText}>{item.name}</Text>
-            </View>
-          </TouchableOpacity>
-        ))}
-      </View>
-    </View>
-    
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    paddingTop: 20,
+    padding: 20,
   },
-  detailsContainer: {
-    marginTop: 20,
-    padding: 10,
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    width: '90%',
+  picker: {
+    marginBottom: 20,
   },
-  detailsTitle: {
+  chartContainer: {
+    backgroundColor: '#f0f0f0',
+    padding: 20,
+    borderRadius: 10,
+    marginBottom: 20,
+  },
+  chartTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
     textAlign: 'center',
-  },
-  detailItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginVertical: 5,
-  },
-  description: {
-    fontSize: 14,
-  },
-  amount: {
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  legendContainer: {
-    marginTop: 20,
-    width: '90%',
   },
   legendItem: {
     flexDirection: 'row',
@@ -172,31 +164,28 @@ const styles = StyleSheet.create({
   },
   legendText: {
     fontSize: 14,
-    fontWeight: 'bold',
   },
-  monthSelector: {
+  detailsContainer: {
+    padding: 20,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+  },
+  detailsTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  detailItem: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    marginBottom: 20,
+    justifyContent: 'space-between',
+    marginVertical: 5,
   },
-  monthText: {
-    fontSize: 16,
-    color: '#878787',
-    fontWeight: 'bold',
-    marginHorizontal: 8,
-    paddingVertical: 5,
+  description: {
+    fontSize: 14,
   },
-  selectedMonthText: {
-    fontSize: 16,
-    marginHorizontal: 8,
-    borderRadius: 6, 
-    paddingVertical: 5,
-    paddingHorizontal: 10, 
-    color: '#B19CD9',
+  amount: {
+    fontSize: 14,
     fontWeight: 'bold',
-    borderWidth: 1, 
-    borderColor: '#B19CD9', 
-    backgroundColor: '#f5f5f5',
   },
 });
+
