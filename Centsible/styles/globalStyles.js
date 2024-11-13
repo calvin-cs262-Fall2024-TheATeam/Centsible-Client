@@ -11,7 +11,7 @@ export const globalStyles = StyleSheet.create({
     flex: 0.8, // Adjust this to control image height
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: 50, 
+    paddingTop: 50,
   },
   textContainer: {
     alignItems: 'center', // Center horizontally
@@ -23,11 +23,11 @@ export const globalStyles = StyleSheet.create({
     textAlign: 'center', // Center text alignment
   },
   screenText: {
-    flex: 1, 
-    justifyContent: 'center', 
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center'
   },
-  
+
   createTransactionText: {
     color: 'white',
     fontSize: 18,
@@ -42,17 +42,17 @@ export const globalStyles = StyleSheet.create({
     marginHorizontal: 10,
     marginVertical: 5,
   },
-  buttonText:{
+  buttonText: {
     color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
   },
   modalContainer: {
+    backgroundColor: '#e8d0f4',
     flex: 1,
     alignItems: 'center',
-    backgroundColor: '#eee',
-    padding: 20,
+    justifyContent: 'flex-start',
   },
   modalTitle: {
     fontSize: 24,
@@ -63,11 +63,11 @@ export const globalStyles = StyleSheet.create({
     color: 'white',
   },
   input: {
-    width: '100%',
+    width: '96%',
     padding: 10,
     borderWidth: 1,
     borderColor: '#ccc',
-    backgroundColor:'white',
+    backgroundColor: 'white',
     borderRadius: 5,
     marginTop: 15,
   },
@@ -79,11 +79,12 @@ export const globalStyles = StyleSheet.create({
     paddingRight: 10,
     marginBottom: 15,
   },
-  
+
   tabStyle: {
     backgroundColor: 'white',
     borderColor: 'gray',
     padding: 3,
+    height: 35,
   },
 
   // expense/income seg control tab
@@ -116,10 +117,11 @@ export const globalStyles = StyleSheet.create({
     position: 'absolute',
     right: 15,
   },
-  
+
   // header for transaction input
   transactionHeader: {
     width: '100%',
+    height: 90,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -127,7 +129,8 @@ export const globalStyles = StyleSheet.create({
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
     paddingHorizontal: 5,  // Ensure there's padding on the sides
-    marginBottom: 10
+    marginBottom: 10,
+    paddingTop: 40,
   },
 
   transactionHeaderText: {
@@ -135,5 +138,37 @@ export const globalStyles = StyleSheet.create({
     fontWeight: '600',
     color: '#333',
     textAlign: 'center',  // Center the text within the header
+  },
+
+  categoryOption: {
+    padding: 15,
+    backgroundColor: '#FFF',
+    borderBottomWidth: 1,
+    borderColor: '#ddd',
+  },
+  categoryOptionText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  categoryModalContainer: {
+    backgroundColor: 'white',
+    marginTop: '50%',
+    borderRadius: 10,
+    padding: 20,
+    marginHorizontal: 20,
+  },
+  categoryList: {
+    maxHeight: 300,
+  },
+  closeCategoryModal: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: 'purple',
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  closeCategoryText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
