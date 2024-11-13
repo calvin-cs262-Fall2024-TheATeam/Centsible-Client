@@ -74,7 +74,7 @@ const SubCategoryList = ({ subcategories, onAddTransaction, transactions, onAddS
                 autoFocus
               />
             ) : (
-              <Text style={styles.amountText}>
+              <Text style={styles.subAmountText}>
                 ${parseFloat(amounts[subcat] || '0').toFixed(2)} {/* Show amount with two decimals */}
               </Text>
             )}
@@ -251,14 +251,19 @@ const styles = {
     marginBottom: 10,
   },
   categoryTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#333',
   },
   amountText: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#333',
+  },
+  subAmountText: {
     color: 'purple',
+    fontSize: 18,
+    // fontWeight: '',
   },
   subCategoryContainer: {
     paddingLeft: 10,
