@@ -30,7 +30,7 @@ export default function ReportsScreen() {
       name: category,
       population: categoryTotals[category],
       color: getColor(index),
-      legendFontColor: '#333',
+      legendFontColor: '#000',
       legendFontSize: 12,
     }));
 
@@ -61,6 +61,10 @@ export default function ReportsScreen() {
 
   return (
     <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerText}>November 2024</Text>
+      </View>
+      
       <PieChart
         data={chartData}
         width={screenWidth}
@@ -112,7 +116,23 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    paddingTop: 20,
+    backgroundColor: '#e8d0f4',
+  },
+  // header and headerText are purple bar at the top
+  header: {
+    padding: 10,
+    marginLeft: 0,
+    backgroundColor: 'purple',
+    justifyContent: 'center',
+    width: '100%',
+    flexDirection: 'row',
+    paddingLeft: 14,
+    paddingRight: 14,
+  },
+  headerText: {
+    fontSize: 18,
+    color: 'white',
+    fontWeight: 'bold',
   },
   detailsContainer: {
     marginTop: 20,
