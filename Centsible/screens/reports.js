@@ -103,10 +103,13 @@ export default function ReportsScreen() {
   }, []);
 
   const handleCategoryPress = (category) => {
-    setSelectedCategory(category === selectedCategory ? null : category);
+    if (category !== 'Income') {  
+      setSelectedCategory(category === selectedCategory ? null : category);
+    }
   };
-
+  
   const sortedChartData = [...chartData].sort((a, b) => b.population - a.population);
+  const filteredChartData = chartData.filter(item => item.name !== 'Income');
 
   const subscriptions = [
     { 
@@ -132,7 +135,6 @@ export default function ReportsScreen() {
   const categoryColors = {
     "Food": "#1c43da", 
     "Entertainment": "#ffb609", 
-    "Income": "#077dd5", 
     "Subscriptions": "#FFD700",
     "Transportation":"#fbd309",
     "Housing":"#f95d6a",
@@ -200,7 +202,7 @@ export default function ReportsScreen() {
       <View style={styles.box}>
         <View style={styles.chartContainer}>
         <PieChart
-          data={sortedChartData}
+          data={sortedChartData && filteredChartData}
           width={screenWidth * 0.8}
           height={220}
           chartConfig={{
@@ -220,7 +222,7 @@ export default function ReportsScreen() {
         
         {/* Legend for the Pie Chart */}
         <View style={styles.legendContainer}>
-          {chartData.map((item, index) => (
+          {filteredChartData.map((item, index) => (
             <TouchableOpacity key={index} onPress={() => handleCategoryPress(item.name)}>
               <View style={styles.legendItem}>
                 <View style={[styles.legendColor, { backgroundColor: item.color }]} />
@@ -244,13 +246,16 @@ export default function ReportsScreen() {
             keyExtractor={(item, index) => index.toString()}
             renderItem={({ item }) => (
               <View style={styles.detailItem}>
-                <Text style={styles.description}>{item.description} {item.date.toLocaleDateString()}</Text>
+                <Text style={styles.date}>{item.date.toLocaleDateString()}</Text>
+                <Text style={styles.description}>{item.description} </Text>
                 <Text style={styles.amount}>${item.amount.toFixed(2)}</Text>
               </View>
             )}
+            contentContainerStyle={styles.scrollableContent}
           />
         </View>
       )}
+
       {/* New box */}
       <View style={styles.newBox}>
         <Text style={styles.newBoxTitle}> You're SUBSCRIBED to... </Text>
@@ -276,7 +281,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     alignItems: 'center',
     backgroundColor: '#e8d0f4',
-    justifyContent: 'center'
+    justifyContent: 'flex-start'
   },
   box: {
     backgroundColor: '#fff',
@@ -314,14 +319,21 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 14,
   },
+
   amount: {
     fontSize: 15,
     fontWeight: 'bold',
   },
+   legendContainer: {
+    flexDirection: 'column',
+    flexWrap: 'wrap',
+    marginVertical: 10,
+  },
   legendItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 5,
+    marginRight: 20,
+    marginBottom: 10,
   },
   legendColor: {
     width: 25,
@@ -337,6 +349,9 @@ const styles = StyleSheet.create({
     marginVertical: 15,
     paddingHorizontal: 15,
     borderRadius: 8,
+  },
+  scrollableContent: {
+    maxHeight: 200, 
   },
   newBox: {
     backgroundColor: '#fff',
