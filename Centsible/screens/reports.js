@@ -43,7 +43,6 @@ export default function ReportsScreen() {
     { key: '52', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 10, 15) },
     { key: '53', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 10, 22) },
     { key: '54', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 10, 29) },
-    // { key: '55', amount: 3000, category: 'Income', description: 'Summer income', type: 'income', date: new Date(2024, 9, 31) },
   ];
 
   const colors = ['#f95d6a', '#ffb609', '#fbd309', '#7cb6dc', '#1c43da', '#2e3884', '#077dd5'];
