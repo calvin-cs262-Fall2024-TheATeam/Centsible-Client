@@ -11,7 +11,6 @@ export default function ReportsScreen() {
   const [totalIncome, setTotalIncome] = useState(0);
   const [totalExpense, setTotalExpense] = useState(0);
 
-
   const initialTransactions = [
     { key: '1', amount: 200, category: 'Housing', description: 'Monthly rent', type: 'expense', date: new Date(2024, 10, 1) },
     { key: '3', amount: 5.99, category: 'Entertainment', description: 'Spotify subscription', type: 'expense', date: new Date(2024, 10, 2) },
@@ -48,7 +47,6 @@ export default function ReportsScreen() {
   ];
 
   const colors = ['#f95d6a', '#ffb609', '#fbd309', '#7cb6dc', '#1c43da', '#2e3884', '#077dd5'];
-
   const getColor = (index) => colors[index % colors.length];
 
   const processData = () => {
@@ -110,8 +108,43 @@ export default function ReportsScreen() {
 
   const sortedChartData = [...chartData].sort((a, b) => b.population - a.population);
 
+  const subscriptions = [
+    { 
+      key: '3', 
+      amount: 5.99, 
+      category: 'Entertainment', 
+      description: 'Spotify subscription', 
+      type: 'expense', 
+      date: new Date(2024, 10, 2), 
+      color: '#1DB954' 
+    },
+    { 
+      key: '23', 
+      amount: 5.67, 
+      category: 'Entertainment', 
+      description: 'Netflix subscription', 
+      type: 'expense', 
+      date: new Date(2024, 10, 13), 
+      color: '#E50914'  
+    },
+  ];
+
+  const categoryColors = {
+    "Food": "#1c43da", 
+    "Entertainment": "#ffb609", 
+    "Income": "#077dd5", 
+    "Subscriptions": "#FFD700",
+    "Transportation":"#fbd309",
+    "Housing":"#f95d6a",
+    "Education":"#2e3884",
+    "Personal": "#7cb6dc"
+  };
+  
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerText}>November 2024</Text>
+      </View>
       <Text style={styles.title}></Text>
 
     {/* Bar Chart */}
@@ -201,7 +234,11 @@ export default function ReportsScreen() {
       {/* Box for Category Details (if selected) */}
       {selectedCategory && (
         <View style={styles.box}>
-          <Text style={styles.detailsTitle}>What You Spent on {selectedCategory}</Text>
+          <Text style={[
+            styles.detailsTitle,
+            { color: categoryColors[selectedCategory] || "#000000" } 
+          ]}>What You Spent on {selectedCategory}
+        </Text>
           <FlatList
             data={details[selectedCategory]}
             keyExtractor={(item, index) => index.toString()}
@@ -214,6 +251,22 @@ export default function ReportsScreen() {
           />
         </View>
       )}
+      {/* New box */}
+      <View style={styles.newBox}>
+        <Text style={styles.newBoxTitle}> You're SUBSCRIBED to... </Text>
+        <FlatList
+          data={subscriptions}  // Use the subscription data
+          keyExtractor={(item) => item.key}  // Using the unique key for each subscription
+          renderItem={({ item }) => (
+            <View style={styles.subscriptionItem}>
+            <View style={[styles.subscriptionColor, { backgroundColor: item.color }]} />
+            <Text style={styles.subscriptionText}>{item.description}</Text>
+            <Text style={styles.subscriptionAmount}>${item.amount.toFixed(2)}</Text>
+          </View>
+        )}
+      />
+    </View>
+
     </ScrollView>
   );
 }
@@ -223,7 +276,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     alignItems: 'center',
     backgroundColor: '#e8d0f4',
-    paddingBottom: 20, 
+    justifyContent: 'center'
   },
   box: {
     backgroundColor: '#fff',
@@ -231,6 +284,21 @@ const styles = StyleSheet.create({
     width: '94%',
     padding: 15,
     marginBottom: 20,
+  },
+  header: {
+    padding: 10,
+    marginLeft: 0,
+    backgroundColor: 'purple',
+    justifyContent: 'center',
+    width: '100%',
+    flexDirection: 'row',
+    paddingLeft: 14,
+    paddingRight: 14,
+  },
+  headerText: {
+    fontSize: 18,
+    color: 'white',
+    fontWeight: 'bold',
   },
   detailsTitle: {
     fontSize: 18,
@@ -269,5 +337,34 @@ const styles = StyleSheet.create({
     marginVertical: 15,
     paddingHorizontal: 15,
     borderRadius: 8,
+  },
+  newBox: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    width: '94%',
+    padding: 15,
+    marginBottom: 20,
+  },
+  newBoxTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  newBoxContent: {
+    fontSize: 16,
+  },
+  susbcriptionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  subscriptionText: {
+    fontSize: 16,
+    flex: 1, 
+  },
+  subscriptionAmount: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
