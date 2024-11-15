@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Dimensions, TouchableOpacity, FlatList, ScrollView } from 'react-native';
 import { BarChart, PieChart } from 'react-native-chart-kit';
-import TransactionScreen from './transaction';
 
 export default function ReportsScreen() {
   const screenWidth = Dimensions.get('window').width;
