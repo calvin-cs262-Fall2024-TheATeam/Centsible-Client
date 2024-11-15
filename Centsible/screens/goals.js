@@ -53,7 +53,7 @@ const initialAmounts = {
   'Internet bill': '50'
 };
 
-const SubCategoryList = ({ subcategories, onAddTransaction, transactions, category }) => {
+const SubCategoryList = ({ subcategories, onAddTransaction, transactions, category, onAddSubcategory }) => {
   const [amounts, setAmounts] = useState(initialAmounts); // Initialize amounts with initialAmounts
   const [isEditing, setIsEditing] = useState(false); 
   const [activeSubcategory, setActiveSubcategory] = useState(null); 
@@ -99,7 +99,7 @@ const SubCategoryList = ({ subcategories, onAddTransaction, transactions, catego
   };
 
   return (
-    <ScrollView style={styles.subCategoryContainer}>
+    <View style={styles.subCategoryContainer}>
       {subcategories.map((subcat) => (
         <View key={subcat} style={styles.subCategoryItem}>
           <Text style={styles.subCategoryText}>{subcat}</Text>
@@ -145,7 +145,7 @@ const SubCategoryList = ({ subcategories, onAddTransaction, transactions, catego
           </View>
         </View>
       )}
-    </ScrollView>
+    </View>
   );
 };
 
@@ -258,21 +258,26 @@ const styles = {
     paddingHorizontal: 10,
   },
   header: {
-    padding: 20,
+    padding: 10,
+    marginLeft: 0,
     backgroundColor: 'purple',
-    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    flexDirection: 'row',
+    paddingLeft: 14,
+    paddingRight: 14,
   },
   headerText: {
+    fontSize: 18,
     color: 'white',
-    fontSize: 28,
     fontWeight: 'bold',
   },
   remainingBudgetText: {
     color: 'purple',
     fontSize: 20,
-    textAlign: 'center',
+    textAlign: 'left',
     fontWeight: 'bold',
-    marginVertical: 15,
+    margin: 15,
   },
   warningText: {
     color: 'red',
@@ -281,21 +286,38 @@ const styles = {
     marginBottom: 10,
   },
   scrollView: {
-    marginBottom: 100,
+    marginBottom: 10,
   },
   categoryContainer: {
-    paddingVertical: 10,
+    marginBottom: 10,
+    marginRight: 10,
+    marginLeft: 10,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    backgroundColor: '#fff',
+    marginHorizontal: 5,
   },
   categoryHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
   },
   categoryTitle: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#333',
   },
   amountText: {
-    fontSize: 16,
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  subAmountText: {
+    color: 'purple', // Updated to purple
+    fontSize: 18,
   },
   progressBarContainer: {
     height: 10,
@@ -308,46 +330,51 @@ const styles = {
     borderRadius: 5,
   },
   subCategoryContainer: {
-    marginTop: 10,
+    paddingLeft: 10,
+    marginBottom: 5,
+    maxHeight: 100, // Limit the height of the subcategory list for scrolling
   },
   subCategoryItem: {
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 5,
   },
   subCategoryText: {
     fontSize: 16,
-  },
-  amountText: {
-    fontSize: 16,
+    color: '#333',
   },
   input: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-    fontSize: 16,
-    padding: 5,
-    marginBottom: 10,
+    backgroundColor: '#f0f0f0',
+    padding: 10,
+    borderRadius: 5,
+    width: 220,
+    textAlign: 'right',
+    fontSize: 18,     // Font size to match the amount text
   },
   addSubcategoryText: {
     color: 'purple',
     fontSize: 16,
+    textAlign: 'left',
+    textDecorationLine: 'underline',
   },
   addSubcategoryContainer: {
-    paddingTop: 10,
+    marginTop: 10,
   },
   addSubcategoryActions: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-between', // Align Add on the left and Cancel on the right
   },
   addButton: {
-    backgroundColor: 'purple',
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 5,
+    padding: 5,
+    fontSize: 16,
+  },
+  addButtonText: {
+    color: 'purple',
   },
   cancelButtonText: {
+    color: 'red',
     fontSize: 16,
-    color: 'blue',
+    alignSelf: 'center',
   },
 };
 
