@@ -17,6 +17,7 @@
     "@react-navigation/native-stack": "^6.11.0",
     "@react-navigation/stack": "^6.4.1",
     "chart.js": "^4.4.6",
+    "d3-color": "^3.1.0",
     "expo": "~51.0.39",
     "expo-status-bar": "~1.12.1",
     "react": "18.2.0",
@@ -33,6 +34,7 @@
     "react-native-svg-charts": "^5.4.0",
     "react-native-swipe-list-view": "^3.2.9",
     "react-native-web": "~0.19.10",
+    "send": "^0.19.0",
     "victory-native": "^37.3.2"
   },
   "devDependencies": {

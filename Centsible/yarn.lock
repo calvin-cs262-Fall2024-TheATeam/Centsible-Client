@@ -2752,7 +2752,7 @@ d3-color@1:
   resolved "https://registry.yarnpkg.com/d3-color/-/d3-color-1.4.1.tgz#c52002bf8846ada4424d55d97982fef26eb3bc8a"
   integrity sha512-p2sTHSLCJI2QKunbGb7ocOh7DgTAn8IrLx21QRc/BSnodXM4sv6aLQlnfpvehFMLZEfBc6g9pH9SWQccFYfJ9Q==
 
-"d3-color@1 - 3":
+"d3-color@1 - 3", d3-color@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/d3-color/-/d3-color-3.1.0.tgz#395b2833dfac71507f12ac2f7af23bf819de24e2"
   integrity sha512-zg/chbXyeBtMQ1LbD/WSoW2DpC3I0mpmPdW+ynRTj/x2DAWYrIY7qeZIHidozwV24m4iavr15lNwIwLxRmOxhA==
@@ -2826,13 +2826,6 @@ d3-scale@^4.0.2:
     d3-interpolate "1.2.0 - 3"
     d3-time "2.1.1 - 3"
     d3-time-format "2 - 4"
-
-d3-shape@1.0.6:
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/d3-shape/-/d3-shape-1.0.6.tgz#b09e305cf0c7c6b9a98c90e6b42f62dac4bcfd5b"
-  integrity sha512-7cazlkh7DuLGJLRQK2rHS+E01J22HLriofOJbpziR5aAQjV8Yk0MPtUbSwzSEfCHjyMRdWqc3b4DvboAfW8ZQQ==
-  dependencies:
-    d3-path "1"
 
 d3-shape@3.2.0, d3-shape@^3.1.0:
   version "3.2.0"
@@ -4411,7 +4404,7 @@ join-component@^1.1.0:
 
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
   version "4.0.0"
-  resolved "https://registry.npmjs.org/js-tokens/-/js-tokens-4.0.0.tgz"
+  resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-4.0.0.tgz#19203fb59991df98e3a287050d4647cdeaf32499"
   integrity sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==
 
 js-yaml@^3.13.1:
@@ -5744,21 +5737,6 @@ react-is@^18.0.0:
   resolved "https://registry.npmjs.org/react-is/-/react-is-18.3.1.tgz"
   integrity sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==
 
-react-native-animatable@^1.3.3:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/react-native-animatable/-/react-native-animatable-1.4.0.tgz#05a259e1566081ce7d3f6fba1e92edc65f5c6160"
-  integrity sha512-DZwaDVWm2NBvBxf7I0wXKXLKb/TxDnkV53sWhCvei1pRyTX3MVFpkvdYBknNBqPrxYuAIlPxEp7gJOidIauUkw==
-  dependencies:
-    prop-types "^15.8.1"
-
-react-native-chart-kit-chz@^1.1.2:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/react-native-chart-kit-chz/-/react-native-chart-kit-chz-1.1.2.tgz#36e1eb22c044af0cbacfb3dbe2e07b4dc28ade6e"
-  integrity sha512-AJjysXBejRhoUdRi2P6ixnoxYsPZmp8/MTSISMoS1zCxSgae0R9vm010FT0NrRbgAGyRUezHF9VFj0x2HBeatA==
-  dependencies:
-    d3-shape "1.0.6"
-    react-native-funnel-chart "^1.1.5"
-
 react-native-chart-kit@^6.12.0:
   version "6.12.0"
   resolved "https://registry.npmjs.org/react-native-chart-kit/-/react-native-chart-kit-6.12.0.tgz"
@@ -5767,13 +5745,6 @@ react-native-chart-kit@^6.12.0:
     lodash "^4.17.13"
     paths-js "^0.4.10"
     point-in-polygon "^1.0.1"
-
-react-native-funnel-chart@^1.1.5:
-  version "1.1.5"
-  resolved "https://registry.yarnpkg.com/react-native-funnel-chart/-/react-native-funnel-chart-1.1.5.tgz#e035823e35aaead2dec558d00dfd75cc9df6dd2d"
-  integrity sha512-NJdddAhahOhox1raA8yfbhseSWmn4hhH5PmFwM36egzDRTcpwY1lRjKzGLnaBM9ZM/HhqRG1x4ZhD0eu8lC1sA==
-  dependencies:
-    react-native-animatable "^1.3.3"
 
 react-native-gesture-handler@~2.16.1:
   version "2.16.2"
@@ -6196,6 +6167,25 @@ send@^0.18.0:
     depd "2.0.0"
     destroy "1.2.0"
     encodeurl "~1.0.2"
+    escape-html "~1.0.3"
+    etag "~1.8.1"
+    fresh "0.5.2"
+    http-errors "2.0.0"
+    mime "1.6.0"
+    ms "2.1.3"
+    on-finished "2.4.1"
+    range-parser "~1.2.1"
+    statuses "2.0.1"
+
+send@^0.19.0:
+  version "0.19.1"
+  resolved "https://registry.yarnpkg.com/send/-/send-0.19.1.tgz#1c2563b2ee4fe510b806b21ec46f355005a369f9"
+  integrity sha512-p4rRk4f23ynFEfcD9LA0xRYngj+IyGiEYyqqOak8kaN0TvNmuxC2dcVeBn62GpCeR2CpWqyHCNScTP91QbAVFg==
+  dependencies:
+    debug "2.6.9"
+    depd "2.0.0"
+    destroy "1.2.0"
+    encodeurl "~2.0.0"
     escape-html "~1.0.3"
     etag "~1.8.1"
     fresh "0.5.2"
