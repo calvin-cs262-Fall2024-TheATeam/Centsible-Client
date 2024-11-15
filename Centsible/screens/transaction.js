@@ -12,38 +12,68 @@ export default function TransactionScreen({ navigation }) {
   const [date, setDate] = useState(new Date());
   const [category, setCategory] = useState('');
   const [type, setType] = useState('expense'); //setting the default to say expense
+  const [description, setDescription] = useState('');
   const [transactions, setTransactions] = useState([]);
+  const [expandedTransaction, setExpandedTransaction] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(0); // set state for expense/income segmented control tab
 
   //temporary hard-coded transactions
   useEffect(() => {
     const initialTransactions = [
-      { key: 1, amount: 50, category: 'Groceries', type: 'expense', date: new Date(2024, 10, 15) },
-      { key: 2, amount: 200, category: 'Salary', type: 'income', date: new Date(2024, 10, 10) },
-      { key: 3, amount: 30, category: 'Utilities', type: 'expense', date: new Date(2024, 10, 12) },
+    { key: '1', amount: 200, category: 'Housing', description: 'Monthly rent', type: 'expense', date: new Date(2024, 9, 1) },
+    { key: '4', amount: 30, category: 'Transportation', description: 'Gas for the car', type: 'expense', date: new Date(2024, 9, 3) },
+    { key: '5', amount: 50, category: 'Personal', description: 'New clothes', type: 'expense', date: new Date(2024, 9, 2) },
+    { key: '7', amount: 10, category: 'Food', description: 'Takeout dinner', type: 'expense', date: new Date(2024, 9, 3) },
+    { key: '8', amount: 60, category: 'Housing', description: 'Electricity bill', type: 'expense', date: new Date(2024, 9, 5) },
+    { key: '10', amount: 10, category: 'Food', description: 'Lunch with friends', type: 'expense', date: new Date(2024, 9, 6) },
+    { key: '12', amount: 25, category: 'Personal', description: 'Coffee and bagels', type: 'expense', date: new Date(2024, 9, 6) },
+    { key: '13', amount: 90, category: 'Food', description: 'Groceries for the week', type: 'expense', date: new Date(2024, 9, 7) },
+    { key: '14', amount: 20, category: 'Personal', description: 'Shampoo and toiletries', type: 'expense', date: new Date(2024, 9, 7) },
+    { key: '15', amount: 50, category: 'Entertainment', description: 'Weekend trip', type: 'expense', date: new Date(2024, 9, 8) },
+    { key: '16', amount: 10, category: 'Food', description: 'Fast food lunch', type: 'expense', date: new Date(2024, 9, 9) },
+    { key: '18', amount: 45, category: 'Personal', description: 'Haircut', type: 'expense', date: new Date(2024, 9, 5) },
+    { key: '21', amount: 10, category: 'Personal', description: 'Coffee at campus cafe', type: 'expense', date: new Date(2024, 9, 10) },
+    { key: '22', amount: 100, category: 'Personal', description: 'New shoes', type: 'expense', date: new Date(2024, 9, 13) },
+    { key: '22', amount: 100, category: 'Personal', description: 'Amazon', type: 'expense', date: new Date(2024, 9, 13) },
+    { key: '24', amount: 50, category: 'Food', description: 'Groceries for the week', type: 'expense', date: new Date(2024, 9, 14) },
+    { key: '25', amount: 15, category: 'Education', description: 'School supplies', type: 'expense', date: new Date(2024, 9, 14) },
+    { key: '28', amount: 50, category: 'Personal', description: 'Earrings', type: 'expense', date: new Date(2024, 9, 16) },
+    { key: '30', amount: 10, category: 'Entertainment', description: 'Sports event tickets', type: 'expense', date: new Date(2024, 9, 16) },
+    { key: '32', amount: 5, category: 'Food', description: 'Coffee shop', type: 'expense', date: new Date(2024, 9, 18) },
+    { key: '34', amount: 15, category: 'Food', description: 'Lunch with friends', type: 'expense', date: new Date(2024, 9, 19) },
+    { key: '36', amount: 50, category: 'Transportation', description: 'Gas for the car', type: 'expense', date: new Date(2024, 9, 20) },
+    { key: '38', amount: 10, category: 'Entertainment', description: 'Movie night with friends', type: 'expense', date: new Date(2024, 9, 22) },
+    { key: '47', amount: 25, category: 'Personal', description: 'Toiletries', type: 'expense', date: new Date(2024, 9, 28) },
+    { key: '48', amount: 50, category: 'Food', description: 'Groceries for the weekend', type: 'expense', date: new Date(2024, 9, 28) },
+    { key: '50', amount: 15, category: 'Entertainment', description: 'Monthly gaming subscription', type: 'expense', date: new Date(2024, 9, 30) },
+    { key: '51', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 8) },
+    { key: '52', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 15) },
+    { key: '53', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 22) },
+    { key: '54', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 29) },
+    
     ];
 
-    setTransactions(initialTransactions);
+    const sortedTransactions = initialTransactions.sort((a, b) => b.date - a.date);
+    setTransactions(sortedTransactions);
   }, []);
 
   const handleAddTransaction = () => {
     const parsedAmount = parseFloat(amount);
-    // Validate that the amount is a positive number
-    if (isNaN(parsedAmount) || parsedAmount <= 0) {
-      Alert.alert("Invalid amount", "Please enter a valid amount greater than zero.");
-      return;
-    }
 
     // Create a new transaction object
     const newTransaction = {
       key: Date.now().toString(), // To generate unique key
       amount: parsedAmount,
       category,
+      description,
       type,
       date,
     };
 
-    setTransactions([newTransaction, ...transactions]);
+    setTransactions(prevTransactions => {
+      const updatedTransactions = [newTransaction, ...prevTransactions];
+      return updatedTransactions.sort((a, b) => b.date - a.date);  // Sort by date descending
+    });
     resetForm();
   };
 
@@ -53,6 +83,7 @@ export default function TransactionScreen({ navigation }) {
     setCategory('');
     setType('expense');
     setDate(new Date());
+    setDescription('');
     setSelectedIndex(0); //Resets to "Expense" (index 0)
     setModalVisible(false);
   };
@@ -62,6 +93,14 @@ export default function TransactionScreen({ navigation }) {
     setSelectedIndex(index);
     if (index === 0) { setType('expense') };
     if (index === 1) { setType('income') };
+  };
+
+  const handleExpandTransaction = (transactionKey) => {
+    if (expandedTransaction === transactionKey) {
+      setExpandedTransaction(null);  // Collapse the transaction if it's already expanded
+    } else {
+      setExpandedTransaction(transactionKey);  // Expand the clicked transaction
+    }
   };
 
   // Calculate current balance
@@ -77,20 +116,34 @@ export default function TransactionScreen({ navigation }) {
   const TransactionItem = ({ data }) => {
     const options = { month: 'short', day: 'numeric', year: 'numeric' };
     const formattedDate = data.item.date.toLocaleDateString('en-US', options).replace(',', '');
+    const isExpanded = expandedTransaction === data.item.key;
 
     return (
-      <TouchableHighlight style={styles.rowFrontVisible}>
+      <TouchableHighlight
+        style={[styles.rowFrontVisible, { height: isExpanded ? 70 : 60 }]}  // Adjust height if expanded
+        onPress={() => handleExpandTransaction(data.item.key)} // Toggle expansion on press
+        underlayColor="#D3D3D3"
+      >
         <View style={styles.itemContainer}>
           <View>
             <Text style={styles.dateText}>{formattedDate.toUpperCase()}</Text>
-            <Text style={styles.categoryText}>{data.item.category}</Text>
+            {data.item.type === 'income' ? (
+              <Text style={[styles.categoryText, isExpanded && { paddingBottom: 0 }]}>Income</Text>
+            ) : (
+              <Text style={[styles.categoryText, isExpanded && { paddingBottom: 0 }]}>{data.item.category}</Text>
+            )}
+            {/* Render description if expanded */}
+            {isExpanded && (
+              <Text style={[styles.descriptionText, { paddingBottom: 8 }]}>
+                {data.item.description || "No description given"}
+              </Text>
+            )}
           </View>
           <Text style={[styles.amountText, { color: data.item.type === 'income' ? 'green' : 'black' }]}>
             {data.item.type === 'income' ? `+$${data.item.amount.toFixed(2)}` : `-$${data.item.amount.toFixed(2)}`}
           </Text>
         </View>
       </TouchableHighlight>
-
     );
   };
 
@@ -115,11 +168,11 @@ export default function TransactionScreen({ navigation }) {
     setTransactions(newData); // Update state with the new list
   };
 
-  const HiddenItemWithActions = ({ swipeAnimatedValue, onDelete }) => {
-
+  const HiddenItemWithActions = ({ swipeAnimatedValue, onDelete, data }) => {
+    const isExpanded = expandedTransaction === data.item.key;
     return (
-      <View style={styles.rowBack}>
-        <TouchableOpacity style={styles.trashBtn} onPress={onDelete}>
+      <View style={[styles.rowBack, { height: isExpanded ? 70 : 60 }]}>
+        <TouchableOpacity style={[styles.trashBtn, { height: isExpanded ? 70 : 60 }]} onPress={onDelete}>
           <Animated.View
             style={[styles.trash, {
               transform: [{
@@ -132,7 +185,7 @@ export default function TransactionScreen({ navigation }) {
             },]}>
             <MaterialCommunityIcons
               name="trash-can-outline"
-              size={25}
+              size={35}
               color="#fff"
             />
           </Animated.View>
@@ -183,6 +236,8 @@ export default function TransactionScreen({ navigation }) {
         setAmount={setAmount}
         category={category}
         setCategory={setCategory}
+        description={description}
+        setDescription={setDescription}
         type={type}
         setType={setType}
         date={date}
@@ -190,6 +245,7 @@ export default function TransactionScreen({ navigation }) {
         onRequestClose={() => setModalVisible(false)}
         selectedIndex={selectedIndex}
         handleIndexChange={handleIndexChange}
+        resetForm={resetForm}
       />
 
       {/* Transaction Table */}
@@ -220,14 +276,14 @@ const styles = {
   transactionTableContainer: {
     paddingHorizontal: 10,
     flex: 1,
-    marginTop: 7,
+    marginTop: 12,
+    marginBottom: 12, // Add some bottom margin
   },
   rowFrontVisible: {
     backgroundColor: '#FFF',
     borderRadius: 5,
-    height: 50,
-    marginBottom: 5,
-    padding: 10,
+    marginBottom: 10,
+    padding: 15,
     width: '100%', // Full width for the item
   },
   itemContainer: {
@@ -239,15 +295,25 @@ const styles = {
   },
   dateText: {
     fontWeight: '500',
+    paddingTop: 8,
     paddingBottom: 2, // Space between date and category
+    fontSize: 16,
   },
   categoryText: {
-    fontWeight: '400',
-    color: '#666',
+    fontWeight: '500',
+    color: '#777',
+    fontSize: 16,
+    paddingBottom: 8,
+  },
+  descriptionText: {
+    fontSize: 15,
+    color: '#888',  // Lighter color for description
+    fontWeight: '300',  // Lighter weight
   },
   amountText: {
     fontWeight: 'bold',
     textAlign: 'right',
+    fontSize: 16,
   },
 
   //styles for when you swipe on a transaction
@@ -274,9 +340,9 @@ const styles = {
     height: 50,
   },
   trash: {
-    height: 25,
-    width: 25,
-    marginRight: 7,
+    height: 35,
+    width: 35,
+    marginRight: 3,
   },
 
   //add transaction button

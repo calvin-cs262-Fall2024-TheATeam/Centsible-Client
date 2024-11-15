@@ -199,7 +199,7 @@ const BudgetPlanner = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerText}>November 2024</Text>
+        <Text style={styles.headerText}>October 2024</Text>
       </View>
 
       <Text style={styles.remainingBudgetText}>
@@ -256,6 +256,8 @@ const styles = {
     backgroundColor: '#e8d0f4',
     flex: 1,
   },
+  
+  // header and headerText are purple bar at the top
   header: {
     padding: 10,
     marginLeft: 0,

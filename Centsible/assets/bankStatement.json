@@ -1,204 +1,186 @@
 {
-    "account": "Student Checking",
-    "statementPeriod": "2023-10-01 to 2024-10-31",
-    "transactions": [
-      {
-        "date": "2023-10-05",
-        "description": "Part-time Job Paycheck",
-        "category": "Income",
-        "amount": 520
-      },
-      {
-        "date": "2023-10-10",
-        "description": "Rent Payment",
-        "category": "Rent",
-        "amount": -650
-      },
-      {
-        "date": "2023-10-15",
-        "description": "Grocery Store",
-        "category": "Groceries",
-        "amount": -90
-      },
-      {
-        "date": "2023-10-20",
-        "description": "Textbook Purchase",
-        "category": "Education",
-        "amount": -120
-      },
-      
-    
-      {
-        "date": "2023-11-03",
-        "description": "Streaming Subscription",
-        "category": "Entertainment",
-        "amount": -12.99
-      },
-      {
-        "date": "2023-11-10",
-        "description": "Coffee Shop",
-        "category": "Food & Drink",
-        "amount": -8.5
-      },
-      {
-        "date": "2023-11-25",
-        "description": "Utility Bill - Electricity",
-        "category": "Utilities",
-        "amount": -50
-      },
-  
-
-      {
-        "date": "2023-12-01",
-        "description": "Holiday Gifts",
-        "category": "Gifts",
-        "amount": -75
-      },
-      {
-        "date": "2023-12-15",
-        "description": "Part-time Job Paycheck",
-        "category": "Income",
-        "amount": 540
-      },
-  
-     
-      {
-        "date": "2024-01-10",
-        "description": "Rent Payment",
-        "category": "Rent",
-        "amount": -650
-      },
-      {
-        "date": "2024-01-12",
-        "description": "Grocery Store",
-        "category": "Groceries",
-        "amount": -85.5
-      },
-  
- 
-      {
-        "date": "2024-02-01",
-        "description": "Tuition Payment",
-        "category": "Education",
-        "amount": -1500
-      },
-      {
-        "date": "2024-02-15",
-        "description": "Phone Bill",
-        "category": "Utilities",
-        "amount": -30
-      },
-  
-     
-      {
-        "date": "2024-03-05",
-        "description": "Textbook Purchase",
-        "category": "Education",
-        "amount": -95
-      },
-      {
-        "date": "2024-03-20",
-        "description": "Coffee Shop",
-        "category": "Food & Drink",
-        "amount": -7
-      },
-  
- 
-      {
-        "date": "2024-04-05",
-        "description": "Part-time Job Paycheck",
-        "category": "Income",
-        "amount": 560
-      },
-      {
-        "date": "2024-04-15",
-        "description": "Clothing Purchase",
-        "category": "Shopping",
-        "amount": -120
-      },
-  
-  
-      {
-        "date": "2024-05-01",
-        "description": "Rent Payment",
-        "category": "Rent",
-        "amount": -650
-      },
-      {
-        "date": "2024-05-20",
-        "description": "Streaming Subscription",
-        "category": "Entertainment",
-        "amount": -12.99
-      },
-  
-
-      {
-        "date": "2024-06-18",
-        "description": "Utility Bill - Internet",
-        "category": "Utilities",
-        "amount": -40
-      },
-      {
-        "date": "2024-06-20",
-        "description": "Grocery Store",
-        "category": "Groceries",
-        "amount": -95
-      },
-  
-
-      {
-        "date": "2024-07-05",
-        "description": "Part-time Job Paycheck",
-        "category": "Income",
-        "amount": 580
-      },
-      {
-        "date": "2024-07-20",
-        "description": "Public Transportation Pass",
-        "category": "Transportation",
-        "amount": -30
-      },
-  
-   
-      {
-        "date": "2024-08-15",
-        "description": "Rent Payment",
-        "category": "Rent",
-        "amount": -650
-      },
-      {
-        "date": "2024-08-25",
-        "description": "Back-to-School Supplies",
-        "category": "Education",
-        "amount": -60
-      },
-  
- 
-      {
-        "date": "2024-09-10",
-        "description": "Gym Membership",
-        "category": "Health & Wellness",
-        "amount": -25
-      },
-      {
-        "date": "2024-09-15",
-        "description": "Grocery Store",
-        "category": "Groceries",
-        "amount": -88
-      },
-  
-   
-      {
-        "date": "2024-10-10",
-        "description": "Part-time Job Paycheck",
-        "category": "Income",
-        "amount": 600
-      },
-      {
-        "date": "2024-10-15",
-        "description": "Restaurant",
-        "category": "Food & Drink",
-        "amount": -45
+  "account": "Student Checking",
+  "statementPeriod": "2023-10-01 to 2024-10-31",
+  "transactions": [
+    {
+      "date": "2024-10-02",
+      "description": "Part-time Job Paycheck",
+      "category": "Income",
+      "amount": 310
+    },
+    {
+      "date": "2024-10-03",
+      "description": "Grocery Store",
+      "category": "Groceries",
+      "amount": -70
+    },
+    {
+      "date": "2024-10-05",
+      "description": "Textbook Purchase",
+      "category": "Education",
+      "amount": -120
+    },
+    {
+      "date": "2024-10-06",
+      "description": "Phone Bill",
+      "category": "Utilities",
+      "amount": -35
+    },
+    {
+      "date": "2024-10-07",
+      "description": "Dining Out",
+      "category": "Food",
+      "amount": -20
+    },
+    {
+      "date": "2024-10-12",
+      "description": "Spotify Subscription",
+      "category": "Entertainment",
+      "amount": -5.99
+    },
+    {
+      "date": "2024-10-13",
+      "description": "Clothing Purchase",
+      "category": "Personal",
+      "amount": -50
+    },
+    {
+      "date": "2024-10-15",
+      "description": "Coffee Shop",
+      "category": "Food",
+      "amount": -6
+    },
+    {
+      "date": "2024-10-20",
+      "description": "Grocery Store",
+      "category": "Groceries",
+      "amount": -30
+    },
+    {
+      "date": "2024-10-22",
+      "description": "Miscellaneous",
+      "category": "Miscellaneous",
+      "amount": -20
+    },
+    {
+      "date": "2024-10-23",
+      "description": "Gas Station",
+      "category": "Transportation",
+      "amount": -40
+    },
+    {
+      "date": "2024-10-25",
+      "description": "Calvin work",
+      "category": "Income",
+      "amount": 30.56
+    },
+    {
+      "date": "2024-10-28",
+      "description": "Weekend Trip (Travel)",
+      "category": "Entertainment",
+      "amount": -150
+    },
+    {
+      "date": "2024-10-30",
+      "description": "Gifts for Birthday",
+      "category": "Gifts",
+      "amount": -40
+    },
+    {
+      "date": "2024-11-01",
+      "description": "Part-time Job Paycheck",
+      "category": "Income",
+      "amount": 150
+    },
+    {
+      "date": "2024-11-02",
+      "description": "Haircut",
+      "category": "Personal",
+      "amount": -25
+    },
+    {
+      "date": "2024-11-04",
+      "description": "Rent Payment",
+      "category": "Housing",
+      "amount": -650
+    },
+    {
+      "date": "2024-11-05",
+      "description": "Streaming Subscription",
+      "category": "Entertainment",
+      "amount": -12.99
+    },
+    {
+      "date": "2024-11-06",
+      "description": "Grocery Store",
+      "category": "Groceries",
+      "amount": -45
+    },
+    {
+      "date": "2024-11-07",
+      "description": "Utility Bill - Electricity",
+      "category": "Utilities",
+      "amount": -50
+    },
+    {
+      "date": "2024-11-09",
+      "description": "Public Transportation",
+      "category": "Transportation",
+      "amount": -30
+    },
+    {
+      "date": "2024-11-11",
+      "description": "Dining Out",
+      "category": "Food",
+      "amount": -25
+    },
+    {
+      "date": "2024-11-12",
+      "description": "Coffee Shop",
+      "category": "Food",
+      "amount": -8
+    },
+    {
+      "date": "2024-11-14",
+      "description": "Textbook Purchase",
+      "category": "Education",
+      "amount": -150
+    },
+    {
+      "date": "2024-11-16",
+      "description": "Health & Wellness - Gym Membership",
+      "category": "Health",
+      "amount": -20
+    },
+    {
+      "date": "2024-11-18",
+      "description": "Gift for Friend",
+      "category": "Gifts",
+      "amount": -25
+    },
+    {
+      "date": "2024-11-20",
+      "description": "Gas Station",
+      "category": "Transportation",
+      "amount": -35
+    },
+    {
+      "date": "2024-11-22",
+      "description": "Miscellaneous - New Shoes",
+      "category": "Miscellaneous",
+      "amount": -55
+    },
+    {
+      "date": "2024-11-23",
+      "description": "Utilities - Internet",
+      "category": "Utilities",
+      "amount": -40
+    },
+    {
+      "date": "2024-11-25",
+      "description": "Utility Bill - Electricity",
+      "category": "Utilities",
+      "amount": -60
       }
     ]
   }
