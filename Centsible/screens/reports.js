@@ -13,13 +13,12 @@ export default function ReportsScreen() {
 
   const initialTransactions = [
     { key: '1', amount: 200, category: 'Housing', description: 'Monthly rent', type: 'expense', date: new Date(2024, 10, 1) },
-    { key: '3', amount: 5.99, category: 'Entertainment', description: 'Spotify subscription', type: 'expense', date: new Date(2024, 10, 2) },
     { key: '4', amount: 30, category: 'Transportation', description: 'Gas for the car', type: 'expense', date: new Date(2024, 10, 3) },
     { key: '5', amount: 50, category: 'Personal', description: 'New clothes', type: 'expense', date: new Date(2024, 10, 2) },
     { key: '7', amount: 10, category: 'Food', description: 'Takeout dinner', type: 'expense', date: new Date(2024, 10, 3) },
     { key: '8', amount: 60, category: 'Housing', description: 'Electricity bill', type: 'expense', date: new Date(2024, 10, 5) },
     { key: '10', amount: 10, category: 'Food', description: 'Lunch with friends', type: 'expense', date: new Date(2024, 10, 6) },
-    { key: '12', amount: 25, category: 'Transportation', description: 'Uber ride to campus', type: 'expense', date: new Date(2024, 10, 6) },
+    { key: '12', amount: 25, category: 'Personal', description: 'Coffee and bagels', type: 'expense', date: new Date(2024, 10, 6) },
     { key: '13', amount: 90, category: 'Food', description: 'Groceries for the week', type: 'expense', date: new Date(2024, 10, 7) },
     { key: '14', amount: 20, category: 'Personal', description: 'Shampoo and toiletries', type: 'expense', date: new Date(2024, 10, 7) },
     { key: '15', amount: 50, category: 'Entertainment', description: 'Weekend trip', type: 'expense', date: new Date(2024, 10, 8) },
@@ -27,10 +26,10 @@ export default function ReportsScreen() {
     { key: '18', amount: 45, category: 'Personal', description: 'Haircut', type: 'expense', date: new Date(2024, 10, 5) },
     { key: '21', amount: 10, category: 'Personal', description: 'Coffee at campus cafe', type: 'expense', date: new Date(2024, 10, 10) },
     { key: '22', amount: 100, category: 'Personal', description: 'New shoes', type: 'expense', date: new Date(2024, 10, 13) },
-    { key: '23', amount: 5.67, category: 'Entertainment', description: 'Netflix subscription', type: 'expense', date: new Date(2024, 10, 13) },
+    { key: '22', amount: 100, category: 'Personal', description: 'Amazon', type: 'expense', date: new Date(2024, 10, 13) },
     { key: '24', amount: 50, category: 'Food', description: 'Groceries for the week', type: 'expense', date: new Date(2024, 10, 14) },
     { key: '25', amount: 15, category: 'Education', description: 'School supplies', type: 'expense', date: new Date(2024, 10, 14) },
-    { key: '28', amount: 50, category: 'Transportation', description: 'Tolls on road trip', type: 'expense', date: new Date(2024, 10, 16) },
+    { key: '28', amount: 50, category: 'Personal', description: 'Earrings', type: 'expense', date: new Date(2024, 10, 16) },
     { key: '30', amount: 10, category: 'Entertainment', description: 'Sports event tickets', type: 'expense', date: new Date(2024, 10, 16) },
     { key: '32', amount: 5, category: 'Food', description: 'Coffee shop', type: 'expense', date: new Date(2024, 10, 18) },
     { key: '34', amount: 15, category: 'Food', description: 'Lunch with friends', type: 'expense', date: new Date(2024, 10, 19) },
@@ -144,7 +143,7 @@ export default function ReportsScreen() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerText}>November 2024</Text>
+        <Text style={styles.headerText}>October 2024</Text>
       </View>
       <Text style={styles.title}></Text>
 
@@ -255,7 +254,7 @@ export default function ReportsScreen() {
         </View>
       )}
 
-      {/* New box */}
+      {/* New box
       <View style={styles.newBox}>
         <Text style={styles.newBoxTitle}> You're SUBSCRIBED to... </Text>
         <FlatList
@@ -269,7 +268,7 @@ export default function ReportsScreen() {
           </View>
         )}
       />
-    </View>
+    </View> */}
 
     </ScrollView>
   );
@@ -318,7 +317,6 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 14,
   },
-
   amount: {
     fontSize: 15,
     fontWeight: 'bold',
@@ -365,20 +363,20 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     textAlign: 'center',
   },
-  newBoxContent: {
-    fontSize: 16,
-  },
-  susbcriptionItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  subscriptionText: {
-    fontSize: 16,
-    flex: 1, 
-  },
-  subscriptionAmount: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
+  // newBoxContent: {
+  //   fontSize: 16,
+  // },
+  // susbcriptionItem: {
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  //   marginBottom: 12,
+  // },
+  // subscriptionText: {
+  //   fontSize: 16,
+  //   flex: 1, 
+  // },
+  // subscriptionAmount: {
+  //   fontSize: 16,
+  //   fontWeight: 'bold',
+  // },
 });

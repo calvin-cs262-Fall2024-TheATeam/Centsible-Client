@@ -154,7 +154,7 @@ const BudgetPlanner = () => {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerText}>November 2024</Text>
+        <Text style={styles.headerText}>October 2024</Text>
       </View>
 
       {/* Remaining budget with warning if below zero */}

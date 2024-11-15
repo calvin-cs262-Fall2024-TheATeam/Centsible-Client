@@ -74,8 +74,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   createAccountText: {
-    color: 'blue',
+    color: 'purple',
     marginTop: 20,
+    fontWeight: 'bold',
     textAlign: 'center',
   },
 });
