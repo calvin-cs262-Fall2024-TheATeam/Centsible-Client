@@ -10,7 +10,7 @@ export default function LoginScreen({ route, navigation }) {
   const handleLogin = () => {
     setIsLoading(true);
     // Basic login simulation (replace with actual login logic)
-    if (email === 'a' && password === 'a') {
+    if (email === 'user@example.com' && password === 'password') {
       setIsLoggedIn(true);
       Alert.alert('Login Successful!');
       navigation.replace('Home'); // Navigate to the Home screen
