@@ -34,9 +34,9 @@ const initialTransactions =
     { key: '52', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 15) },
     { key: '53', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 22) },
     { key: '54', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 29) },
-    
-  
-];
+
+
+  ];
 
 const initialAmounts = {
   Groceries: '100.00',
@@ -55,14 +55,14 @@ const initialAmounts = {
 
 const SubCategoryList = ({ subcategories, onAddTransaction, transactions, category, onAddSubcategory }) => {
   const [amounts, setAmounts] = useState(initialAmounts); // Initialize amounts with initialAmounts
-  const [isEditing, setIsEditing] = useState(false); 
-  const [activeSubcategory, setActiveSubcategory] = useState(null); 
-  const [newSubcategoryName, setNewSubcategoryName] = useState(''); 
-  const [isAddingSubcategory, setIsAddingSubcategory] = useState(false); 
+  const [isEditing, setIsEditing] = useState(false);
+  const [activeSubcategory, setActiveSubcategory] = useState(null);
+  const [newSubcategoryName, setNewSubcategoryName] = useState('');
+  const [isAddingSubcategory, setIsAddingSubcategory] = useState(false);
 
   const handleAmountPress = (subcategory) => {
-    setActiveSubcategory(subcategory); 
-    setIsEditing(true); 
+    setActiveSubcategory(subcategory);
+    setIsEditing(true);
   };
 
   const handleAmountChange = (subcategory, value) => {
@@ -107,7 +107,7 @@ const SubCategoryList = ({ subcategories, onAddTransaction, transactions, catego
           <TouchableOpacity onPress={() => handleAmountPress(subcat)}>
             {activeSubcategory === subcat ? (
               <TextInput
-                value={amounts[subcat] || initialAmounts[subcat] || '0'} 
+                value={amounts[subcat] || ''} // If amounts[subcat] is empty, show an empty input field
                 onChangeText={(text) => handleAmountChange(subcat, text)}
                 keyboardType="numeric"
                 style={styles.input}
@@ -116,7 +116,7 @@ const SubCategoryList = ({ subcategories, onAddTransaction, transactions, catego
               />
             ) : (
               <Text style={styles.subAmountText}>
-                ${parseFloat(amounts[subcat] || initialAmounts[subcat] || '0').toFixed(2)}
+                ${parseFloat(amounts[subcat] || '0').toFixed(2)} {/* Display 0.00 if no value */}
               </Text>
             )}
           </TouchableOpacity>
@@ -183,7 +183,7 @@ const BudgetPlanner = () => {
       const subcategoryTotal = transactions
         .filter((t) => t.subcategory === subcat)
         .reduce((subSum, t) => subSum + t.amount, 0);
-  
+
       const initialAmount = parseFloat(initialAmounts[subcat] || '0.00');
       return sum + (subcategoryTotal || initialAmount);
     }, 0);
@@ -208,16 +208,21 @@ const BudgetPlanner = () => {
 
       <ScrollView style={styles.scrollView}>
         {Object.entries(categories).map(([category, subcategories]) => {
+          // Get the total amount spent across all subcategories in this category
           const categorySpent = getCurrentAmountForCategory(subcategories);
+
+          // Sum up the initial amounts for all subcategories in this category
           const initialAmount = subcategories.reduce((sum, subcat) => {
             return sum + parseFloat(initialAmounts[subcat] || '0.00');
           }, 0);
+
+          // Calculate the progress based on the total spent vs initial budget for all subcategories
+          const progress = (categorySpent / initialAmount) * 100;
 
           return (
             <View key={category} style={styles.categoryContainer}>
               <View style={styles.categoryHeader}>
                 <Text style={styles.categoryTitle}>{category}</Text>
-                
                 <Text style={styles.amountText}>
                   Total: ${categorySpent.toFixed(2)}
                 </Text>
@@ -227,7 +232,7 @@ const BudgetPlanner = () => {
                 <View
                   style={{
                     ...styles.progressBar,
-                    width: `${(categorySpent / initialAmount) * 100}%`,
+                    width: `${Math.min(progress, 100)}%`, // Cap the progress at 100%
                     backgroundColor: getProgressBarColor(categorySpent, initialAmount),
                   }}
                 />
@@ -253,7 +258,7 @@ const styles = {
     backgroundColor: '#e8d0f4',
     flex: 1,
   },
-  
+
   // header and headerText are purple bar at the top
   header: {
     padding: 10,
