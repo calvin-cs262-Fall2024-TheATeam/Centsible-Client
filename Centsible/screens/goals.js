@@ -202,9 +202,6 @@ const BudgetPlanner = () => {
         <Text style={styles.headerText}>October 2024</Text>
       </View>
 
-      <Text style={styles.remainingBudgetText}>
-        ${getRemainingBudget().toFixed(2)} left to budget
-      </Text>
       {getRemainingBudget() < 0 && (
         <Text style={styles.warningText}>Warning: You’re out of budget!</Text>
       )}
@@ -288,7 +285,8 @@ const styles = {
     marginBottom: 10,
   },
   categoryContainer: {
-    marginBottom: 10,
+    marginTop: 5,
+    marginBottom: 5,
     marginRight: 10,
     marginLeft: 10,
     padding: 10,
