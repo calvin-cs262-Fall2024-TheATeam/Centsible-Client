@@ -115,7 +115,7 @@ const SubCategoryList = ({ subcategories, onAddTransaction, transactions, catego
                 autoFocus
               />
             ) : (
-              <Text style={styles.amountText}>
+              <Text style={styles.subAmountText}>
                 ${parseFloat(amounts[subcat] || initialAmounts[subcat] || '0').toFixed(2)}
               </Text>
             )}
@@ -255,7 +255,6 @@ const styles = {
   container: {
     backgroundColor: '#e8d0f4',
     flex: 1,
-    paddingHorizontal: 10,
   },
   header: {
     padding: 10,
@@ -264,8 +263,6 @@ const styles = {
     justifyContent: 'center',
     width: '100%',
     flexDirection: 'row',
-    paddingLeft: 14,
-    paddingRight: 14,
   },
   headerText: {
     fontSize: 18,
@@ -298,6 +295,7 @@ const styles = {
     borderRadius: 8,
     backgroundColor: '#fff',
     marginHorizontal: 5,
+    flexGrow: 1,
   },
   categoryHeader: {
     flexDirection: 'row',
@@ -318,6 +316,7 @@ const styles = {
   subAmountText: {
     color: 'purple', // Updated to purple
     fontSize: 18,
+    fontWeight: 'normal',
   },
   progressBarContainer: {
     height: 10,
@@ -333,6 +332,7 @@ const styles = {
     paddingLeft: 10,
     marginBottom: 5,
     maxHeight: 100, // Limit the height of the subcategory list for scrolling
+    flexGrow: 1,
   },
   subCategoryItem: {
     flexDirection: 'row',
