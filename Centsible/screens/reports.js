@@ -108,6 +108,16 @@ export default function ReportsScreen() {
   const sortedChartData = [...chartData].sort((a, b) => b.population - a.population);
   const filteredChartData = chartData.filter(item => item.name !== 'Income');
 
+  const calculatePercentage = (data) => {
+    const total = data.reduce((sum, item) => sum + item.population, 0);
+    return data.map(item => ({
+      ...item,
+      percentage: ((item.population / total) * 100).toFixed(2) + '%'
+    }));
+  };
+
+  const dataWithPercentage = calculatePercentage(filteredChartData);
+
   const subscriptions = [
     { 
       key: '3', 
@@ -199,7 +209,7 @@ export default function ReportsScreen() {
       <View style={styles.box}>
         <View style={styles.chartContainer}>
         <PieChart
-          data={sortedChartData && filteredChartData}
+          data={sortedChartData && filteredChartData && dataWithPercentage}
           width={screenWidth * 0.8}
           height={220}
           chartConfig={{
@@ -219,11 +229,11 @@ export default function ReportsScreen() {
         
         {/* Legend for the Pie Chart */}
         <View style={styles.legendContainer}>
-          {filteredChartData.map((item, index) => (
+          {dataWithPercentage.map((item, index) => (
             <TouchableOpacity key={index} onPress={() => handleCategoryPress(item.name)}>
               <View style={styles.legendItem}>
                 <View style={[styles.legendColor, { backgroundColor: item.color }]} />
-                <Text style={styles.legendText}>{item.name}</Text>
+                <Text style={styles.legendText}>{item.name} ({item.percentage})</Text>
               </View>
             </TouchableOpacity>
           ))}
@@ -238,6 +248,7 @@ export default function ReportsScreen() {
             { color: categoryColors[selectedCategory] || "#000000" } 
           ]}>What You Spent on {selectedCategory}
         </Text>
+        <ScrollView contentContainerStyle={styles.scrollableContent}>
           <FlatList
             data={details[selectedCategory]}
             keyExtractor={(item, index) => index.toString()}
@@ -248,10 +259,10 @@ export default function ReportsScreen() {
                 <Text style={styles.amount}>${item.amount.toFixed(2)}</Text>
               </View>
             )}
-            contentContainerStyle={styles.scrollableContent}
           />
-        </View>
-      )}
+        </ScrollView>
+      </View>
+    )}
 
       {/* New box
       <View style={styles.newBox}>
@@ -277,105 +288,127 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     alignItems: 'center',
-    backgroundColor: '#e8d0f4',
-    justifyContent: 'flex-start'
+    justifyContent: 'flex-start',
+    backgroundColor: '#f0f4ff',
   },
   box: {
     backgroundColor: '#fff',
-    borderRadius: 8,
+    borderRadius: 12,
     width: '94%',
-    padding: 15,
+    padding: 20,
     marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
   },
   header: {
     padding: 10,
     marginLeft: 0,
-    backgroundColor: 'purple',
     justifyContent: 'center',
     width: '100%',
     flexDirection: 'row',
     paddingLeft: 14,
     paddingRight: 14,
+    backgroundColor: 'linear-gradient(90deg, #6a11cb 0%, #2575fc 100%)',
   },
   headerText: {
     fontSize: 18,
-    color: 'white',
+    color: 'purple',
     fontWeight: 'bold',
   },
   detailsTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 15,
     textAlign: 'center',
+    color: '#1c43da',
   },
   detailItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginVertical: 5,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
   },
   description: {
-    fontSize: 14,
+    fontSize: 16,
+    color: '#333',
   },
   amount: {
-    fontSize: 15,
-    fontWeight: 'bold',
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#f95d6a',
   },
-   legendContainer: {
+  legendContainer: {
     flexDirection: 'column',
-    flexWrap: 'wrap',
     marginVertical: 10,
+    alignItems: 'flex-start',
   },
   legendItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 20,
     marginBottom: 10,
   },
   legendColor: {
     width: 25,
     height: 16,
-    marginRight: 8,
+    borderRadius: 4,
+    marginRight: 10,
   },
   legendText: {
-    fontSize: 14,
-    fontWeight: 'bold',
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#333',
   },
   barChart: {
     alignItems: 'center',
     marginVertical: 15,
-    paddingHorizontal: 15,
-    borderRadius: 8,
+    borderRadius: 12,
   },
   scrollableContent: {
-    maxHeight: 200, 
+    maxHeight: 200,
   },
   newBox: {
     backgroundColor: '#fff',
-    borderRadius: 8,
+    borderRadius: 12,
     width: '94%',
-    padding: 15,
+    padding: 20,
     marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   newBoxTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
     textAlign: 'center',
+    color: '#2575fc',
   },
-  // newBoxContent: {
-  //   fontSize: 16,
-  // },
-  // susbcriptionItem: {
+  // subscriptionItem: {
   //   flexDirection: 'row',
-  //   alignItems: 'center',
-  //   marginBottom: 12,
+  //   justifyContent: 'space-between',
+  //   paddingVertical: 10,
+  //   borderBottomWidth: 1,
+  //   borderBottomColor: '#e0e0e0',
   // },
   // subscriptionText: {
   //   fontSize: 16,
-  //   flex: 1, 
+  //   color: '#333',
   // },
   // subscriptionAmount: {
   //   fontSize: 16,
   //   fontWeight: 'bold',
+  //   color: '#f95d6a',
+  // },
+  // subscriptionColor: {
+  //   width: 8,
+  //   height: 8,
+  //   borderRadius: 4,
+  //   marginRight: 10,
   // },
 });
