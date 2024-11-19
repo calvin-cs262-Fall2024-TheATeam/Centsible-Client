@@ -104,7 +104,7 @@ export default function ReportsScreen() {
       setSelectedCategory(category === selectedCategory ? null : category);
     }
   };
-  
+ 
   const sortedChartData = [...chartData].sort((a, b) => b.population - a.population);
   const filteredChartData = chartData.filter(item => item.name !== 'Income');
 
