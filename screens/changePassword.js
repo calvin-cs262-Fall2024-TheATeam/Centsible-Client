@@ -11,7 +11,6 @@ const ChangePassword = ({ visible, onClose, onChangePassword, oldPassword }) => 
         uppercase: false,
     });
 
-
     const clearInputs = () => {
         setEnteredOldPassword('');
         setNewPassword('');
