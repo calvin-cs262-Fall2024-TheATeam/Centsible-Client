@@ -1,6 +1,6 @@
 # Centsible Client
 
-This is the client application for the [Centsible-Project](https://github.com/calvin-cs262-Fall2024-TheATeam/Centsible-Project) app.
+This is the client application for the [Centsible](https://github.com/calvin-cs262-Fall2024-TheATeam/Centsible-Project) app.
 
 The data service for this application is hosted on Azure (see the [Centsible-Service](https://github.com/calvin-cs262-Fall2024-TheATeam/Centsible-Service)).
 
