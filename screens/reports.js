@@ -26,18 +26,18 @@ export default function ReportsScreen() {
     { key: '14', amount: 20, category: 'Personal', description: 'Shampoo and toiletries', type: 'expense', date: new Date(2024, 9, 7) },
     { key: '15', amount: 50, category: 'Entertainment', description: 'Weekend trip', type: 'expense', date: new Date(2024, 9, 8) },
     { key: '16', amount: 10, category: 'Food', description: 'Fast food lunch', type: 'expense', date: new Date(2024, 9, 9) },
-    { key: '18', amount: 45, category: 'Personal', description: 'Haircut', type: 'expense', date: new Date(2024, 9, 5) },
+    { key: '18', amount: 25, category: 'Personal', description: 'Haircut', type: 'expense', date: new Date(2024, 9, 5) },
     { key: '21', amount: 10, category: 'Personal', description: 'Coffee at campus cafe', type: 'expense', date: new Date(2024, 9, 10) },
     { key: '22', amount: 100, category: 'Personal', description: 'New shoes', type: 'expense', date: new Date(2024, 9, 13) },
     { key: '22', amount: 100, category: 'Personal', description: 'Amazon', type: 'expense', date: new Date(2024, 9, 13) },
     { key: '24', amount: 50, category: 'Food', description: 'Groceries for the week', type: 'expense', date: new Date(2024, 9, 14) },
-    { key: '25', amount: 35, category: 'Education', description: 'School supplies', type: 'expense', date: new Date(2024, 9, 14) },
+    { key: '25', amount: 45, category: 'Education', description: 'School supplies', type: 'expense', date: new Date(2024, 9, 14) },
     { key: '28', amount: 50, category: 'Personal', description: 'Earrings', type: 'expense', date: new Date(2024, 9, 16) },
     { key: '30', amount: 10, category: 'Entertainment', description: 'Sports event tickets', type: 'expense', date: new Date(2024, 9, 16) },
     { key: '32', amount: 5, category: 'Food', description: 'Coffee shop', type: 'expense', date: new Date(2024, 9, 18) },
     { key: '34', amount: 15, category: 'Food', description: 'Lunch with friends', type: 'expense', date: new Date(2024, 9, 19) },
     { key: '36', amount: 50, category: 'Transportation', description: 'Gas for the car', type: 'expense', date: new Date(2024, 9, 20) },
-    { key: '38', amount: 10, category: 'Entertainment', description: 'Movie night with friends', type: 'expense', date: new Date(2024, 9, 22) },
+    { key: '38', amount: 12, category: 'Entertainment', description: 'Movie night with friends', type: 'expense', date: new Date(2024, 9, 22) },
     { key: '47', amount: 25, category: 'Personal', description: 'Toiletries', type: 'expense', date: new Date(2024, 9, 28) },
     { key: '48', amount: 50, category: 'Food', description: 'Groceries for the weekend', type: 'expense', date: new Date(2024, 9, 28) },
     { key: '50', amount: 15, category: 'Entertainment', description: 'Monthly gaming subscription', type: 'expense', date: new Date(2024, 9, 30) },
@@ -213,7 +213,7 @@ export default function ReportsScreen() {
       {/* Box for Pie Chart */}
       <View style={styles.box}>
         <View style={styles.chartContainer}>
-          <Text style={styles.boxText}>Top Expenses</Text>
+          <Text style={styles.boxText}>Total Expenses</Text>
 
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
             <View style={{ position: 'relative', alignItems: 'center', width: '50%' }}>
@@ -237,6 +237,7 @@ export default function ReportsScreen() {
               />
               <View style={styles.donutCenter} />
               <Text style={styles.totalExpenseText}>${Math.round(totalExpense).toLocaleString()}</Text>
+      
           </View>
 
           {/* Legend for the Pie Chart */}
@@ -300,13 +301,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 12,
     width: '95%',
-    padding: 20,
-    marginBottom: 30,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
+    padding: 15,
+    marginBottom: 20,
   },
   chartContainer: {
     alignItems: 'space-between',
@@ -329,7 +325,7 @@ const styles = StyleSheet.create({
     color: 'purple',
     fontWeight: 'bold',
     marginBottom: 10,
-    alignSelf: 'flex-start',
+    alignSelf: 'center',
   },
   donutCenter: {
     position: 'absolute',
@@ -344,10 +340,10 @@ const styles = StyleSheet.create({
   totalExpenseText: {
     position: 'absolute',
     top: '44%', 
-    left: '9%',
-    fontSize: 23,
+    left: '10%',
+    fontSize: 24,
     fontWeight: 'bold',
-    color: 'black',
+    color: 'red',
   },
   detailsTitle: {
     fontSize: 20,
