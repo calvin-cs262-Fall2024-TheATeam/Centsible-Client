@@ -125,6 +125,12 @@ export default function ReportsScreen() {
     }));
   };
 
+  const calculateCategoryPercentage = (category) => {
+    const total = chartData.reduce((sum, item) => sum + item.population, 0);
+    const categoryTotal = calculateCategoryTotal(category);
+    return ((categoryTotal / total) * 100).toFixed(1) + '%';
+  };
+
   const dataWithPercentage = calculatePercentage(filteredChartData);
 
   //for legend box cateogry labels
@@ -258,10 +264,12 @@ export default function ReportsScreen() {
             { color: categoryColors[selectedCategory] || "#000000" } 
           ]}>What You Spent on {selectedCategory}
         </Text>
-        <Text style={styles.totalCategoryExpense}>
+        {/* <Text style={styles.totalPercentage}> {calculateCategoryPercentage(selectedCategory)}</Text> */}
+          <Text style={styles.totalCategoryExpense && totalPercentage}> 
           <Text style={styles.totalLabel}>Total: </Text>
           <Text style={styles.totalAmount}>${calculateCategoryTotal(selectedCategory).toLocaleString()}</Text>
           </Text>
+
         <ScrollView contentContainerStyle={styles.scrollableContent}>
           <FlatList
             data={details[selectedCategory]}
@@ -356,18 +364,24 @@ const styles = StyleSheet.create({
     borderBottomColor: '#e0e0e0',
   },
   totalLabel: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    textAlign: 'right',
+    fontSize: 17,
     marginBottom: 10,
     color: 'gray',
   },
   totalAmount: {
     fontSize: 18,
+    flex: 1,
     fontWeight: 'bold',
     marginBottom: 10,
-    alignSelf: 'flex-end',
     color: 'red',
   },
+  // totalPercentage: {
+  //   textAlign: 'left',
+  //   fontSize: 18,
+  //   fontWeight: 'bold',
+  //   color: 'black',
+  // },
   description: {
     fontSize: 16,
     color: '#333',
