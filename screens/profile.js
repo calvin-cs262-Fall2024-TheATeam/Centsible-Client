@@ -135,12 +135,13 @@ export default function ProfileScreen({ setIsLoggedIn }) {
         visible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
         onChangePassword={handleChangePassword}
+        oldPassword={password}  // Pass the current password to the modal
       />
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
@@ -224,7 +225,7 @@ const styles = StyleSheet.create({
     paddingLeft: 5,
   },
   passwordContainer: {
-    flexDirection: 'row', 
+    flexDirection: 'row',
     alignItems: 'right', // Ensure password text and icon are aligned horizontally
   },
 });

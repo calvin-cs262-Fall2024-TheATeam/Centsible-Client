@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Modal, Alert, TouchableWithoutFeedback, Keyboard, StyleSheet } from 'react-native';
 
-const ChangePassword = ({ visible, onClose, onChangePassword }) => {
-    const [oldPassword, setOldPassword] = useState('');
+const ChangePassword = ({ visible, onClose, onChangePassword, oldPassword }) => {
+    const [enteredOldPassword, setEnteredOldPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmNewPassword, setConfirmNewPassword] = useState('');
     const [passwordValidations, setPasswordValidations] = useState({
@@ -10,10 +10,10 @@ const ChangePassword = ({ visible, onClose, onChangePassword }) => {
         specialChar: false,
         uppercase: false,
     });
-    
+
 
     const clearInputs = () => {
-        setOldPassword('');
+        setEnteredOldPassword('');
         setNewPassword('');
         setConfirmNewPassword('');
     };
@@ -25,25 +25,32 @@ const ChangePassword = ({ visible, onClose, onChangePassword }) => {
 
     const handleChangePassword = () => {
         // Step 1: Check if all fields are filled
-        if (!oldPassword || !newPassword || !confirmNewPassword) {
+        if (!enteredOldPassword || !newPassword || !confirmNewPassword) {
             Alert.alert('Error', 'Please fill in all fields.');
             return;
         }
-    
-        // Step 2: Check if new password is the same as the old password
+
+        // Step 2: Verify if the entered old password matches the actual old password
+        if (enteredOldPassword !== oldPassword) {
+            Alert.alert('Error', 'Old password is incorrect.');
+            setEnteredOldPassword(''); // Clear old password input to prevent confusion
+            return;
+        }
+
+        // Step 3: Check if new password is the same as the old password
         if (newPassword === oldPassword) {
             Alert.alert('Error', 'New password cannot be the same as old password.');
             clearNewPassword(); // Clear new password fields to prevent confusion
             return;
         }
-    
-        // Step 3: Check if new password and confirm new password match
+
+        // Step 4: Check if new password and confirm new password match
         if (newPassword !== confirmNewPassword) {
             Alert.alert('Error', 'New password and confirm password do not match.');
             return;
         }
-    
-        // Step 4: Check if the new password meets the required criteria (length, special character, uppercase)
+
+        // Step 5: Check if the new password meets the required criteria (length, special character, uppercase)
         const passwordRegex = /^(?=.*[A-Z])(?=.*\W).{8,}$/;
         if (!passwordRegex.test(newPassword)) {
             Alert.alert(
@@ -52,8 +59,8 @@ const ChangePassword = ({ visible, onClose, onChangePassword }) => {
             );
             return;
         }
-    
-        // Step 5: If all conditions are met, proceed with the password change
+
+        // Step 6: If all conditions are met, proceed with the password change
         onChangePassword(newPassword); // Call the onChangePassword function to actually change the password
         clearInputs(); // Clear inputs after successful password change
         setPasswordValidations({
@@ -63,7 +70,7 @@ const ChangePassword = ({ visible, onClose, onChangePassword }) => {
         });
         onClose(); // Close the modal after changing the password
     };
-    
+
 
     const handleCancel = () => {
         clearInputs(); // Clear inputs when cancel is pressed
@@ -73,7 +80,7 @@ const ChangePassword = ({ visible, onClose, onChangePassword }) => {
             uppercase: false,
         });
         onClose(); // Close the modal
-    };
+    };    
 
     // Update password validation states on every new character input
     const handleNewPasswordChange = (password) => {
@@ -100,8 +107,8 @@ const ChangePassword = ({ visible, onClose, onChangePassword }) => {
                             style={styles.input}
                             placeholder="Enter old password"
                             secureTextEntry
-                            value={oldPassword}
-                            onChangeText={setOldPassword}
+                            value={enteredOldPassword}
+                            onChangeText={setEnteredOldPassword}
                         />
 
                         {/* New Password Input */}
