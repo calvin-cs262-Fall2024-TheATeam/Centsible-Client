@@ -7,6 +7,7 @@ export default function ProfileScreen({ setIsLoggedIn }) {
   const [isNotificationsEnabled, setIsNotificationsEnabled] = useState(false);
   const [reminderNotification, setReminderNotification] = useState(false);
   const [budgetWarningNotification, setBudgetWarningNotification] = useState(false);
+  const [firstName] = useState('John');  // Example first name
   const [username] = useState('user@example.com');  // Example username
   const [password, setPassword] = useState('password');
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -55,6 +56,12 @@ export default function ProfileScreen({ setIsLoggedIn }) {
   return (
     <View style={styles.container}>
       <View style={styles.infoBox}>
+        {/* First Name Box */}
+        <View style={[styles.rowDisplay, styles.rowWithBorder]}>
+          <Text style={styles.infoText}>First name:</Text>
+          <Text style={styles.usernameText}> {firstName}</Text>
+        </View>
+        
         {/* Username Box */}
         <View style={[styles.rowDisplay, styles.rowWithBorder]}>
           <Text style={styles.infoText}>Username:</Text>
