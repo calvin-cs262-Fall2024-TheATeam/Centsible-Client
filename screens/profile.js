@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Switch } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import ChangePassword from './changePassword';
 
 export default function ProfileScreen({ setIsLoggedIn }) {
   const [isNotificationsEnabled, setIsNotificationsEnabled] = useState(false);
   const [reminderNotification, setReminderNotification] = useState(false);
   const [budgetWarningNotification, setBudgetWarningNotification] = useState(false);
   const [username] = useState('user@example.com');  // Example username
-  const [password] = useState('password');
+  const [password, setPassword] = useState('password');
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const handleLogout = () => {
     setIsLoggedIn(false);
@@ -38,8 +41,15 @@ export default function ProfileScreen({ setIsLoggedIn }) {
   };
 
   const handleChangePasswordPress = () => {
-    // Handle the change password click (could navigate to another screen or open a dialog)
-    console.log("Change Password Pressed");
+    setIsModalVisible(true);
+  };
+
+  const handleChangePassword = (newPassword) => {
+    setPassword(newPassword);
+  };
+
+  const togglePasswordVisibility = () => {
+    setIsPasswordVisible(prevState => !prevState);
   };
 
   return (
@@ -54,7 +64,14 @@ export default function ProfileScreen({ setIsLoggedIn }) {
         {/* Password Box */}
         <View style={[styles.rowDisplay, styles.rowWithBorder]}>
           <Text style={styles.infoText}>Password:</Text>
-          <Text style={styles.usernameText}> {password}</Text>
+          <View style={styles.passwordContainer}>
+            <Text style={styles.usernameText}>
+              {isPasswordVisible ? password : '••••••••'}  {/* Show or hide the password */}
+            </Text>
+            <TouchableOpacity onPress={togglePasswordVisibility}>
+              <Icon name={isPasswordVisible ? 'visibility' : 'visibility-off'} size={24} color="#333" />
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Change Password Box */}
@@ -72,7 +89,7 @@ export default function ProfileScreen({ setIsLoggedIn }) {
           styles.notificationToggleContainer,
           isNotificationsEnabled && styles.rowWithBorder  // Apply border if notifications are enabled
         ]}>
-          <Text style={[styles.notificationText, isNotificationsEnabled && {fontWeight: 500}]}>Notifications</Text>
+          <Text style={[styles.notificationText, isNotificationsEnabled && { fontWeight: 500 }]}>Notifications</Text>
           <Switch
             value={isNotificationsEnabled}
             onValueChange={toggleNotifications}
@@ -87,7 +104,7 @@ export default function ProfileScreen({ setIsLoggedIn }) {
           <>
             {/* Reminder Notification Toggle */}
             <View style={[styles.notificationToggleContainer, { marginTop: 10 }]}>
-              <Text style={styles.checkboxLabel}>Reminder to input transactions</Text>
+              <Text style={styles.checkboxLabel}>Record Transactions Reminder</Text>
               <Switch
                 value={reminderNotification}
                 onValueChange={toggleReminderNotification}
@@ -97,7 +114,7 @@ export default function ProfileScreen({ setIsLoggedIn }) {
 
             {/* Budget Warning Notification Toggle */}
             <View style={[styles.notificationToggleContainer]}>
-              <Text style={styles.checkboxLabel}>Warning for going over budget</Text>
+              <Text style={styles.checkboxLabel}>Budget Exceeded Warning</Text>
               <Switch
                 value={budgetWarningNotification}
                 onValueChange={toggleBudgetWarningNotification}
@@ -108,12 +125,17 @@ export default function ProfileScreen({ setIsLoggedIn }) {
         )}
       </View>
 
-
       <View style={styles.logoutButtonContainer}>
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Text style={styles.buttonText}>Logout</Text>
         </TouchableOpacity>
       </View>
+
+      <ChangePassword
+        visible={isModalVisible}
+        onClose={() => setIsModalVisible(false)}
+        onChangePassword={handleChangePassword}
+      />
     </View>
   );
 }
@@ -185,6 +207,7 @@ const styles = StyleSheet.create({
     color: '#333',
     marginLeft: 20,
     flex: 1,
+    fontWeight: 300,
   },
   switch: {
     marginLeft: 0,
@@ -199,5 +222,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: 'purple',
     paddingLeft: 5,
+  },
+  passwordContainer: {
+    flexDirection: 'row', 
+    alignItems: 'right', // Ensure password text and icon are aligned horizontally
   },
 });
