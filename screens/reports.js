@@ -133,6 +133,8 @@ export default function ReportsScreen() {
 
   const dataWithPercentage = calculatePercentage(filteredChartData);
 
+  const sortedDataWithPercentage = [...dataWithPercentage].sort((b, a) => a.population - b.population);
+
   //for legend box cateogry labels
   const Triangle = ({ color, isSelected }) => {
     return (
@@ -242,7 +244,7 @@ export default function ReportsScreen() {
 
           {/* Legend for the Pie Chart */}
           <View style={styles.legendContainer}>
-            {dataWithPercentage.map((item, index) => (
+            {sortedDataWithPercentage.map((item, index) => (
               <TouchableOpacity key={index} onPress={() => handleCategoryPress(item.name)}>
                 <View style={styles.legendItem}>
                   <Triangle color= {item.color} isSelected={selectedCategory === item.name}/>
