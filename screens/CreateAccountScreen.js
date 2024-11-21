@@ -5,6 +5,7 @@ import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 
 export default function CreateAccountScreen({ navigation }) {
   const [email, setEmail] = useState('');
+  const [firstName, setFirstName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
@@ -24,12 +25,22 @@ export default function CreateAccountScreen({ navigation }) {
 
       <TextInput
         style={styles.input}
+        placeholder="First name"
+        value={firstName}
+        onChangeText={setFirstName}
+        autoCapitalize="words"
+        keyboardType="default"
+      />
+
+      <TextInput
+        style={styles.input}
         placeholder="Email"
         value={email}
         onChangeText={setEmail}
         autoCapitalize="none"
         keyboardType="email-address"
       />
+
       <TextInput
         style={styles.input}
         placeholder="Password"
@@ -37,6 +48,7 @@ export default function CreateAccountScreen({ navigation }) {
         onChangeText={setPassword}
         secureTextEntry
       />
+
       <TextInput
         style={styles.input}
         placeholder="Confirm Password"
@@ -53,8 +65,8 @@ export default function CreateAccountScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     padding: 20,
+    marginTop: 70,
   },
   title: {
     fontSize: 32,
