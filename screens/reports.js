@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Dimensions, TouchableOpacity, FlatList, ScrollView } from 'react-native';
 import { BarChart, PieChart } from 'react-native-chart-kit';
 
+
 export default function ReportsScreen() {
   const screenWidth = Dimensions.get('window').width;
   const [chartData, setChartData] = useState([]);
@@ -27,7 +28,7 @@ export default function ReportsScreen() {
     { key: '22', amount: 100, category: 'Personal', description: 'New shoes', type: 'expense', date: new Date(2024, 9, 13) },
     { key: '22', amount: 100, category: 'Personal', description: 'Amazon', type: 'expense', date: new Date(2024, 9, 13) },
     { key: '24', amount: 50, category: 'Food', description: 'Groceries for the week', type: 'expense', date: new Date(2024, 9, 14) },
-    { key: '25', amount: 15, category: 'Education', description: 'School supplies', type: 'expense', date: new Date(2024, 9, 14) },
+    { key: '25', amount: 35, category: 'Education', description: 'School supplies', type: 'expense', date: new Date(2024, 9, 14) },
     { key: '28', amount: 50, category: 'Personal', description: 'Earrings', type: 'expense', date: new Date(2024, 9, 16) },
     { key: '30', amount: 10, category: 'Entertainment', description: 'Sports event tickets', type: 'expense', date: new Date(2024, 9, 16) },
     { key: '32', amount: 5, category: 'Food', description: 'Coffee shop', type: 'expense', date: new Date(2024, 9, 18) },
@@ -43,7 +44,7 @@ export default function ReportsScreen() {
     { key: '54', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 29) },
   ];
 
-  const colors = ['#f95d6a', '#ffb609', '#fbd309', '#7cb6dc', '#1c43da', '#2e3884', '#077dd5'];
+  const colors = ['#f95d6a', '#ff9909', '#fbd309', '#7cb6dc', '#2e3884', '#1c43da', '#077dd5'];
   const getColor = (index) => colors[index % colors.length];
 
   const processData = () => {
@@ -118,26 +119,27 @@ export default function ReportsScreen() {
 
   const dataWithPercentage = calculatePercentage(filteredChartData);
 
-  const subscriptions = [
-    { 
-      key: '3', 
-      amount: 5.99, 
-      category: 'Entertainment', 
-      description: 'Spotify subscription', 
-      type: 'expense', 
-      date: new Date(2024, 10, 2), 
-      color: '#1DB954' 
-    },
-    { 
-      key: '23', 
-      amount: 5.67, 
-      category: 'Entertainment', 
-      description: 'Netflix subscription', 
-      type: 'expense', 
-      date: new Date(2024, 10, 13), 
-      color: '#E50914'  
-    },
-  ];
+  // not doing subscriptions, but leaving it here just in case
+  // const subscriptions = [
+  //   { 
+  //     key: '3', 
+  //     amount: 5.99, 
+  //     category: 'Entertainment', 
+  //     description: 'Spotify subscription', 
+  //     type: 'expense', 
+  //     date: new Date(2024, 10, 2), 
+  //     color: '#1DB954' 
+  //   },
+  //   { 
+  //     key: '23', 
+  //     amount: 5.67, 
+  //     category: 'Entertainment', 
+  //     description: 'Netflix subscription', 
+  //     type: 'expense', 
+  //     date: new Date(2024, 10, 13), 
+  //     color: '#E50914'  
+  //   },
+  // ];
 
   const categoryColors = {
     "Food": "#1c43da", 
@@ -205,40 +207,53 @@ export default function ReportsScreen() {
     </View>
     </View>
 
-      {/* Box for Pie Chart and Legend */}
+      {/* Box for Pie Chart */}
       <View style={styles.box}>
         <View style={styles.chartContainer}>
-        <PieChart
-          data={sortedChartData && filteredChartData && dataWithPercentage}
-          width={screenWidth * 0.8}
-          height={220}
-          chartConfig={{
-            backgroundColor: '#1cc910',
-            backgroundGradientFrom: '#eff3ff',
-            backgroundGradientTo: '#efefef',
-            color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-          }}
-          accessor="population"
-          backgroundColor="transparent"
-          paddingLeft="15"
-          absolute={false}
-          innerRadius="50%"
-        />
-      </View>
-        
-        {/* Legend for the Pie Chart */}
-        <View style={styles.legendContainer}>
-          {dataWithPercentage.map((item, index) => (
-            <TouchableOpacity key={index} onPress={() => handleCategoryPress(item.name)}>
-              <View style={styles.legendItem}>
-                <View style={[styles.legendColor, { backgroundColor: item.color }]} />
-                <Text style={styles.legendText}>{item.name} ({item.percentage})</Text>
-              </View>
-            </TouchableOpacity>
-          ))}
+          <Text style={styles.headerText}>Top Expenses</Text>
+
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+            <View style={{ position: 'relative', alignItems: 'center', width: '50%' }}>
+              <PieChart
+                data={sortedChartData && filteredChartData && dataWithPercentage}
+                width={screenWidth * 0.8}
+                height={220}
+                chartConfig={{
+                  backgroundColor: '#1cc910',
+                  backgroundGradientFrom: '#eff3ff',
+                  backgroundGradientTo: '#efefef',
+                  color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                  labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                }}
+                accessor="population"
+                backgroundColor="transparent"
+                paddingLeft="45"
+                // hid the freakin labels that come with pie chart :) yay
+                hasLegend={false}
+                absolute={false}
+              />
+              <View style={styles.donutCenter} />
+              <Text style={styles.totalExpenseText}>${Math.round(totalExpense).toLocaleString()}</Text>
+          </View>
+
+          {/* Legend for the Pie Chart */}
+          <View style={styles.legendContainer}>
+            {dataWithPercentage.map((item, index) => (
+              <TouchableOpacity key={index} onPress={() => handleCategoryPress(item.name)}>
+                <View style={styles.legendItem}>
+                  <View style={[styles.legendColor, { backgroundColor: item.color }]} />
+                  <Text style={styles.legendText}>{item.name} 
+                    {/*({item.percentage}) */}
+                    </Text>
+                </View>
+              </TouchableOpacity>
+            ))}
         </View>
       </View>
+    </View>
+  </View>
+        
+        
   
       {/* Box for Category Details (if selected) */}
       {selectedCategory && (
@@ -294,14 +309,17 @@ const styles = StyleSheet.create({
   box: {
     backgroundColor: '#fff',
     borderRadius: 12,
-    width: '94%',
+    width: '95%',
     padding: 20,
-    marginBottom: 20,
+    marginBottom: 30,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 4,
+  },
+  chartContainer: {
+    alignItems: 'space-between',
   },
   header: {
     padding: 10,
@@ -314,9 +332,29 @@ const styles = StyleSheet.create({
     backgroundColor: 'linear-gradient(90deg, #6a11cb 0%, #2575fc 100%)',
   },
   headerText: {
-    fontSize: 18,
+    fontSize: 20,
     color: 'purple',
     fontWeight: 'bold',
+    marginBottom: 10,
+    alignSelf: 'flex-start',
+  },
+  donutCenter: {
+    position: 'absolute',
+    top: '50%',
+    left: '30%',
+    width: 120, 
+    height: 120, 
+    backgroundColor: '#fff',
+    borderRadius: 60, 
+    transform: [{ translateX: -60 }, { translateY: -60 }],
+  },
+  totalExpenseText: {
+    position: 'absolute',
+    top: '44%', 
+    left: '9%',
+    fontSize: 23,
+    fontWeight: 'bold',
+    color: 'black',
   },
   detailsTitle: {
     fontSize: 20,
@@ -343,13 +381,14 @@ const styles = StyleSheet.create({
   },
   legendContainer: {
     flexDirection: 'column',
-    marginVertical: 10,
+    marginLeft: 15,
     alignItems: 'flex-start',
+    width: '35%',
   },
   legendItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 18,
   },
   legendColor: {
     width: 25,
@@ -358,9 +397,11 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   legendText: {
-    fontSize: 15,
+    fontSize: 12,
+    fontWeight: 'bold',
     fontWeight: '600',
     color: '#333',
+
   },
   barChart: {
     alignItems: 'center',
@@ -370,25 +411,25 @@ const styles = StyleSheet.create({
   scrollableContent: {
     maxHeight: 200,
   },
-  newBox: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    width: '94%',
-    padding: 20,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  newBoxTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    textAlign: 'center',
-    color: '#2575fc',
-  },
+  // newBox: {
+  //   backgroundColor: '#fff',
+  //   borderRadius: 12,
+  //   width: '94%',
+  //   padding: 20,
+  //   marginBottom: 20,
+  //   shadowColor: '#000',
+  //   shadowOffset: { width: 0, height: 4 },
+  //   shadowOpacity: 0.1,
+  //   shadowRadius: 4,
+  //   elevation: 3,
+  // },
+  // newBoxTitle: {
+  //   fontSize: 20,
+  //   fontWeight: 'bold',
+  //   marginBottom: 10,
+  //   textAlign: 'center',
+  //   color: '#2575fc',
+  // },
   // subscriptionItem: {
   //   flexDirection: 'row',
   //   justifyContent: 'space-between',
