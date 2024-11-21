@@ -68,40 +68,46 @@ export default function ProfileScreen({ setIsLoggedIn }) {
       </View>
 
       <View style={styles.notificationBox}>
-        <Text style={styles.notificationText}>Notifications</Text>
-        <Switch
-          value={isNotificationsEnabled}
-          onValueChange={toggleNotifications}
-          trackColor={{ false: '#767577', true: '#9b59b6' }}
-          thumbColor={isNotificationsEnabled ? '#ffffff' : '#ffffff'}
-          style={styles.switch}
-        />
+        <View style={[
+          styles.notificationToggleContainer,
+          isNotificationsEnabled && styles.rowWithBorder  // Apply border if notifications are enabled
+        ]}>
+          <Text style={[styles.notificationText, isNotificationsEnabled && {fontWeight: 500}]}>Notifications</Text>
+          <Switch
+            value={isNotificationsEnabled}
+            onValueChange={toggleNotifications}
+            trackColor={{ false: '#767577', true: '#9b59b6' }}
+            thumbColor={isNotificationsEnabled ? '#ffffff' : '#ffffff'}
+            style={styles.switch}
+          />
+        </View>
+
+        {/* Conditionally render the reminder and budget warning switches */}
+        {isNotificationsEnabled && (
+          <>
+            {/* Reminder Notification Toggle */}
+            <View style={[styles.notificationToggleContainer, { marginTop: 10 }]}>
+              <Text style={styles.checkboxLabel}>Reminder to input transactions</Text>
+              <Switch
+                value={reminderNotification}
+                onValueChange={toggleReminderNotification}
+                trackColor={{ false: '#767577', true: '#9b59b6' }}
+              />
+            </View>
+
+            {/* Budget Warning Notification Toggle */}
+            <View style={[styles.notificationToggleContainer]}>
+              <Text style={styles.checkboxLabel}>Warning for going over budget</Text>
+              <Switch
+                value={budgetWarningNotification}
+                onValueChange={toggleBudgetWarningNotification}
+                trackColor={{ false: '#767577', true: '#9b59b6' }}
+              />
+            </View>
+          </>
+        )}
       </View>
 
-      {/* These rows show up right below the Notifications switch */}
-      {isNotificationsEnabled && (
-        <View style={styles.notificationOptions}>
-          {/* Reminder Notification Toggle */}
-          <View style={[styles.notificationToggleContainer, styles.rowWithBorder]}>
-            <Text style={styles.checkboxLabel}>Reminder to input transactions</Text>
-            <Switch
-              value={reminderNotification}
-              onValueChange={toggleReminderNotification}
-              trackColor={{ false: '#767577', true: '#9b59b6' }}
-            />
-          </View>
-
-          {/* Budget Warning Notification Toggle */}
-          <View style={[styles.notificationToggleContainer]}>
-            <Text style={styles.checkboxLabel}>Warning for going over budget</Text>
-            <Switch
-              value={budgetWarningNotification}
-              onValueChange={toggleBudgetWarningNotification}
-              trackColor={{ false: '#767577', true: '#9b59b6' }}
-            />
-          </View>
-        </View>
-      )}
 
       <View style={styles.logoutButtonContainer}>
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
@@ -154,43 +160,34 @@ const styles = StyleSheet.create({
   },
   notificationBox: {
     backgroundColor: 'white',
-    padding: 10,
     marginVertical: 10,
     borderRadius: 8,
     width: '95%',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingRight: 15,
+    paddingHorizontal: 7,
+    paddingTop: 13,
+    paddingBottom: 4,
   },
   notificationText: {
     fontSize: 18,
     color: '#333',
     paddingLeft: 5,
-  },
-  notificationOptions: {
-    backgroundColor: 'white',
-    paddingVertical: 0, // Remove padding on top and bottom
-    marginTop: 0,
-    paddingTop: 5,
-    paddingBottom: 0,
-    paddingHorizontal: 10, // Keep padding on the sides
-    borderRadius: 8,
-    width: '95%',
-    marginBottom: 10,
+    flex: 1,
   },
   notificationToggleContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginVertical: 5, // Adjust margin for spacing between rows
     paddingBottom: 10, // Adjust the padding below the text to add more space before the border
     paddingRight: 6,
   },
   checkboxLabel: {
     fontSize: 16,
     color: '#333',
-    marginLeft: 7,
+    marginLeft: 20,
+    flex: 1,
+  },
+  switch: {
+    marginLeft: 0,
   },
   logoutButtonContainer: {
     backgroundColor: 'white',
