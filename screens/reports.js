@@ -133,6 +133,8 @@ export default function ReportsScreen() {
 
   const dataWithPercentage = calculatePercentage(filteredChartData);
 
+  // for now, instead of percentages being shown,
+  // the labels with the most expense come first so in most-least order
   const sortedDataWithPercentage = [...dataWithPercentage].sort((b, a) => a.population - b.population);
 
   //for legend box cateogry labels
