@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { color } from 'chart.js/helpers';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Dimensions, TouchableOpacity, FlatList, ScrollView } from 'react-native';
 import { BarChart, PieChart } from 'react-native-chart-kit';
 
@@ -10,6 +11,8 @@ export default function ReportsScreen() {
   const [details, setDetails] = useState({});
   const [totalIncome, setTotalIncome] = useState(0);
   const [totalExpense, setTotalExpense] = useState(0);
+  const scrollViewRef = useRef(null);
+  const whatYouSpentRef = useRef(null);
 
   const initialTransactions = [
     { key: '1', amount: 200, category: 'Housing', description: 'Monthly rent', type: 'expense', date: new Date(2024, 9, 1) },
@@ -44,7 +47,7 @@ export default function ReportsScreen() {
     { key: '54', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 29) },
   ];
 
-  const colors = ['#f95d6a', '#ff9909', '#fbd309', '#7cb6dc', '#2e3884', '#1c43da', '#077dd5'];
+  const colors = ['#f95d6a', '#ff9909', '#fbd309', '#7cb6dc', '#1c43da', '#2e3884'];
   const getColor = (index) => colors[index % colors.length];
 
   const processData = () => {
@@ -96,9 +99,14 @@ export default function ReportsScreen() {
       }
       categoryDetails[category].push({ description, amount, date });
     });
-
     setDetails(categoryDetails);
   }, []);
+
+  // calculating the toal of each categories..
+  const calculateCategoryTotal = (category) => {
+    if (!details[category]) return 0;
+    return details[category].reduce((sum, item) => sum + item.amount, 0);
+  };
 
   const handleCategoryPress = (category) => {
     if (category !== 'Income') {  
@@ -113,42 +121,31 @@ export default function ReportsScreen() {
     const total = data.reduce((sum, item) => sum + item.population, 0);
     return data.map(item => ({
       ...item,
-      percentage: ((item.population / total) * 100).toFixed(2) + '%'
+      percentage: ((item.population / total) * 100).toFixed(1) + '%'
     }));
   };
 
   const dataWithPercentage = calculatePercentage(filteredChartData);
 
-  // not doing subscriptions, but leaving it here just in case
-  // const subscriptions = [
-  //   { 
-  //     key: '3', 
-  //     amount: 5.99, 
-  //     category: 'Entertainment', 
-  //     description: 'Spotify subscription', 
-  //     type: 'expense', 
-  //     date: new Date(2024, 10, 2), 
-  //     color: '#1DB954' 
-  //   },
-  //   { 
-  //     key: '23', 
-  //     amount: 5.67, 
-  //     category: 'Entertainment', 
-  //     description: 'Netflix subscription', 
-  //     type: 'expense', 
-  //     date: new Date(2024, 10, 13), 
-  //     color: '#E50914'  
-  //   },
-  // ];
+  //for legend box cateogry labels
+  const Triangle = ({ color, isSelected }) => {
+    return (
+      <View style={[styles.triangle, { borderTopColor: color, 
+        transform: [
+        { rotate: isSelected ? '-90deg' : '0deg' }, 
+      ], 
+    },
+  ]} />
+    );
+  };
 
   const categoryColors = {
-    "Food": "#1c43da", 
-    "Entertainment": "#ffb609", 
-    "Subscriptions": "#FFD700",
-    "Transportation":"#fbd309",
     "Housing":"#f95d6a",
+    "Transportation":"#ff9909",
+    "Personal": "#fbd309",
+    "Food": "#7cb6dc", 
     "Education":"#2e3884",
-    "Personal": "#7cb6dc"
+    "Entertainment": "#1c43da"
   };
   
   return (
@@ -210,7 +207,7 @@ export default function ReportsScreen() {
       {/* Box for Pie Chart */}
       <View style={styles.box}>
         <View style={styles.chartContainer}>
-          <Text style={styles.headerText}>Top Expenses</Text>
+          <Text style={styles.boxText}>Top Expenses</Text>
 
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
             <View style={{ position: 'relative', alignItems: 'center', width: '50%' }}>
@@ -241,10 +238,9 @@ export default function ReportsScreen() {
             {dataWithPercentage.map((item, index) => (
               <TouchableOpacity key={index} onPress={() => handleCategoryPress(item.name)}>
                 <View style={styles.legendItem}>
-                  <View style={[styles.legendColor, { backgroundColor: item.color }]} />
-                  <Text style={styles.legendText}>{item.name} 
-                    {/*({item.percentage}) */}
-                    </Text>
+                  <Triangle color= {item.color} isSelected={selectedCategory === item.name}/>
+                  <Text style={[styles.legendText, selectedCategory === item.name && {color: item.color}]}>{item.name}</Text>
+  
                 </View>
               </TouchableOpacity>
             ))}
@@ -252,7 +248,6 @@ export default function ReportsScreen() {
       </View>
     </View>
   </View>
-        
         
   
       {/* Box for Category Details (if selected) */}
@@ -263,6 +258,10 @@ export default function ReportsScreen() {
             { color: categoryColors[selectedCategory] || "#000000" } 
           ]}>What You Spent on {selectedCategory}
         </Text>
+        <Text style={styles.totalCategoryExpense}>
+          <Text style={styles.totalLabel}>Total: </Text>
+          <Text style={styles.totalAmount}>${calculateCategoryTotal(selectedCategory).toLocaleString()}</Text>
+          </Text>
         <ScrollView contentContainerStyle={styles.scrollableContent}>
           <FlatList
             data={details[selectedCategory]}
@@ -271,30 +270,13 @@ export default function ReportsScreen() {
               <View style={styles.detailItem}>
                 <Text style={styles.date}>{item.date.toLocaleDateString()}</Text>
                 <Text style={styles.description}>{item.description} </Text>
-                <Text style={styles.amount}>${item.amount.toFixed(2)}</Text>
+                <Text style={styles.amount}>${item.amount.toFixed()}</Text>
               </View>
             )}
           />
         </ScrollView>
       </View>
-    )}
-
-      {/* New box
-      <View style={styles.newBox}>
-        <Text style={styles.newBoxTitle}> You're SUBSCRIBED to... </Text>
-        <FlatList
-          data={subscriptions}  // Use the subscription data
-          keyExtractor={(item) => item.key}  // Using the unique key for each subscription
-          renderItem={({ item }) => (
-            <View style={styles.subscriptionItem}>
-            <View style={[styles.subscriptionColor, { backgroundColor: item.color }]} />
-            <Text style={styles.subscriptionText}>{item.description}</Text>
-            <Text style={styles.subscriptionAmount}>${item.amount.toFixed(2)}</Text>
-          </View>
-        )}
-      />
-    </View> */}
-
+      )}
     </ScrollView>
   );
 }
@@ -304,7 +286,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'flex-start',
-    backgroundColor: '#f0f4ff',
+    backgroundColor: '#e8d0f4',
   },
   box: {
     backgroundColor: '#fff',
@@ -324,14 +306,17 @@ const styles = StyleSheet.create({
   header: {
     padding: 10,
     marginLeft: 0,
+    backgroundColor: 'purple',
     justifyContent: 'center',
     width: '100%',
     flexDirection: 'row',
-    paddingLeft: 14,
-    paddingRight: 14,
-    backgroundColor: 'linear-gradient(90deg, #6a11cb 0%, #2575fc 100%)',
   },
   headerText: {
+    fontSize: 18,
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  boxText: {
     fontSize: 20,
     color: 'purple',
     fontWeight: 'bold',
@@ -370,6 +355,19 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
   },
+  totalLabel: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: 'gray',
+  },
+  totalAmount: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    alignSelf: 'flex-end',
+    color: 'red',
+  },
   description: {
     fontSize: 16,
     color: '#333',
@@ -397,11 +395,29 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   legendText: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: 'bold',
     fontWeight: '600',
     color: '#333',
-
+    marginLeft: 6,
+  },
+  selectedLegendText: {
+    color: color, 
+  },
+  legend2Text: {
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
+  triangle: {
+    width: 0,
+    height: 0,
+    borderLeftWidth: 7,
+    borderRightWidth: 7,
+    borderTopWidth: 10,
+    borderStyle: 'solid',
+    backgroundColor: 'transparent',
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
   },
   barChart: {
     alignItems: 'center',
@@ -411,45 +427,4 @@ const styles = StyleSheet.create({
   scrollableContent: {
     maxHeight: 200,
   },
-  // newBox: {
-  //   backgroundColor: '#fff',
-  //   borderRadius: 12,
-  //   width: '94%',
-  //   padding: 20,
-  //   marginBottom: 20,
-  //   shadowColor: '#000',
-  //   shadowOffset: { width: 0, height: 4 },
-  //   shadowOpacity: 0.1,
-  //   shadowRadius: 4,
-  //   elevation: 3,
-  // },
-  // newBoxTitle: {
-  //   fontSize: 20,
-  //   fontWeight: 'bold',
-  //   marginBottom: 10,
-  //   textAlign: 'center',
-  //   color: '#2575fc',
-  // },
-  // subscriptionItem: {
-  //   flexDirection: 'row',
-  //   justifyContent: 'space-between',
-  //   paddingVertical: 10,
-  //   borderBottomWidth: 1,
-  //   borderBottomColor: '#e0e0e0',
-  // },
-  // subscriptionText: {
-  //   fontSize: 16,
-  //   color: '#333',
-  // },
-  // subscriptionAmount: {
-  //   fontSize: 16,
-  //   fontWeight: 'bold',
-  //   color: '#f95d6a',
-  // },
-  // subscriptionColor: {
-  //   width: 8,
-  //   height: 8,
-  //   borderRadius: 4,
-  //   marginRight: 10,
-  // },
 });
