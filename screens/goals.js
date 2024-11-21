@@ -106,7 +106,7 @@ const SubCategoryList = ({
     // Add the new subcategory to the selected category
     setCategories((prev) => ({
       ...prev,
-      [category]: [...prev[category], newSubcategoryName],
+      [category]: [...(prev[category] || []), newSubcategoryName],
     }));
 
     // Update the amount for the new subcategory
@@ -114,10 +114,6 @@ const SubCategoryList = ({
       ...prev,
       [newSubcategoryName]: newAmount.toFixed(2),
     }));
-
-    const updatedTotal = Object.values(amounts).reduce((acc, val) => acc + parseFloat(val || 0), 0);
-    onAmountUpdate(category, updatedTotal.toFixed(2));
-
 
     // Reset the form and close the input
     setNewSubcategoryName('');
@@ -244,6 +240,9 @@ const BudgetPlanner = () => {
                     backgroundColor: getProgressBarColor(categorySpent, totalAmount),
                   }}
                 />
+                <Text style={styles.progressPercentage}>  
+                  {Math.min(progress, 100).toFixed(0)}%  
+                </Text>  
               </View>
 
               <View style={styles.categoryHeader}>
@@ -255,19 +254,14 @@ const BudgetPlanner = () => {
 
               <SubCategoryList
                 category={category}
-                subcategories={categories[category]} // Correctly pass updated subcategories
+                subcategories={categories[category] || []} // Correctly pass updated subcategories
                 onAddTransaction={(subcategory, amount) =>
                   setTransactions([...transactions, { category, subcategory, amount }])
                 }
                 transactions={transactions}
-                onAddSubcategory={(category, subcategory) => 
-                  setCategories((prev) => ({
-                    ...prev,
-                    [category]: [...(prev[category] || []), subcategory], // Sync categories
-                  }))
-                }
                 amounts={amounts}
                 setAmounts={setAmounts}
+                setCategories={setCategories}
                 onAmountUpdate={onAmountUpdate}
               />
             </View>
@@ -348,7 +342,7 @@ const styles = {
     fontWeight: 'normal',
   },
   progressBarContainer: {
-    height: 10,
+    height: 15,
     marginVertical: 15,
     backgroundColor: '#f0f0f0',
     borderRadius: 5,
@@ -357,16 +351,30 @@ const styles = {
     height: '100%',
     borderRadius: 5,
   },
+  progressPercentage: {  
+    position: 'absolute',  
+    top: 0,  
+    left: '50%',  
+    transform: [{ translateX: -15 }],  
+    color: 'black',  
+    fontWeight: 'bold',  
+    fontSize: 10,  
+  },  
   subCategoryContainer: {
-    paddingLeft: 10,
+    paddingLeft: 15,
+    paddingRight: 15,
+    paddingVertical: 10,
     marginBottom: 5,
-    maxHeight: 100, // Limit the height of the subcategory list for scrolling
+    borderRadius: 10,
     flexGrow: 1,
   },
   subCategoryItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 5,
+    alignItems: 'center',
+    paddingVertical: 5, // Decrease padding to make it smaller
+    paddingHorizontal: 10, // Adjust horizontal padding
+    marginBottom: 5, // Adjust spacing between items
   },
   subCategoryText: {
     fontSize: 16,
