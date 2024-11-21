@@ -56,12 +56,22 @@ const ChangePassword = ({ visible, onClose, onChangePassword }) => {
         // Step 5: If all conditions are met, proceed with the password change
         onChangePassword(newPassword); // Call the onChangePassword function to actually change the password
         clearInputs(); // Clear inputs after successful password change
+        setPasswordValidations({
+            minLength: false,
+            specialChar: false,
+            uppercase: false,
+        });
         onClose(); // Close the modal after changing the password
     };
     
 
     const handleCancel = () => {
         clearInputs(); // Clear inputs when cancel is pressed
+        setPasswordValidations({
+            minLength: false,
+            specialChar: false,
+            uppercase: false,
+        });
         onClose(); // Close the modal
     };
 
