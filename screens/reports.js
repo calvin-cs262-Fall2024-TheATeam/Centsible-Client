@@ -142,7 +142,7 @@ export default function ReportsScreen() {
     return (
       <View style={[styles.triangle, { borderTopColor: color, 
         transform: [
-        { rotate: isSelected ? '-90deg' : '0deg' }, 
+        { rotate: isSelected ? '0deg' : '-90deg' }, 
       ], 
     },
   ]} />
