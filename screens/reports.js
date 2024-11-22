@@ -1,7 +1,14 @@
 import { color } from 'chart.js/helpers';
 import React, { useState, useEffect, useRef } from 'react';
+<<<<<<< HEAD
 import { View, Text, StyleSheet, Dimensions, TouchableOpacity, FlatList, ScrollView } from 'react-native';
 import { BarChart, PieChart } from 'react-native-chart-kit';
+=======
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, FlatList, ScrollView, Modal } from 'react-native';
+import { BarChart, PieChart } from 'react-native-chart-kit';
+import { Picker } from '@react-native-picker/picker';
+
+>>>>>>> updating-the-bar-chart-and-months-feature
 
 
 export default function ReportsScreen() {
@@ -13,6 +20,15 @@ export default function ReportsScreen() {
   const [totalExpense, setTotalExpense] = useState(0);
   const scrollViewRef = useRef(null);
   const whatYouSpentRef = useRef(null);
+<<<<<<< HEAD
+=======
+  const currentDate = new Date(); // Get today's date
+  const [selectedMonth, setSelectedMonth] = useState({
+    month: currentDate.getMonth(), // Initialize with the current month (0-based index)
+    year: currentDate.getFullYear(), // Initialize with the current year
+  });
+  const [isPickerVisible, setPickerVisible] = useState(false); // Controls modal visibility
+>>>>>>> updating-the-bar-chart-and-months-feature
 
   const initialTransactions = [
     { key: '1', amount: 200, category: 'Housing', description: 'Monthly rent', type: 'expense', date: new Date(2024, 9, 1) },
@@ -88,6 +104,7 @@ export default function ReportsScreen() {
   };
 
   useEffect(() => {
+<<<<<<< HEAD
     const data = processData();
     setChartData(data);
 
@@ -101,6 +118,49 @@ export default function ReportsScreen() {
     });
     setDetails(categoryDetails);
   }, []);
+=======
+    const data = initialTransactions.filter(
+      (transaction) =>
+        transaction.date.getMonth() === selectedMonth.month &&
+        transaction.date.getFullYear() === selectedMonth.year
+    );
+  
+    const categoryTotals = {};
+    const categoryDetails = {};
+    let income = 0;
+    let expense = 0;
+  
+    data.forEach((transaction) => {
+      const { category, amount, type, description = "No description", date = new Date() } = transaction;
+      if (type === 'expense') {
+        if (!categoryTotals[category]) categoryTotals[category] = 0;
+        categoryTotals[category] += Math.abs(amount);
+        expense += Math.abs(amount);
+      } else {
+        income += amount;
+      }
+
+      if (!categoryDetails[category]) {
+        categoryDetails[category] = [];
+      }
+      categoryDetails[category].push({ description:transaction.description || "No description", amount, date });
+    });
+  
+    setTotalIncome(income);
+    setTotalExpense(expense);
+  
+    setChartData(
+      Object.keys(categoryTotals).map((category, index) => ({
+        name: category,
+        population: categoryTotals[category],
+        color: colors[index % colors.length],
+      }))
+    );
+    setDetails(categoryDetails);
+  }, [selectedMonth]);
+  // Recalculate when selectedMonth changes
+  
+>>>>>>> updating-the-bar-chart-and-months-feature
 
   // calculating the toal of each categories..
   const calculateCategoryTotal = (category) => {
@@ -142,7 +202,11 @@ export default function ReportsScreen() {
     return (
       <View style={[styles.triangle, { borderTopColor: color, 
         transform: [
+<<<<<<< HEAD
         { rotate: isSelected ? '0deg' : '-90deg' }, 
+=======
+        { rotate: isSelected ? '-90deg' : '0deg' }, 
+>>>>>>> updating-the-bar-chart-and-months-feature
       ], 
     },
   ]} />
@@ -160,6 +224,7 @@ export default function ReportsScreen() {
   
   return (
     <ScrollView contentContainerStyle={styles.container}>
+<<<<<<< HEAD
       <View style={styles.header}>
         <Text style={styles.headerText}>October 2024</Text>
       </View>
@@ -213,6 +278,68 @@ export default function ReportsScreen() {
       />
     </View>
     </View>
+=======
+      <View style={styles.dropdownButtonContainer}>
+  <TouchableOpacity
+    style={styles.dropdownButton}
+    onPress={() => setPickerVisible(true)} // Show the modal
+  >
+    <Text style={styles.dropdownButtonText}>
+      {new Date(selectedMonth.year, selectedMonth.month).toLocaleString('default', { month: 'long' })} {selectedMonth.year} 
+    </Text>
+  </TouchableOpacity>
+</View>
+
+
+
+
+      <Text style={styles.title}></Text>
+
+      <View style={styles.box}>
+  <View style={styles.chartContainer}>
+    <Text style={styles.boxText}>Cha-Ching vs. Cha-Gone</Text>
+
+    {/* Total Income Progress Bar */}
+    <View style={styles.progressBarContainer}>
+      <Text style={styles.progressBarLabel}>Total Income</Text>
+      <View style={styles.progressBarBackground}>
+        <View
+          style={[
+            styles.progressBarFill,
+            {
+              width: totalIncome > 0 ? `${(totalIncome / (totalIncome + totalExpense)) * 100}%` : '0%',
+              backgroundColor: 'rgba(0, 123, 255, 1)',
+            },
+          ]}
+        />
+      </View>
+      <Text style={styles.progressBarValue}>
+        {totalIncome > 0 ? `$${totalIncome.toLocaleString()}` : '$0'}
+      </Text>
+    </View>
+
+    {/* Total Expense Progress Bar */}
+    <View style={styles.progressBarContainer}>
+      <Text style={styles.progressBarLabel}>Total Expense</Text>
+      <View style={styles.progressBarBackground}>
+        <View
+          style={[
+            styles.progressBarFill,
+            {
+              width: totalExpense > 0 ? `${(totalExpense / (totalIncome + totalExpense)) * 100}%` : '0%',
+              backgroundColor: 'rgba(255, 69, 58, 1)',
+            },
+          ]}
+        />
+      </View>
+      <Text style={styles.progressBarValue}>
+        {totalExpense > 0 ? `$${totalExpense.toLocaleString()}` : '$0'}
+      </Text>
+    </View>
+  </View>
+</View>
+
+>>>>>>> updating-the-bar-chart-and-months-feature
 
       {/* Box for Pie Chart */}
       <View style={styles.box}>
@@ -290,6 +417,45 @@ export default function ReportsScreen() {
         </ScrollView>
       </View>
       )}
+<<<<<<< HEAD
+=======
+      <Modal
+  visible={isPickerVisible} // Show/hide modal
+  transparent={true} // Makes the modal overlay transparent
+  animationType="slide" // Slide-in effect
+  onRequestClose={() => setPickerVisible(false)} // Close modal on back press
+>
+  <View style={styles.modalContainer}>
+    <View style={styles.modalContent}>
+      <Text style={styles.modalTitle}>Select Month</Text>
+      <Picker
+        selectedValue={`${selectedMonth.month}-${selectedMonth.year}`} // Use a string as value
+        onValueChange={(itemValue) => {
+          const [month, year] = itemValue.split('-').map(Number); // Parse the selected value
+          setSelectedMonth({ month, year }); // Update state with parsed values
+          setPickerVisible(false); // Close modal after selection
+        }}
+        style={styles.picker}
+      >
+        {Array.from({ length: currentDate.getMonth() + 1 }, (_, i) => (
+          <Picker.Item
+            key={i}
+            label={`${new Date(currentDate.getFullYear(), i).toLocaleString('default', { month: 'long' })} ${currentDate.getFullYear()}`}
+            value={`${i}-${currentDate.getFullYear()}`} // Use a string representation
+          />
+        ))}
+      </Picker>
+      <TouchableOpacity
+        style={styles.closeButton}
+        onPress={() => setPickerVisible(false)} // Close modal without selection
+      >
+        <Text style={styles.closeButtonText}>Close</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+</Modal>
+
+>>>>>>> updating-the-bar-chart-and-months-feature
     </ScrollView>
   );
 }
@@ -311,6 +477,7 @@ const styles = StyleSheet.create({
   chartContainer: {
     alignItems: 'space-between',
   },
+<<<<<<< HEAD
   header: {
     padding: 10,
     marginLeft: 0,
@@ -324,6 +491,8 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
   },
+=======
+>>>>>>> updating-the-bar-chart-and-months-feature
   boxText: {
     fontSize: 20,
     color: 'purple',
@@ -441,4 +610,84 @@ const styles = StyleSheet.create({
   scrollableContent: {
     maxHeight: 200,
   },
+<<<<<<< HEAD
+=======
+  dropdownButtonContainer: {
+    width: '100%',
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  dropdownButton: {
+    backgroundColor: 'purple',
+    padding: 10,
+    alignItems: 'center',
+    alignItems: 'center',
+    borderRadius: 0,
+    width: '100%',
+  },
+  dropdownButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 18,
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)', // Semi-transparent background
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    width: '80%',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  picker: {
+    width: '100%',
+  },
+  closeButton: {
+    marginTop: 10,
+    backgroundColor: 'red',
+    padding: 10,
+    borderRadius: 5,
+  },
+  closeButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  progressBarContainer: {
+    width: '100%',
+    marginBottom: 15,
+  },
+  progressBarLabel: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginBottom: 5,
+    color: '#555',
+  },
+  progressBarBackground: {
+    width: '100%',
+    height: 10,
+    backgroundColor: '#e0e0e0', // Light gray background for unfilled part
+    borderRadius: 5,
+    overflow: 'hidden',
+  },
+  progressBarFill: {
+    height: '100%',
+    borderRadius: 5,
+  },
+  progressBarValue: {
+    marginTop: 5,
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#555',
+    textAlign: 'right', // Align the value to the right
+  },
+>>>>>>> updating-the-bar-chart-and-months-feature
 });
