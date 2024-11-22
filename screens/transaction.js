@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, React } from 'react';
 import {
-  View, Text, Animated, TouchableHighlight, TouchableOpacity, Alert
-} from 'react-native';
+  View, Text, Animated, TouchableHighlight, TouchableOpacity} from 'react-native';
 import TransactionModal from '../transactionComponents/transactionModal'; // Import the modal component
 import { SwipeListView } from 'react-native-swipe-list-view';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import PropTypes from 'prop-types';
 
 export default function TransactionScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
@@ -17,6 +17,10 @@ export default function TransactionScreen({ navigation }) {
   const [expandedTransaction, setExpandedTransaction] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(0); // set state for expense/income segmented control tab
 
+  TransactionScreen.propTypes = {
+    navigation: PropTypes.object.isRequired, // Navigation prop is an object
+  };
+  
   //temporary hard-coded transactions
   useEffect(() => {
     const initialTransactions = [
@@ -117,7 +121,7 @@ export default function TransactionScreen({ navigation }) {
     const options = { month: 'short', day: 'numeric', year: 'numeric' };
     const formattedDate = data.item.date.toLocaleDateString('en-US', options).replace(',', '');
     const isExpanded = expandedTransaction === data.item.key;
-
+  
     return (
       <TouchableHighlight
         style={[styles.rowFrontVisible, { height: isExpanded ? 70 : 60 }]}  // Adjust height if expanded
@@ -146,6 +150,19 @@ export default function TransactionScreen({ navigation }) {
       </TouchableHighlight>
     );
   };
+  
+  TransactionItem.propTypes = {
+    data: PropTypes.shape({
+      item: PropTypes.shape({
+        key: PropTypes.string.isRequired,         // validate the key (string)
+        amount: PropTypes.number.isRequired,      // validate the amount (number)
+        category: PropTypes.string.isRequired,    // validate the category (string)
+        description: PropTypes.string,            // description is optional (string)
+        type: PropTypes.string.isRequired,        // validate the type (string)
+        date: PropTypes.instanceOf(Date).isRequired, // validate date (instance of Date)
+      }).isRequired,
+    }).isRequired,
+  };  
 
   // Render function for individual transaction items
   const renderItem = (data) => {
@@ -194,16 +211,33 @@ export default function TransactionScreen({ navigation }) {
     )
   }
 
+  HiddenItemWithActions.propTypes = {
+    swipeAnimatedValue: PropTypes.object.isRequired,  // Assuming this is an Animated.Value from react-native
+    onDelete: PropTypes.func.isRequired,  // onDelete is a function
+    data: PropTypes.shape({
+      item: PropTypes.shape({
+        key: PropTypes.string.isRequired,         // Validate that key is a string
+        amount: PropTypes.number.isRequired,      // Validate amount as a number
+        category: PropTypes.string.isRequired,    // Validate category as a string
+        description: PropTypes.string,            // Description is optional (string)
+        type: PropTypes.string.isRequired,        // Validate type as a string (income/expense)
+        date: PropTypes.instanceOf(Date).isRequired, // Validate date as an instance of Date
+      }).isRequired, // `item` is required
+    }).isRequired,  // `data` is required
+    rowMap: PropTypes.object.isRequired,  // rowMap is an object passed from SwipeListView
+  };
+  
+
   // Render the hidden item when swiped
   const renderHiddenItem = (data, rowMap) => {
     return (
       <HiddenItemWithActions
-        data={data}
+        data={data}  // Pass data directly to HiddenItemWithActions
         rowMap={rowMap}
         onDelete={() => deleteTransaction(rowMap, data.item.key)}
       />
     );
-  }
+  };
 
   // Set headerRight option dynamically
   useEffect(() => {
