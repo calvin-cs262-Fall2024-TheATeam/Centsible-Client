@@ -1,14 +1,9 @@
 import { color } from 'chart.js/helpers';
 import React, { useState, useEffect, useRef } from 'react';
-<<<<<<< HEAD
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, FlatList, ScrollView } from 'react-native';
-import { BarChart, PieChart } from 'react-native-chart-kit';
-=======
 import { View, Text, StyleSheet, Dimensions, TouchableOpacity, FlatList, ScrollView, Modal } from 'react-native';
 import { BarChart, PieChart } from 'react-native-chart-kit';
 import { Picker } from '@react-native-picker/picker';
 
->>>>>>> updating-the-bar-chart-and-months-feature
 
 
 export default function ReportsScreen() {
@@ -20,15 +15,12 @@ export default function ReportsScreen() {
   const [totalExpense, setTotalExpense] = useState(0);
   const scrollViewRef = useRef(null);
   const whatYouSpentRef = useRef(null);
-<<<<<<< HEAD
-=======
   const currentDate = new Date(); // Get today's date
   const [selectedMonth, setSelectedMonth] = useState({
     month: currentDate.getMonth(), // Initialize with the current month (0-based index)
     year: currentDate.getFullYear(), // Initialize with the current year
   });
   const [isPickerVisible, setPickerVisible] = useState(false); // Controls modal visibility
->>>>>>> updating-the-bar-chart-and-months-feature
 
   const initialTransactions = [
     { key: '1', amount: 200, category: 'Housing', description: 'Monthly rent', type: 'expense', date: new Date(2024, 9, 1) },
@@ -104,21 +96,6 @@ export default function ReportsScreen() {
   };
 
   useEffect(() => {
-<<<<<<< HEAD
-    const data = processData();
-    setChartData(data);
-
-    const categoryDetails = {};
-    initialTransactions.forEach((transaction) => {
-      const { category, description, amount, date } = transaction;
-      if (!categoryDetails[category]) {
-        categoryDetails[category] = [];
-      }
-      categoryDetails[category].push({ description, amount, date });
-    });
-    setDetails(categoryDetails);
-  }, []);
-=======
     const data = initialTransactions.filter(
       (transaction) =>
         transaction.date.getMonth() === selectedMonth.month &&
@@ -160,7 +137,6 @@ export default function ReportsScreen() {
   }, [selectedMonth]);
   // Recalculate when selectedMonth changes
   
->>>>>>> updating-the-bar-chart-and-months-feature
 
   // calculating the toal of each categories..
   const calculateCategoryTotal = (category) => {
@@ -202,11 +178,7 @@ export default function ReportsScreen() {
     return (
       <View style={[styles.triangle, { borderTopColor: color, 
         transform: [
-<<<<<<< HEAD
-        { rotate: isSelected ? '0deg' : '-90deg' }, 
-=======
         { rotate: isSelected ? '-90deg' : '0deg' }, 
->>>>>>> updating-the-bar-chart-and-months-feature
       ], 
     },
   ]} />
@@ -224,61 +196,6 @@ export default function ReportsScreen() {
   
   return (
     <ScrollView contentContainerStyle={styles.container}>
-<<<<<<< HEAD
-      <View style={styles.header}>
-        <Text style={styles.headerText}>October 2024</Text>
-      </View>
-      <Text style={styles.title}></Text>
-
-    {/* Bar Chart */}
-    <View style={styles.box}>
-      <View style={styles.chartContainer}>
-        <BarChart
-          data={{
-            labels: ['Total Income', 'Total Expense'],
-            datasets: [{data: [totalIncome, totalExpense],
-              colors: [
-                (opacity = 1) => `rgba(0, 123, 255, ${opacity})`, //Income
-                (opacity = 1) => `rgba(255, 69, 58, ${opacity})`, //Expense
-              ],
-            }],
-          }}
-          width={screenWidth * 0.8}
-          height={170}
-          fromZero={true}
-          horizontal={true}
-          showValuesOnTopOfBars={true}
-          withHorizontalLabels={true}
-        
-          chartConfig={{
-            backgroundColor: '#f0f0f0',
-            backgroundGradientFrom: '#ffffff',
-            backgroundGradientTo: '#ffffff',
-            color: (opacity = 1) => `rgba(0, 123, 255, ${opacity})`,
-            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-            barPercentage: 0.6,
-
-            propsForLabels: {
-              fontWeight: 'bold',
-            },
-            propsForHorizontalLabels: {
-              fontWeight: 'bold',  
-              paddingRight: 10,    
-            },
-            propsForValuesOnTopOfBars: {
-              fontWeight: 'bold',  
-              fontSize: 14,        
-              paddingTop: 10,      
-              paddingBottom: 5,
-            },
-        }}
-        withCustomBarColorFromData={true}
-        flatColor={true}
-        style={styles.barChart}
-      />
-    </View>
-    </View>
-=======
       <View style={styles.dropdownButtonContainer}>
   <TouchableOpacity
     style={styles.dropdownButton}
@@ -289,9 +206,6 @@ export default function ReportsScreen() {
     </Text>
   </TouchableOpacity>
 </View>
-
-
-
 
       <Text style={styles.title}></Text>
 
@@ -339,7 +253,6 @@ export default function ReportsScreen() {
   </View>
 </View>
 
->>>>>>> updating-the-bar-chart-and-months-feature
 
       {/* Box for Pie Chart */}
       <View style={styles.box}>
@@ -417,8 +330,6 @@ export default function ReportsScreen() {
         </ScrollView>
       </View>
       )}
-<<<<<<< HEAD
-=======
       <Modal
   visible={isPickerVisible} // Show/hide modal
   transparent={true} // Makes the modal overlay transparent
@@ -455,7 +366,6 @@ export default function ReportsScreen() {
   </View>
 </Modal>
 
->>>>>>> updating-the-bar-chart-and-months-feature
     </ScrollView>
   );
 }
@@ -477,22 +387,6 @@ const styles = StyleSheet.create({
   chartContainer: {
     alignItems: 'space-between',
   },
-<<<<<<< HEAD
-  header: {
-    padding: 10,
-    marginLeft: 0,
-    backgroundColor: 'purple',
-    justifyContent: 'center',
-    width: '100%',
-    flexDirection: 'row',
-  },
-  headerText: {
-    fontSize: 18,
-    color: 'white',
-    fontWeight: 'bold',
-  },
-=======
->>>>>>> updating-the-bar-chart-and-months-feature
   boxText: {
     fontSize: 20,
     color: 'purple',
@@ -610,8 +504,6 @@ const styles = StyleSheet.create({
   scrollableContent: {
     maxHeight: 200,
   },
-<<<<<<< HEAD
-=======
   dropdownButtonContainer: {
     width: '100%',
     alignItems: 'center',
@@ -689,5 +581,4 @@ const styles = StyleSheet.create({
     color: '#555',
     textAlign: 'right', // Align the value to the right
   },
->>>>>>> updating-the-bar-chart-and-months-feature
 });
