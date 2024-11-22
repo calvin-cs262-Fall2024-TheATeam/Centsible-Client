@@ -11,6 +11,7 @@ export default function ReportsScreen() {
   const [details, setDetails] = useState({});
   const [totalIncome, setTotalIncome] = useState(0);
   const [totalExpense, setTotalExpense] = useState(0);
+  
   const currentDate = new Date(); // Get today's date
   const [selectedMonth, setSelectedMonth] = useState({
     month: currentDate.getMonth(), // Initialize with the current month (0-based index)
