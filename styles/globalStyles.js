@@ -20,7 +20,11 @@ export const globalStyles = StyleSheet.create({
   welcomeText: {
     color: 'white', // Change text color for better visibility
     fontSize: 55,
+    fontWeight: 'bold',
+    fontStyle: 'italic',
     textAlign: 'center', // Center text alignment
+    justifyContent: 'center',
+    paddingTop: 350,
   },
   screenText: {
     flex: 1,

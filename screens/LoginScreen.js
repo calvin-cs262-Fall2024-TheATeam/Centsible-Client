@@ -12,7 +12,6 @@ export default function LoginScreen({ route, navigation }) {
     // Basic login simulation (replace with actual login logic)
     if (email === 'user@example.com' && password === 'password') {
       setIsLoggedIn(true);
-      Alert.alert('Login Successful!');
       navigation.replace('Home'); // Navigate to the Home screen
     } else {
       Alert.alert('Login Failed', 'Invalid email or password.');

@@ -37,12 +37,7 @@ export default function App() {
   if (isLoading) {
     return (
       <View style={globalStyles.splashContainer}>
-        <View style={globalStyles.imageContainer}>
-          <ImageViewer placeholderImageSource={PlaceholderImage} />
-        </View>
-        <View style={globalStyles.textContainer}>
-          <Text style={globalStyles.welcomeText}>Welcome to Centsible!</Text>
-        </View>
+          <Text style={globalStyles.welcomeText}>Centsible</Text>
       </View>
     );
   }
