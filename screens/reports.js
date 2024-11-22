@@ -207,9 +207,6 @@ export default function ReportsScreen() {
   </TouchableOpacity>
 </View>
 
-
-
-
       <Text style={styles.title}></Text>
 
       <View style={styles.box}>
