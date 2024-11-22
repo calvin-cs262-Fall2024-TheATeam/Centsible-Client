@@ -17,7 +17,7 @@ export default function ReportsScreen() {
     month: currentDate.getMonth(), // Initialize with the current month (0-based index)
     year: currentDate.getFullYear(), // Initialize with the current year
   });
-  const [isPickerVisible, setPickerVisible] = useState(false); // Controls modal visibility
+  const [isPickerVisible, setPickerVisible] = useState(false); 
 
   const initialTransactions = [
     { key: '1', amount: 200, category: 'Housing', description: 'Monthly rent', type: 'expense', date: new Date(2024, 9, 1) },
