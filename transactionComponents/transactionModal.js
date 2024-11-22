@@ -31,23 +31,6 @@ const TransactionModal = ({ visible, onClose, onAdd, amount, setAmount, category
         </TouchableOpacity>
     );
 
-    TransactionModal.propTypes = {
-        visible: PropTypes.bool,
-        onClose: PropTypes.func,
-        onAdd: PropTypes.func,
-        amount: PropTypes.string,
-        setAmount: PropTypes.func,
-        category: PropTypes.string,
-        setCategory: PropTypes.func,
-        date: PropTypes.instanceOf(Date),
-        setDate: PropTypes.func,
-        selectedIndex: PropTypes.number,
-        handleIndexChange: PropTypes.func,
-        description: PropTypes.string,
-        setDescription: PropTypes.func,
-        resetForm: PropTypes.func,
-    };
-
     return (
         <Modal
             transparent={true}
