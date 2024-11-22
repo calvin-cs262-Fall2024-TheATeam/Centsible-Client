@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Modal, TextInput, Text, View, Button, TouchableOpacity, FlatList, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { globalStyles } from '../styles/globalStyles';
-import SegmentedControlTab from "react-native-segmented-control-tab"; // me
+import SegmentedControlTab from "react-native-segmented-control-tab";
+import PropTypes from 'prop-types';
 // may need to use command "npm install react-native-segmented-control-tab"
 
 const expenseCategories = [
@@ -29,6 +30,23 @@ const TransactionModal = ({ visible, onClose, onAdd, amount, setAmount, category
             <Text style={globalStyles.categoryOptionText}>{categoryName}</Text>
         </TouchableOpacity>
     );
+
+    TransactionModal.propTypes = {
+        visible: PropTypes.bool,
+        onClose: PropTypes.func,
+        onAdd: PropTypes.func,
+        amount: PropTypes.string,
+        setAmount: PropTypes.func,
+        category: PropTypes.string,
+        setCategory: PropTypes.func,
+        date: PropTypes.instanceOf(Date),
+        setDate: PropTypes.func,
+        selectedIndex: PropTypes.number,
+        handleIndexChange: PropTypes.func,
+        description: PropTypes.string,
+        setDescription: PropTypes.func,
+        resetForm: PropTypes.func,
+    };
 
     return (
         <Modal
