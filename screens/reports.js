@@ -504,7 +504,6 @@ const styles = StyleSheet.create({
   dropdownButtonContainer: {
     width: '100%',
     alignItems: 'center',
-    marginVertical: 10,
   },
   dropdownButton: {
     backgroundColor: 'purple',
