@@ -4,8 +4,6 @@ import { View, Text, StyleSheet, Dimensions, TouchableOpacity, FlatList, ScrollV
 import { BarChart, PieChart } from 'react-native-chart-kit';
 import { Picker } from '@react-native-picker/picker';
 
-
-
 export default function ReportsScreen() {
   const screenWidth = Dimensions.get('window').width;
   const [chartData, setChartData] = useState([]);
@@ -13,8 +11,6 @@ export default function ReportsScreen() {
   const [details, setDetails] = useState({});
   const [totalIncome, setTotalIncome] = useState(0);
   const [totalExpense, setTotalExpense] = useState(0);
-  const scrollViewRef = useRef(null);
-  const whatYouSpentRef = useRef(null);
   const currentDate = new Date(); // Get today's date
   const [selectedMonth, setSelectedMonth] = useState({
     month: currentDate.getMonth(), // Initialize with the current month (0-based index)
@@ -178,7 +174,7 @@ export default function ReportsScreen() {
     return (
       <View style={[styles.triangle, { borderTopColor: color, 
         transform: [
-        { rotate: isSelected ? '-90deg' : '0deg' }, 
+        { rotate: isSelected ? '0deg' : '-90deg' }, 
       ], 
     },
   ]} />
@@ -211,7 +207,7 @@ export default function ReportsScreen() {
 
       <View style={styles.box}>
   <View style={styles.chartContainer}>
-    <Text style={styles.boxText}>Cha-Ching vs. Cha-Gone</Text>
+    <Text style={styles.boxText}>Income vs. Expense</Text>
 
     {/* Total Income Progress Bar */}
     <View style={styles.progressBarContainer}>
