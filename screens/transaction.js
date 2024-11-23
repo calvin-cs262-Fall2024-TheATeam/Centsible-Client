@@ -172,7 +172,7 @@ export default function TransactionScreen({ navigation }) {
       <TransactionItem data={data} />
     );
   };
-
+  
   const closeRow = (rowMap, rowKey) => {
     if (rowMap[rowKey]) {
       rowMap[rowKey].closeRow();
@@ -187,25 +187,21 @@ export default function TransactionScreen({ navigation }) {
     setTransactions(newData); // Update state with the new list
   };
 
-  const HiddenItemWithActions = ({ onDelete, data }) => {
+  const HiddenItemWithActions = ({ onDelete, data, rowMap }) => {
     const isExpanded = expandedTransaction === data.item.key;
-    
+  
     return (
       <View style={[styles.rowBack, { height: isExpanded ? 70 : 60 }]}>
-        <TouchableOpacity 
-          style={[styles.trashBtn, { height: isExpanded ? 70 : 60 }]} 
-          onPress={onDelete}
+        <TouchableOpacity
+          style={[styles.trashBtn, { height: isExpanded ? 70 : 60 }]}
+          onPress={() => onDelete(rowMap, data.item.key)} // Use the passed onDelete handler
         >
-          <MaterialCommunityIcons
-            name="trash-can-outline"
-            size={25}
-            color="#fff"
-          />
+          <MaterialCommunityIcons name="trash-can-outline" size={25} color="#fff" />
         </TouchableOpacity>
       </View>
     );
   };
-
+  
   HiddenItemWithActions.propTypes = {
     onDelete: PropTypes.func.isRequired,
     data: PropTypes.shape({
@@ -227,11 +223,11 @@ export default function TransactionScreen({ navigation }) {
       <HiddenItemWithActions
         data={data}
         rowMap={rowMap}
-        onDelete={() => deleteTransaction(rowMap, data.item.key)}
+        onDelete={deleteTransaction}
       />
     );
-  };  
-
+  };
+  
   // Set headerRight option dynamically
   useEffect(() => {
     navigation.setOptions({
