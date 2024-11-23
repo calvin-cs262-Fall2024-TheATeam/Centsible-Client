@@ -212,7 +212,7 @@ export default function TransactionScreen({ navigation }) {
   }
 
   HiddenItemWithActions.propTypes = {
-    swipeAnimatedValue: PropTypes.object.isRequired,  // Assuming this is an Animated.Value from react-native
+    swipeAnimatedValue: PropTypes.instanceOf(Animated.Value).isRequired,
     onDelete: PropTypes.func.isRequired,  // onDelete is a function
     data: PropTypes.shape({
       item: PropTypes.shape({
@@ -225,9 +225,8 @@ export default function TransactionScreen({ navigation }) {
       }).isRequired, // `item` is required
     }).isRequired,  // `data` is required
     rowMap: PropTypes.object.isRequired,  // rowMap is an object passed from SwipeListView
-  };
+  };  
   
-
   // Render the hidden item when swiped
   const renderHiddenItem = (data, rowMap) => {
     return (
