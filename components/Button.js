@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+import React from 'react';
 import { StyleSheet, View, Pressable, Text } from 'react-native';
  
 export default function Button({ label }) {
@@ -9,7 +11,11 @@ export default function Button({ label }) {
     </View>
   );
 }
- 
+
+Button.PropTypes = {
+  label: PropTypes.string.isRequired,
+};
+
 const styles = StyleSheet.create({
   buttonContainer: {
     width: 320,
@@ -23,7 +29,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: '100%',
     height: '100%',
-    alignItems: 'bottom',
+    alignItems: 'flex-end',
     justifyContent: 'center',
     flexDirection: 'row',
   },
