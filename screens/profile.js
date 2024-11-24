@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Switch } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import ChangePassword from './changePassword';
+import PropTypes from 'prop-types'; 
 
 export default function ProfileScreen({ setIsLoggedIn }) {
   const [isNotificationsEnabled, setIsNotificationsEnabled] = useState(false);
@@ -148,7 +149,11 @@ export default function ProfileScreen({ setIsLoggedIn }) {
   );
 }
 
-styles = StyleSheet.create({
+ProfileScreen.propTypes = {
+  setIsLoggedIn: PropTypes.func.isRequired,  
+};
+
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
