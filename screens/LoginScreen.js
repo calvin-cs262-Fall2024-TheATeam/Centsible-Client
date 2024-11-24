@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import PropTypes from 'prop-types';
 
 export default function LoginScreen({ route, navigation }) {
   const { setIsLoggedIn } = route.params; // Get the setter for login state
@@ -44,11 +45,23 @@ export default function LoginScreen({ route, navigation }) {
 
       {/* Link to Create Account Screen */}
       <TouchableOpacity onPress={() => navigation.navigate('CreateAccount')}>
-        <Text style={styles.createAccountText}>Don't have an account? Create one</Text>
+        <Text style={styles.createAccountText}>Don&apos;t have an account? Create one</Text>
       </TouchableOpacity>
     </View>
   );
 }
+
+LoginScreen.propTypes = {
+  route: PropTypes.shape({
+    params: PropTypes.shape({
+      setIsLoggedIn: PropTypes.func.isRequired,
+    }).isRequired,
+  }).isRequired,
+  navigation: PropTypes.shape({
+    replace: PropTypes.func.isRequired,
+    navigate: PropTypes.func.isRequired,
+  }).isRequired,
+};
 
 const styles = StyleSheet.create({
   container: {
