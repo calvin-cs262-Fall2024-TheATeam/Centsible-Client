@@ -132,7 +132,7 @@ const SubCategoryList = ({
                 value={amounts[subcat] || ''}
                 onChangeText={(text) => handleAmountChange(subcat, text)}
                 keyboardType="numeric"
-                style={styles.input}
+                style={styles.amountInput}
                 onBlur={() => handleAmountBlur(subcat)}
                 autoFocus
               />
@@ -151,19 +151,21 @@ const SubCategoryList = ({
         </TouchableOpacity>
       ) : (
         <View style={styles.addSubcategoryContainer}>
-          <TextInput
-            style={styles.input}
-            value={newSubcategoryName}
-            onChangeText={setNewSubcategoryName}
-            placeholder="Enter subcategory name"
-          />
-          <TextInput
-            style={styles.amountInput}
-            value={newSubcategoryAmount}
-            onChangeText={setNewSubcategoryAmount}
-            placeholder="Enter amount"
-            keyboardType="numeric"
-          />
+          <View style={styles.addSubCat}>
+            <TextInput
+              style={styles.input}
+              value={newSubcategoryName}
+              onChangeText={setNewSubcategoryName}
+              placeholder="Enter subcategory name"
+            />
+            <TextInput
+              style={styles.amountInput}
+              value={newSubcategoryAmount}
+              onChangeText={setNewSubcategoryAmount}
+              placeholder="Enter amount"
+              keyboardType="numeric"
+            />
+          </View>
           <View style={styles.addSubcategoryActions}>
             <TouchableOpacity style={styles.addButton} onPress={handleAddSubcategory}>
               <Text style={styles.addButtonText}>Add</Text>
@@ -208,9 +210,9 @@ const BudgetPlanner = () => {
 
   const getProgressBarColor = (spentAmount, totalAmount) => {
     const progress = (spentAmount / totalAmount) * 100;
-    if (progress >= 100) return 'red';
-    if (progress >= 90) return 'yellow';
-    return 'green';
+    if (progress >= 100) return '#cc0000';
+    if (progress >= 90) return '#ff9933';
+    return '#006600';
   };
 
   return (
@@ -240,16 +242,17 @@ const BudgetPlanner = () => {
                     backgroundColor: getProgressBarColor(categorySpent, totalAmount),
                   }}
                 />
-                <Text style={styles.progressPercentage}>  
+                {/* <Text style={styles.progressPercentage}>  
                   {Math.min(progress, 100).toFixed(0)}%  
-                </Text>  
+                </Text>   */}
               </View>
 
               <View style={styles.categoryHeader}>
                 <Text style={styles.categoryTitle}>{category}</Text>
-                <Text style={styles.amountText}>
-                  ${categorySpent.toFixed(2)}/ ${totalAmount.toFixed(2)}
-                </Text>
+                <View  style={styles.amountText}>
+                  <Text style={styles.amountUsed}>${categorySpent.toFixed(2)} / </Text>
+                  <Text style={styles.amountTotal}>${totalAmount.toFixed(2)}</Text>
+                </View>
               </View>
 
               <SubCategoryList
@@ -332,18 +335,33 @@ const styles = {
     color: '#333',
   },
   amountText: {
+    flexDirection: 'row',
+  },
+  amountUsed: {
+    fontSize: 18,
+    color: '#999',
+  },
+  
+  amountTotal: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#333',
   },
+
+  addSubCat: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+
   subAmountText: {
     color: 'purple', // Updated to purple
     fontSize: 18,
-    fontWeight: 'normal',
   },
+
   progressBarContainer: {
-    height: 15,
-    marginVertical: 15,
+    height: 10,
+    marginTop: 5,
+    marginBottom: 10, 
     backgroundColor: '#f0f0f0',
     borderRadius: 5,
   },
@@ -353,18 +371,15 @@ const styles = {
   },
   progressPercentage: {  
     position: 'absolute',  
-    top: 0,  
-    left: '50%',  
-    transform: [{ translateX: -15 }],  
-    color: 'black',  
-    fontWeight: 'bold',  
+    top: 0,
+    color: 'white',  
     fontSize: 10,  
   },  
   subCategoryContainer: {
-    paddingLeft: 15,
-    paddingRight: 15,
-    paddingVertical: 10,
-    marginBottom: 5,
+    paddingLeft: 5,
+    // paddingRight: 5,
+    paddingBottom: 10,
+    // marginBottom: 5,
     borderRadius: 10,
     flexGrow: 1,
   },
@@ -374,54 +389,67 @@ const styles = {
     alignItems: 'center',
     paddingVertical: 5, // Decrease padding to make it smaller
     paddingHorizontal: 10, // Adjust horizontal padding
-    marginBottom: 5, // Adjust spacing between items
   },
   subCategoryText: {
     fontSize: 16,
     color: '#333',
   },
   input: {
-    width: 150,
+    width: '60%',
     height: 40, // Adjust the height
     backgroundColor: '#f0f0f0',
     borderColor: '#ccc',
-    paddingLeft: 10, // Reduce padding for a smaller look
-    borderWidth: 1,
-    marginBottom: 10, // Space between the two fields
-    fontSize: 14, // Slightly smaller font
+    paddingLeft: 10,
+    marginBottom: 10, 
+    fontSize: 14,
+    borderRadius: 8,
+  },
+  editSubcatAmount: {
+    width: 100,
+    height: 40, 
+    backgroundColor: '#f0f0f0',
+    borderColor: '#ccc',
+    paddingLeft: 10,
+    marginBottom: 10, 
+    fontSize: 14,
+    borderRadius: 8,
   },
 
   amountInput: {
-    width: 100, // Set a smaller width for the amount input
+    width: '35%', // Set a smaller width for the amount input
     height: 40, // Match the height of the subcategory input
     backgroundColor: '#f0f0f0',
     padding: 8,
     marginBottom: 10,
     fontSize: 14, // Match font size
+    borderRadius: 8,
   },
   addSubcategoryText: {
     color: 'purple',
     fontSize: 16,
-    textAlign: 'left',
     textDecorationLine: 'underline',
+    marginTop: 10,
+    marginHorizontal: 10,
+
   },
   addSubcategoryContainer: {
-    marginTop: 10,
+    marginVertical: 10,
   },
   addSubcategoryActions: {
     flexDirection: 'row',
-    justifyContent: 'space-between', // Align Add on the left and Cancel on the right
+    justifyContent: 'space-between',
   },
   addButton: {
-    padding: 5,
     fontSize: 16,
   },
   addButtonText: {
     color: 'purple',
+    fontWeight: 'bold',
+    fontSize: 18,
   },
   cancelButtonText: {
     color: 'red',
-    fontSize: 16,
+    fontSize: 18,
     alignSelf: 'center',
   },
 };
