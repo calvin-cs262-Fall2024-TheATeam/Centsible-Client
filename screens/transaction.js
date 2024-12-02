@@ -11,77 +11,107 @@ export default function TransactionScreen({ navigation }) {
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState(new Date());
   const [category, setCategory] = useState('');
-  const [type, setType] = useState('expense'); //setting the default to say expense
+  const [type, setType] = useState('Expense'); //setting the default to say expense
   const [description, setDescription] = useState('');
   const [transactions, setTransactions] = useState([]);
   const [expandedTransaction, setExpandedTransaction] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(0); // set state for expense/income segmented control tab
+  const [currentBalance] = useState(0); // Initialize with a default value of 0
 
-  //temporary hard-coded transactions
   useEffect(() => {
-    const initialTransactions = [
-    { key: '1', amount: 200, category: 'Housing', description: 'Monthly rent', type: 'expense', date: new Date(2024, 9, 1) },
-    { key: '4', amount: 30, category: 'Transportation', description: 'Gas for the car', type: 'expense', date: new Date(2024, 9, 3) },
-    { key: '5', amount: 50, category: 'Personal', description: 'New clothes', type: 'expense', date: new Date(2024, 9, 2) },
-    { key: '7', amount: 10, category: 'Food', description: 'Takeout dinner', type: 'expense', date: new Date(2024, 9, 3) },
-    { key: '8', amount: 60, category: 'Housing', description: 'Electricity bill', type: 'expense', date: new Date(2024, 9, 5) },
-    { key: '10', amount: 10, category: 'Food', description: 'Lunch with friends', type: 'expense', date: new Date(2024, 9, 6) },
-    { key: '12', amount: 25, category: 'Personal', description: 'Coffee and bagels', type: 'expense', date: new Date(2024, 9, 6) },
-    { key: '13', amount: 90, category: 'Food', description: 'Groceries for the week', type: 'expense', date: new Date(2024, 9, 7) },
-    { key: '14', amount: 20, category: 'Personal', description: 'Shampoo and toiletries', type: 'expense', date: new Date(2024, 9, 7) },
-    { key: '15', amount: 50, category: 'Entertainment', description: 'Weekend trip', type: 'expense', date: new Date(2024, 9, 8) },
-    { key: '16', amount: 10, category: 'Food', description: 'Fast food lunch', type: 'expense', date: new Date(2024, 9, 9) },
-    { key: '18', amount: 45, category: 'Personal', description: 'Haircut', type: 'expense', date: new Date(2024, 9, 5) },
-    { key: '21', amount: 10, category: 'Personal', description: 'Coffee at campus cafe', type: 'expense', date: new Date(2024, 9, 10) },
-    { key: '22', amount: 100, category: 'Personal', description: 'New shoes', type: 'expense', date: new Date(2024, 9, 13) },
-    { key: '23', amount: 100, category: 'Personal', description: 'Amazon', type: 'expense', date: new Date(2024, 9, 13) },
-    { key: '24', amount: 50, category: 'Food', description: 'Groceries for the week', type: 'expense', date: new Date(2024, 9, 14) },
-    { key: '25', amount: 15, category: 'Education', description: 'School supplies', type: 'expense', date: new Date(2024, 9, 14) },
-    { key: '28', amount: 50, category: 'Personal', description: 'Earrings', type: 'expense', date: new Date(2024, 9, 16) },
-    { key: '30', amount: 10, category: 'Entertainment', description: 'Sports event tickets', type: 'expense', date: new Date(2024, 9, 16) },
-    { key: '32', amount: 5, category: 'Food', description: 'Coffee shop', type: 'expense', date: new Date(2024, 9, 18) },
-    { key: '34', amount: 15, category: 'Food', description: 'Lunch with friends', type: 'expense', date: new Date(2024, 9, 19) },
-    { key: '36', amount: 50, category: 'Transportation', description: 'Gas for the car', type: 'expense', date: new Date(2024, 9, 20) },
-    { key: '38', amount: 10, category: 'Entertainment', description: 'Movie night with friends', type: 'expense', date: new Date(2024, 9, 22) },
-    { key: '47', amount: 25, category: 'Personal', description: 'Toiletries', type: 'expense', date: new Date(2024, 9, 28) },
-    { key: '48', amount: 50, category: 'Food', description: 'Groceries for the weekend', type: 'expense', date: new Date(2024, 9, 28) },
-    { key: '50', amount: 15, category: 'Entertainment', description: 'Monthly gaming subscription', type: 'expense', date: new Date(2024, 9, 30) },
-    { key: '51', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 8) },
-    { key: '52', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 15) },
-    { key: '53', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 22) },
-    { key: '54', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 29) },
-    
-    ];
+    const fetchTransactions = async () => {
+      try {
+        // Replace with your actual backend URL
+        const response = await fetch('https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/transactions/1'); // Replace '1' with actual appuserID
+        if (response.ok) {
+          const data = await response.json();
+          const sortedTransactions = data.map((transaction, index) => ({
+            ...transaction,
+            key: transaction.id || index.toString(), // Ensure a unique key for each transaction
+          })).sort((a, b) => new Date(b.transactiondate) - new Date(a.transactiondate)); // Sort by date
+          setTransactions(sortedTransactions);
+        } else {
+          Alert.alert("Error", "Failed to fetch transactions.");
+        }
+      } catch (error) {
+        console.error('Error fetching transactions:', error);
+        Alert.alert("Error", "Something went wrong.");
+      }
+    };
 
-    const sortedTransactions = initialTransactions.sort((a, b) => b.date - a.date);
-    setTransactions(sortedTransactions);
+    fetchTransactions();
   }, []);
 
-  const handleAddTransaction = () => {
+  const handleAddTransaction = async () => {
     const parsedAmount = parseFloat(amount);
 
     // Create a new transaction object
     const newTransaction = {
-      key: Date.now().toString(), // To generate unique key
-      amount: parsedAmount,
-      category,
-      description,
-      type,
-      date,
+      appuserid: 1, // Ensure field matches the server's expected field
+      dollaramount: parsedAmount.toString(), // Ensure the amount is a string (if that's how the API expects it)
+      transactiontype: type, // "Expense" or "Income"
+      budgetcategoryid: category, // Assuming 'category' is the correct value to pass here
+      optionaldescription: description,
+      transactiondate: date.toISOString(), // Correct format for date
     };
 
-    setTransactions(prevTransactions => {
-      const updatedTransactions = [newTransaction, ...prevTransactions];
-      return updatedTransactions.sort((a, b) => b.date - a.date);  // Sort by date descending
-    });
-    resetForm();
+    try {
+      // Make the API call to create the transaction
+      const response = await fetch('https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/transactions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newTransaction), // Send the newTransaction object as JSON
+      });
+
+      // Log the response status code and body for debugging
+      const responseText = await response.text();  // Read the response body as text
+      console.log('Response Status:', response.status);
+      console.log('Response Text:', responseText);
+
+      if (response.ok) {
+        try {
+          const data = JSON.parse(responseText); // Try parsing the response text as JSON
+          setTransactions((prevTransactions) => {
+            const updatedTransactions = [data, ...prevTransactions];
+            return updatedTransactions.sort((a, b) => new Date(b.transactiondate) - new Date(a.transactiondate)); // Sort by date descending
+          });
+          resetForm(); // Reset the form after adding the transaction
+        } catch (jsonError) {
+          console.error('Error parsing JSON response:', jsonError);
+          alert('Error parsing the response data.');
+        }
+      } else {
+        // Handle server errors or non-200 responses
+        try {
+          const errorData = JSON.parse(responseText); // Try parsing error data returned by the server
+          console.error('Error data from server:', errorData);
+          throw new Error(errorData.message || "Failed to add transaction");
+        } catch (jsonError) {
+          console.error('Error parsing error response:', jsonError);
+          throw new Error("Failed to add transaction. Unknown error.");
+        }
+      }
+    } catch (error) {
+      console.error("Error creating transaction:", error);
+      alert("Error creating transaction: " + error.message); // Show error message
+    }
   };
+
+
+  // setTransactions(prevTransactions => {
+  //   const updatedTransactions = [newTransaction, ...prevTransactions];
+  //   return updatedTransactions.sort((a, b) => b.date - a.date);  // Sort by date descending
+  // });
+  // resetForm();
+
 
   // Resets the form fields and closes the modal
   const resetForm = () => {
     setAmount('');
     setCategory('');
-    setType('expense');
+    setType('Expense');
     setDate(new Date());
     setDescription('');
     setSelectedIndex(0); //Resets to "Expense" (index 0)
@@ -91,31 +121,41 @@ export default function TransactionScreen({ navigation }) {
   // handles switching expense/income tabs in transaction
   const handleIndexChange = (index) => {
     setSelectedIndex(index);
-    if (index === 0) { setType('expense') };
-    if (index === 1) { setType('income') };
+    if (index === 0) { setType('Expense') };
+    if (index === 1) { setType('Income') };
   };
 
   const handleExpandTransaction = (transactionKey) => {
+    // Toggle between expanding and collapsing
     if (expandedTransaction === transactionKey) {
-      setExpandedTransaction(null);  // Collapse the transaction if it's already expanded
+      setExpandedTransaction(null); // Collapse the transaction
     } else {
-      setExpandedTransaction(transactionKey);  // Expand the clicked transaction
+      setExpandedTransaction(transactionKey); // Expand the clicked transaction
     }
-  };
+  };  
 
   // Calculate current balance
   const calculateBalance = () => {
-    return transactions.reduce((balance, transaction) => {
-      return transaction.type === 'income'
-        ? balance + transaction.amount
-        : balance - transaction.amount;
-    }, 0).toFixed(2); // Keep it two decimals
+    let balance = parseFloat(currentBalance); // Start with the current balance from the database (stored in state)
+
+    // Iterate over transactions and adjust the balance
+    transactions.forEach(transaction => {
+      const amount = parseFloat(transaction.dollaramount); // Parse the transaction amount
+      // Update balance based on transaction type
+      if (transaction.transactiontype === 'Income') {
+        balance += amount; // Add income
+      } else if (transaction.transactiontype === 'Expense') {
+        balance -= amount; // Subtract expense
+      }
+    });
+
+    return balance.toFixed(2); // Return balance rounded to two decimal places
   };
 
   // Renders a single transaction item with correct layout 
   const TransactionItem = ({ data }) => {
     const options = { month: 'short', day: 'numeric', year: 'numeric' };
-    const formattedDate = data.item.date.toLocaleDateString('en-US', options).replace(',', '');
+    const formattedDate = new Date(data.item.transactiondate).toLocaleDateString('en-US', options).replace(',', '');
     const isExpanded = expandedTransaction === data.item.key;
 
     return (
@@ -127,7 +167,7 @@ export default function TransactionScreen({ navigation }) {
         <View style={styles.itemContainer}>
           <View>
             <Text style={styles.dateText}>{formattedDate.toUpperCase()}</Text>
-            {data.item.type === 'income' ? (
+            {data.item.type === 'Income' ? (
               <Text style={[styles.categoryText, isExpanded && { paddingBottom: 0 }]}>Income</Text>
             ) : (
               <Text style={[styles.categoryText, isExpanded && { paddingBottom: 0 }]}>{data.item.category}</Text>
@@ -135,12 +175,14 @@ export default function TransactionScreen({ navigation }) {
             {/* Render description if expanded */}
             {isExpanded && (
               <Text style={[styles.descriptionText, { paddingBottom: 8 }]}>
-                {data.item.description || "No description given"}
+                {data.item.optionaldescription || "No description given"}
               </Text>
             )}
           </View>
-          <Text style={[styles.amountText, { color: data.item.type === 'income' ? 'green' : 'black' }]}>
-            {data.item.type === 'income' ? `+$${data.item.amount.toFixed(2)}` : `-$${data.item.amount.toFixed(2)}`}
+          <Text style={[styles.amountText, { color: data.item.type === 'Income' ? 'green' : 'black' }]}>
+            {data.item.type === 'Income'
+              ? `+$${parseFloat(data.item.dollaramount).toFixed(2)}`
+              : `-$${parseFloat(data.item.dollaramount).toFixed(2)}`}
           </Text>
         </View>
       </TouchableHighlight>
