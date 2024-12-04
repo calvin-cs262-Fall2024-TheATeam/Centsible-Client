@@ -49,20 +49,20 @@ export default function App() {
 
   // Home tab screens
   const HomeTabs = () => (
-    <Tab.Navigator initialRouteName="Goals"
+    <Tab.Navigator initialRouteName="Budget"
       screenOptions={{
         tabBarStyle: { backgroundColor: 'white' }, // Optional: Set the background color of the tab bar
         tabBarActiveTintColor: 'purple', // Active icon and label color
         tabBarInactiveTintColor: 'gray', // Inactive icon and label color
       }}>
       <Tab.Screen
-        name="Goals"
+        name="Budget"
         component={GoalsScreen}
         options={{
           tabBarIcon: ({ color, size }) => (
             <Icon name="dollar" color={color} size={size} />
           ),
-          headerTitle: 'Goals',
+          headerTitle: 'Budget',
         }}
       />
       <Tab.Screen
