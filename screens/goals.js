@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Text, View, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
-
+import { Text, View, TouchableOpacity, TextInput, ScrollView, Alert, Modal  } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons';
+import { Picker } from '@react-native-picker/picker';
 // Initial transactions and amounts
 const initialTransactions =
   [
@@ -161,6 +162,14 @@ const BudgetPlanner = () => {
   });
   const initialBudget = 260;
 
+  const currentDate = new Date();
+  const [selectedMonth, setSelectedMonth] = useState({
+    month: currentDate.getMonth(),
+    year: currentDate.getFullYear(),
+  });
+
+  const [isPickerVisible, setPickerVisible] = useState(false);
+
   const getTotalSpent = () => transactions.reduce((sum, t) => sum + t.amount, 0);
   const getRemainingBudget = () => initialBudget - getTotalSpent();
 
@@ -170,6 +179,31 @@ const BudgetPlanner = () => {
       return [...newBudgets, { subcategory, amount }];
     });
   };
+
+  const handlePreviousMonth = () => {
+    if (selectedMonth.month === 0) {
+      setSelectedMonth({ month: 11, year: selectedMonth.year - 1 });
+    } else {
+      setSelectedMonth({ month: selectedMonth.month - 1, year: selectedMonth.year });
+    }
+  };
+
+  const handleNextMonth = () => {
+    if (
+      selectedMonth.month !== currentDate.getMonth() ||
+      selectedMonth.year !== currentDate.getFullYear()
+    ) {
+      if (selectedMonth.month === 11) {
+        setSelectedMonth({ month: 0, year: selectedMonth.year + 1 });
+      } else {
+        setSelectedMonth({ month: selectedMonth.month + 1, year: selectedMonth.year });
+      }
+    }
+  };
+
+  const isNextMonthDisabled =
+    selectedMonth.month === currentDate.getMonth() &&
+    selectedMonth.year === currentDate.getFullYear();
 
   const handleAddSubcategory = (category, newSubcategory) => {
     setCategories(prevCategories => {
@@ -198,25 +232,47 @@ const BudgetPlanner = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>October 2024</Text>
-      </View>
+      {/* Monthly Navigation */}
+      <View style={styles.monthNavigationContainer}>
+  {/* Previous Month Arrow */}
+  <TouchableOpacity
+    style={styles.arrowButton}
+    onPress={handlePreviousMonth}
+  >
+    <FontAwesome name="chevron-left" size={20} color="white" />
+  </TouchableOpacity>
 
-      {getRemainingBudget() < 0 && (
+  {/* Dropdown Button */}
+  <TouchableOpacity
+    style={styles.dropdownButton}
+    onPress={() => setPickerVisible(true)} // Show the modal
+  >
+    <Text style={styles.dropdownButtonText}>
+      {new Date(selectedMonth.year, selectedMonth.month).toLocaleString('default', { month: 'long' })} {selectedMonth.year}
+    </Text>
+  </TouchableOpacity>
+
+  {/* Next Month Arrow */}
+  <TouchableOpacity
+    style={styles.arrowButton}
+    onPress={handleNextMonth}
+    disabled={isNextMonthDisabled}
+  >
+    <FontAwesome name="chevron-right" size={20} color="white" />
+  </TouchableOpacity>
+</View>
+
+
+      {transactions.reduce((sum, t) => sum + t.amount, 0) > initialBudget && (
         <Text style={styles.warningText}>Warning: You’re out of budget!</Text>
       )}
 
       <ScrollView style={styles.scrollView}>
         {Object.entries(categories).map(([category, subcategories]) => {
-          // Get the total amount spent across all subcategories in this category
           const categorySpent = getCurrentAmountForCategory(subcategories);
-
-          // Sum up the initial amounts for all subcategories in this category
           const initialAmount = subcategories.reduce((sum, subcat) => {
             return sum + parseFloat(initialAmounts[subcat] || '0.00');
           }, 0);
-
-          // Calculate the progress based on the total spent vs initial budget for all subcategories
           const progress = (categorySpent / initialAmount) * 100;
 
           return (
@@ -232,7 +288,7 @@ const BudgetPlanner = () => {
                 <View
                   style={{
                     ...styles.progressBar,
-                    width: `${Math.min(progress, 100)}%`, // Cap the progress at 100%
+                    width: `${Math.min(progress, 100)}%`,
                     backgroundColor: getProgressBarColor(categorySpent, initialAmount),
                   }}
                 />
@@ -241,15 +297,51 @@ const BudgetPlanner = () => {
               <SubCategoryList
                 category={category}
                 subcategories={subcategories}
-                onAddTransaction={handleAddTransaction}
+                onAddTransaction={() => {}}
                 transactions={transactions}
-                onAddSubcategory={handleAddSubcategory}
+                onAddSubcategory={() => {}}
               />
             </View>
           );
         })}
       </ScrollView>
+      <Modal
+  visible={isPickerVisible}
+  transparent={true}
+  animationType="slide"
+  onRequestClose={() => setPickerVisible(false)}
+>
+  <View style={styles.modalContainer}>
+    <View style={styles.modalContent}>
+      <Text style={styles.modalTitle}>Select Month</Text>
+      <Picker
+        selectedValue={`${selectedMonth.month}-${selectedMonth.year}`}
+        onValueChange={(itemValue) => {
+          const [month, year] = itemValue.split('-').map(Number);
+          setSelectedMonth({ month, year });
+          setPickerVisible(false);
+        }}
+        style={styles.picker}
+      >
+        {Array.from({ length: 12 }, (_, i) => (
+          <Picker.Item
+            key={i}
+            label={`${new Date(selectedMonth.year, i).toLocaleString('default', { month: 'long' })} ${selectedMonth.year}`}
+            value={`${i}-${selectedMonth.year}`}
+          />
+        ))}
+      </Picker>
+      <TouchableOpacity
+        style={styles.closeButton}
+        onPress={() => setPickerVisible(false)}
+      >
+        <Text style={styles.closeButtonText}>Close</Text>
+      </TouchableOpacity>
     </View>
+  </View>
+</Modal>
+  </View>
+   
   );
 };
 
@@ -258,7 +350,6 @@ const styles = {
     backgroundColor: '#e8d0f4',
     flex: 1,
   },
-
   // header and headerText are purple bar at the top
   header: {
     padding: 10,
@@ -314,18 +405,33 @@ const styles = {
     color: '#333',
   },
   amountText: {
+    flexDirection: 'row',
+  },
+  amountUsed: {
+    fontSize: 18,
+    color: '#999',
+  },
+  
+  amountTotal: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#333',
   },
+
+  addSubCat: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+
   subAmountText: {
     color: 'purple', // Updated to purple
     fontSize: 18,
-    fontWeight: 'normal',
   },
+
   progressBarContainer: {
     height: 10,
-    marginVertical: 15,
+    marginTop: 5,
+    marginBottom: 10, 
     backgroundColor: '#f0f0f0',
     borderRadius: 5,
   },
@@ -333,54 +439,152 @@ const styles = {
     height: '100%',
     borderRadius: 5,
   },
+  progressPercentage: {  
+    position: 'absolute',  
+    top: 0,
+    color: 'white',  
+    fontSize: 10,  
+  },  
   subCategoryContainer: {
-    paddingLeft: 10,
-    marginBottom: 5,
-    maxHeight: 100, // Limit the height of the subcategory list for scrolling
+    paddingLeft: 5,
+    // paddingRight: 5,
+    paddingBottom: 10,
+    // marginBottom: 5,
+    borderRadius: 10,
     flexGrow: 1,
   },
   subCategoryItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 5,
+    alignItems: 'center',
+    paddingVertical: 5, // Decrease padding to make it smaller
+    paddingHorizontal: 10, // Adjust horizontal padding
   },
   subCategoryText: {
     fontSize: 16,
     color: '#333',
   },
   input: {
+    width: '60%',
+    height: 40, // Adjust the height
     backgroundColor: '#f0f0f0',
-    padding: 10,
-    borderRadius: 5,
-    width: 220,
-    textAlign: 'right',
-    fontSize: 18,     // Font size to match the amount text
+    borderColor: '#ccc',
+    paddingLeft: 10,
+    marginBottom: 10, 
+    fontSize: 14,
+    borderRadius: 8,
+  },
+  editSubcatAmount: {
+    width: 100,
+    height: 40, 
+    backgroundColor: '#f0f0f0',
+    borderColor: '#ccc',
+    paddingLeft: 10,
+    marginBottom: 10, 
+    fontSize: 14,
+    borderRadius: 8,
+  },
+
+  amountInput: {
+    width: '35%', // Set a smaller width for the amount input
+    height: 40, // Match the height of the subcategory input
+    backgroundColor: '#f0f0f0',
+    padding: 8,
+    marginBottom: 10,
+    fontSize: 14, // Match font size
+    borderRadius: 8,
   },
   addSubcategoryText: {
     color: 'purple',
     fontSize: 16,
-    textAlign: 'left',
     textDecorationLine: 'underline',
+    marginTop: 10,
+    marginHorizontal: 10,
+
   },
   addSubcategoryContainer: {
-    marginTop: 10,
+    marginVertical: 10,
   },
   addSubcategoryActions: {
     flexDirection: 'row',
-    justifyContent: 'space-between', // Align Add on the left and Cancel on the right
+    justifyContent: 'space-between',
   },
   addButton: {
-    padding: 5,
     fontSize: 16,
   },
   addButtonText: {
     color: 'purple',
+    fontWeight: 'bold',
+    fontSize: 18,
   },
   cancelButtonText: {
     color: 'red',
-    fontSize: 16,
+    fontSize: 18,
     alignSelf: 'center',
   },
+  monthNavigationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingHorizontal: 0,
+    marginVertical: 0,
+  },
+  arrowButton: {
+    padding: 10,
+    backgroundColor: 'purple',
+    borderRadius: 0,
+  },
+  dropdownButtonContainer: {
+    width: '100%',
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  dropdownButton: {
+    backgroundColor: 'purple',
+    padding: 10,
+    alignItems: 'center',
+    alignItems: 'center',
+    borderRadius: 0,
+    width: '80%',
+  },
+  picker: {
+    width: '100%',
+  },
+  dropdownButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 18,
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    width: '80%',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  closeButton: {
+    marginTop: 10,
+    backgroundColor: 'red',
+    padding: 10,
+    borderRadius: 5,
+  },
+  closeButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  
 };
 
 export default BudgetPlanner;

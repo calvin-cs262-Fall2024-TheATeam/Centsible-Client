@@ -1,11 +1,10 @@
-import { useState, useEffect, React } from 'react';
+import { useState, useEffect } from 'react';
 import {
-  View, Text, TouchableHighlight, TouchableOpacity
+  View, Text, Animated, TouchableHighlight, TouchableOpacity, Alert
 } from 'react-native';
 import TransactionModal from '../transactionComponents/transactionModal'; // Import the modal component
 import { SwipeListView } from 'react-native-swipe-list-view';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import PropTypes from 'prop-types';
 
 export default function TransactionScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
@@ -18,44 +17,40 @@ export default function TransactionScreen({ navigation }) {
   const [expandedTransaction, setExpandedTransaction] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(0); // set state for expense/income segmented control tab
 
-  TransactionScreen.propTypes = {
-    navigation: PropTypes.object.isRequired, // Navigation prop is an object
-  };
-
   //temporary hard-coded transactions
   useEffect(() => {
     const initialTransactions = [
-      { key: '1', amount: 200, category: 'Housing', description: 'Monthly rent', type: 'expense', date: new Date(2024, 9, 1) },
-      { key: '4', amount: 30, category: 'Transportation', description: 'Gas for the car', type: 'expense', date: new Date(2024, 9, 3) },
-      { key: '5', amount: 50, category: 'Personal', description: 'New clothes', type: 'expense', date: new Date(2024, 9, 2) },
-      { key: '7', amount: 10, category: 'Food', description: 'Takeout dinner', type: 'expense', date: new Date(2024, 9, 3) },
-      { key: '8', amount: 60, category: 'Housing', description: 'Electricity bill', type: 'expense', date: new Date(2024, 9, 5) },
-      { key: '10', amount: 10, category: 'Food', description: 'Lunch with friends', type: 'expense', date: new Date(2024, 9, 6) },
-      { key: '12', amount: 25, category: 'Personal', description: 'Coffee and bagels', type: 'expense', date: new Date(2024, 9, 6) },
-      { key: '13', amount: 90, category: 'Food', description: 'Groceries for the week', type: 'expense', date: new Date(2024, 9, 7) },
-      { key: '14', amount: 20, category: 'Personal', description: 'Shampoo and toiletries', type: 'expense', date: new Date(2024, 9, 7) },
-      { key: '15', amount: 50, category: 'Entertainment', description: 'Weekend trip', type: 'expense', date: new Date(2024, 9, 8) },
-      { key: '16', amount: 10, category: 'Food', description: 'Fast food lunch', type: 'expense', date: new Date(2024, 9, 9) },
-      { key: '18', amount: 45, category: 'Personal', description: 'Haircut', type: 'expense', date: new Date(2024, 9, 5) },
-      { key: '21', amount: 10, category: 'Personal', description: 'Coffee at campus cafe', type: 'expense', date: new Date(2024, 9, 10) },
-      { key: '22', amount: 100, category: 'Personal', description: 'New shoes', type: 'expense', date: new Date(2024, 9, 13) },
-      { key: '23', amount: 100, category: 'Personal', description: 'Amazon', type: 'expense', date: new Date(2024, 9, 13) },
-      { key: '24', amount: 50, category: 'Food', description: 'Groceries for the week', type: 'expense', date: new Date(2024, 9, 14) },
-      { key: '25', amount: 15, category: 'Education', description: 'School supplies', type: 'expense', date: new Date(2024, 9, 14) },
-      { key: '28', amount: 50, category: 'Personal', description: 'Earrings', type: 'expense', date: new Date(2024, 9, 16) },
-      { key: '30', amount: 10, category: 'Entertainment', description: 'Sports event tickets', type: 'expense', date: new Date(2024, 9, 16) },
-      { key: '32', amount: 5, category: 'Food', description: 'Coffee shop', type: 'expense', date: new Date(2024, 9, 18) },
-      { key: '34', amount: 15, category: 'Food', description: 'Lunch with friends', type: 'expense', date: new Date(2024, 9, 19) },
-      { key: '36', amount: 50, category: 'Transportation', description: 'Gas for the car', type: 'expense', date: new Date(2024, 9, 20) },
-      { key: '38', amount: 10, category: 'Entertainment', description: 'Movie night with friends', type: 'expense', date: new Date(2024, 9, 22) },
-      { key: '47', amount: 25, category: 'Personal', description: 'Toiletries', type: 'expense', date: new Date(2024, 9, 28) },
-      { key: '48', amount: 50, category: 'Food', description: 'Groceries for the weekend', type: 'expense', date: new Date(2024, 9, 28) },
-      { key: '50', amount: 15, category: 'Entertainment', description: 'Monthly gaming subscription', type: 'expense', date: new Date(2024, 9, 30) },
-      { key: '51', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 8) },
-      { key: '52', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 15) },
-      { key: '53', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 22) },
-      { key: '54', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 29) },
-
+    { key: '1', amount: 200, category: 'Housing', description: 'Monthly rent', type: 'expense', date: new Date(2024, 9, 1) },
+    { key: '4', amount: 30, category: 'Transportation', description: 'Gas for the car', type: 'expense', date: new Date(2024, 9, 3) },
+    { key: '5', amount: 50, category: 'Personal', description: 'New clothes', type: 'expense', date: new Date(2024, 9, 2) },
+    { key: '7', amount: 10, category: 'Food', description: 'Takeout dinner', type: 'expense', date: new Date(2024, 9, 3) },
+    { key: '8', amount: 60, category: 'Housing', description: 'Electricity bill', type: 'expense', date: new Date(2024, 9, 5) },
+    { key: '10', amount: 10, category: 'Food', description: 'Lunch with friends', type: 'expense', date: new Date(2024, 9, 6) },
+    { key: '12', amount: 25, category: 'Personal', description: 'Coffee and bagels', type: 'expense', date: new Date(2024, 9, 6) },
+    { key: '13', amount: 90, category: 'Food', description: 'Groceries for the week', type: 'expense', date: new Date(2024, 9, 7) },
+    { key: '14', amount: 20, category: 'Personal', description: 'Shampoo and toiletries', type: 'expense', date: new Date(2024, 9, 7) },
+    { key: '15', amount: 50, category: 'Entertainment', description: 'Weekend trip', type: 'expense', date: new Date(2024, 9, 8) },
+    { key: '16', amount: 10, category: 'Food', description: 'Fast food lunch', type: 'expense', date: new Date(2024, 9, 9) },
+    { key: '18', amount: 45, category: 'Personal', description: 'Haircut', type: 'expense', date: new Date(2024, 9, 5) },
+    { key: '21', amount: 10, category: 'Personal', description: 'Coffee at campus cafe', type: 'expense', date: new Date(2024, 9, 10) },
+    { key: '22', amount: 100, category: 'Personal', description: 'New shoes', type: 'expense', date: new Date(2024, 9, 13) },
+    { key: '23', amount: 100, category: 'Personal', description: 'Amazon', type: 'expense', date: new Date(2024, 9, 13) },
+    { key: '24', amount: 50, category: 'Food', description: 'Groceries for the week', type: 'expense', date: new Date(2024, 9, 14) },
+    { key: '25', amount: 15, category: 'Education', description: 'School supplies', type: 'expense', date: new Date(2024, 9, 14) },
+    { key: '28', amount: 50, category: 'Personal', description: 'Earrings', type: 'expense', date: new Date(2024, 9, 16) },
+    { key: '30', amount: 10, category: 'Entertainment', description: 'Sports event tickets', type: 'expense', date: new Date(2024, 9, 16) },
+    { key: '32', amount: 5, category: 'Food', description: 'Coffee shop', type: 'expense', date: new Date(2024, 9, 18) },
+    { key: '34', amount: 15, category: 'Food', description: 'Lunch with friends', type: 'expense', date: new Date(2024, 9, 19) },
+    { key: '36', amount: 50, category: 'Transportation', description: 'Gas for the car', type: 'expense', date: new Date(2024, 9, 20) },
+    { key: '38', amount: 10, category: 'Entertainment', description: 'Movie night with friends', type: 'expense', date: new Date(2024, 9, 22) },
+    { key: '47', amount: 25, category: 'Personal', description: 'Toiletries', type: 'expense', date: new Date(2024, 9, 28) },
+    { key: '48', amount: 50, category: 'Food', description: 'Groceries for the weekend', type: 'expense', date: new Date(2024, 9, 28) },
+    { key: '50', amount: 15, category: 'Entertainment', description: 'Monthly gaming subscription', type: 'expense', date: new Date(2024, 9, 30) },
+    { key: '51', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 8) },
+    { key: '52', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 15) },
+    { key: '53', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 22) },
+    { key: '54', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 29) },
+    
     ];
 
     const sortedTransactions = initialTransactions.sort((a, b) => b.date - a.date);
@@ -152,27 +147,13 @@ export default function TransactionScreen({ navigation }) {
     );
   };
 
-  TransactionItem.propTypes = {
-    data: PropTypes.shape({
-      item: PropTypes.shape({
-        key: PropTypes.string.isRequired,  // Key should be a string
-        amount: PropTypes.number.isRequired,  // Amount should be a number
-        category: PropTypes.string.isRequired, // Category should be a string
-        description: PropTypes.string,  // Description is optional
-        type: PropTypes.string.isRequired,  // Type should be either 'expense' or 'income'
-        date: PropTypes.instanceOf(Date).isRequired,  // Date should be a Date object
-      }).isRequired,
-    }).isRequired,
-  };
-
-
   // Render function for individual transaction items
   const renderItem = (data) => {
     return (
       <TransactionItem data={data} />
     );
   };
-  
+
   const closeRow = (rowMap, rowKey) => {
     if (rowMap[rowKey]) {
       rowMap[rowKey].closeRow();
@@ -187,35 +168,31 @@ export default function TransactionScreen({ navigation }) {
     setTransactions(newData); // Update state with the new list
   };
 
-  const HiddenItemWithActions = ({ onDelete, data, rowMap }) => {
+  const HiddenItemWithActions = ({ swipeAnimatedValue, onDelete, data }) => {
     const isExpanded = expandedTransaction === data.item.key;
-  
     return (
       <View style={[styles.rowBack, { height: isExpanded ? 70 : 60 }]}>
-        <TouchableOpacity
-          style={[styles.trashBtn, { height: isExpanded ? 70 : 60 }]}
-          onPress={() => onDelete(rowMap, data.item.key)} // Use the passed onDelete handler
-        >
-          <MaterialCommunityIcons name="trash-can-outline" size={25} color="#fff" />
+        <TouchableOpacity style={[styles.trashBtn, { height: isExpanded ? 70 : 60 }]} onPress={onDelete}>
+          <Animated.View
+            style={[styles.trash, {
+              transform: [{
+                scale: swipeAnimatedValue.interpolate({
+                  inputRange: [-90, -45],
+                  outputRange: [1, 0],
+                  extrapolate: 'clamp',
+                }),
+              },],
+            },]}>
+            <MaterialCommunityIcons
+              name="trash-can-outline"
+              size={35}
+              color="#fff"
+            />
+          </Animated.View>
         </TouchableOpacity>
       </View>
-    );
-  };
-  
-  HiddenItemWithActions.propTypes = {
-    onDelete: PropTypes.func.isRequired,
-    data: PropTypes.shape({
-      item: PropTypes.shape({
-        key: PropTypes.string.isRequired,
-        amount: PropTypes.number.isRequired,
-        category: PropTypes.string.isRequired,
-        description: PropTypes.string,
-        type: PropTypes.string.isRequired,
-        date: PropTypes.instanceOf(Date).isRequired,
-      }).isRequired,
-    }).isRequired,
-    rowMap: PropTypes.object.isRequired,
-  };
+    )
+  }
 
   // Render the hidden item when swiped
   const renderHiddenItem = (data, rowMap) => {
@@ -223,11 +200,11 @@ export default function TransactionScreen({ navigation }) {
       <HiddenItemWithActions
         data={data}
         rowMap={rowMap}
-        onDelete={deleteTransaction}
+        onDelete={() => deleteTransaction(rowMap, data.item.key)}
       />
     );
-  };
-  
+  }
+
   // Set headerRight option dynamically
   useEffect(() => {
     navigation.setOptions({
@@ -274,11 +251,11 @@ export default function TransactionScreen({ navigation }) {
       {/* Transaction Table */}
       <View style={styles.transactionTableContainer}>
         <SwipeListView
-          data={transactions}  // An array of transaction objects
-          renderItem={renderItem}  // Function to render each transaction item
-          renderHiddenItem={renderHiddenItem}  // Function to render the hidden swipe actions
-          rightOpenValue={-75}  // Set the swipe-to-delete behavior (negative value to swipe right)
-          disableRightSwipe  // Disable swiping to the right for the row
+          data={transactions}
+          renderItem={renderItem}
+          renderHiddenItem={renderHiddenItem}
+          rightOpenValue={-75}
+          disableRightSwipe
         />
       </View>
 
@@ -349,17 +326,23 @@ const styles = {
     height: 50,
   },
   trashBtn: {
-    alignItems: 'center', // Center the icon horizontally
-    justifyContent: 'center', // Center the icon vertically
-    width: 75, // Width of the swipe action button
-    height: 50, // Height of the swipe action button
-    backgroundColor: '#F44336', // Red background color
-    borderTopRightRadius: 5, // Rounded corners on top-right
-    borderBottomRightRadius: 5, // Rounded corners on bottom-right
-    position: 'absolute', // Positioned absolutely to the right
+    alignItems: 'flex-end',
+    bottom: 0,
+    justifyContent: 'center',
+    position: 'absolute',
     top: 0,
+    width: 75,
+    paddingRight: 17,
+    backgroundColor: 'red',
     right: 0,
-    paddingRight: 0, // Remove any right padding for better alignment
+    borderTopRightRadius: 5,
+    borderBottomRightRadius: 5,
+    height: 50,
+  },
+  trash: {
+    height: 35,
+    width: 35,
+    marginRight: 3,
   },
 
   //add transaction button
