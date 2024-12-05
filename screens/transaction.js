@@ -21,14 +21,44 @@ export default function TransactionScreen({ navigation }) {
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        // Replace with your actual backend URL
-        const response = await fetch('https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/transactions/1'); // Replace '1' with actual appuserID
+        // Step 1: Fetch transactions
+        const response = await fetch('https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/transactions/1'); // Use the correct API endpoint
         if (response.ok) {
           const data = await response.json();
-          const sortedTransactions = data.map((transaction, index) => ({
-            ...transaction,
-            key: transaction.id || index.toString(), // Ensure a unique key for each transaction
-          })).sort((a, b) => new Date(b.transactiondate) - new Date(a.transactiondate)); // Sort by date
+  
+          // Step 2: For each transaction, fetch the category name based on the category ID
+          const updatedTransactions = await Promise.all(data.map(async (transaction, index) => {
+            try {
+              // Fetch category name based on category ID
+              const categoryResponse = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/budgetCategoryName/${transaction.budgetcategoryid}`);
+              if (categoryResponse.ok) {
+                const categoryData = await categoryResponse.json();
+                // Update transaction with category name
+                return {
+                  ...transaction,
+                  category: categoryData.categoryname,  // Set category name
+                  key: transaction.id || index.toString(),
+                };
+              } else {
+                console.error(`Failed to fetch category for ID ${transaction.budgetcategoryid}`);
+                return {
+                  ...transaction,
+                  category: 'Unknown Category',  // Default category if failed
+                  key: transaction.id || index.toString(),
+                };
+              }
+            } catch (err) {
+              console.error(`Error fetching category for ID ${transaction.budgetcategoryid}: `, err);
+              return {
+                ...transaction,
+                category: 'Unknown Category',  // Default category if error
+                key: transaction.id || index.toString(),
+              };
+            }
+          }));
+  
+          // Step 3: Sort transactions by date
+          const sortedTransactions = updatedTransactions.sort((a, b) => new Date(b.transactiondate) - new Date(a.transactiondate));
           setTransactions(sortedTransactions);
         } else {
           Alert.alert("Error", "Failed to fetch transactions.");
@@ -41,6 +71,7 @@ export default function TransactionScreen({ navigation }) {
   
     fetchTransactions();
   }, []);
+  
 
   const handleAddTransaction = async () => {
     const parsedAmount = parseFloat(amount);
