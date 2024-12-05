@@ -38,7 +38,7 @@ export default function TransactionScreen({ navigation }) {
         Alert.alert("Error", "Something went wrong.");
       }
     };
-
+  
     fetchTransactions();
   }, []);
 
@@ -132,7 +132,7 @@ export default function TransactionScreen({ navigation }) {
     } else {
       setExpandedTransaction(transactionKey); // Expand the clicked transaction
     }
-  };  
+  };
 
   // Calculate current balance
   const calculateBalance = () => {
@@ -202,107 +202,137 @@ export default function TransactionScreen({ navigation }) {
     }
   };
 
-  const deleteTransaction = (rowMap, rowKey) => {
+  const deleteTransaction = async (rowMap, rowKey) => {
     closeRow(rowMap, rowKey); // Close the row before deletion
-    const newData = [...transactions]; // Copy current transactions
-    const prevIndex = transactions.findIndex(item => item.key === rowKey); // Find the index of the transaction to delete
-    newData.splice(prevIndex, 1); // Remove the transaction from the list
-    setTransactions(newData); // Update state with the new list
+
+    // Find the transaction to delete in the local state
+    const transactionToDelete = transactions.find(item => item.key === rowKey);
+    if (!transactionToDelete) {
+      alert("Transaction not found!");
+      return;
+    }
+
+    try {
+      // Make DELETE request to the backend
+      const response = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/transactions/${transactionToDelete.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      // Parse the response
+      const responseData = await response.json();
+
+      if (response.ok) {
+        // If deletion was successful, remove the transaction from the local state
+        const newTransactions = transactions.filter(item => item.key !== rowKey);
+        setTransactions(newTransactions);
+        Alert.alert("Success", "Transaction deleted successfully!");
+      } else {
+        // Handle server error
+        Alert.alert("Error", responseData.message || "Failed to delete transaction.");
+      }
+    } catch (error) {
+      console.error('Error deleting transaction:', error);
+      Alert.alert("Error", "Something went wrong while deleting the transaction.");
+    }
   };
 
-  const HiddenItemWithActions = ({ swipeAnimatedValue, onDelete, data }) => {
-    const isExpanded = expandedTransaction === data.item.key;
-    return (
-      <View style={[styles.rowBack, { height: isExpanded ? 70 : 60 }]}>
-        <TouchableOpacity style={[styles.trashBtn, { height: isExpanded ? 70 : 60 }]} onPress={onDelete}>
-          <Animated.View
-            style={[styles.trash, {
-              transform: [{
-                scale: swipeAnimatedValue.interpolate({
-                  inputRange: [-90, -45],
-                  outputRange: [1, 0],
-                  extrapolate: 'clamp',
-                }),
-              },],
-            },]}>
-            <MaterialCommunityIcons
-              name="trash-can-outline"
-              size={35}
-              color="#fff"
-            />
-          </Animated.View>
-        </TouchableOpacity>
-      </View>
-    )
-  }
 
-  // Render the hidden item when swiped
-  const renderHiddenItem = (data, rowMap) => {
-    return (
-      <HiddenItemWithActions
-        data={data}
-        rowMap={rowMap}
-        onDelete={() => deleteTransaction(rowMap, data.item.key)}
-      />
-    );
-  }
-
-  // Set headerRight option dynamically
-  useEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity
-          style={styles.addButton} // Adjust padding for placement
-          onPress={() => setModalVisible(true)} // Show the modal when pressed
-        >
-          <MaterialCommunityIcons name="plus" size={30} color="white" />
-        </TouchableOpacity>
-      ),
-    });
-  }, [navigation]);
-
+const HiddenItemWithActions = ({ swipeAnimatedValue, onDelete, data }) => {
+  const isExpanded = expandedTransaction === data.item.key;
   return (
-    <View style={styles.container}>
-      {/* Balance Section */}
-      <View style={styles.balanceContainer}>
-        <Text style={styles.balanceText}>Current Balance:</Text>
-        <Text style={styles.balanceAmount}>${calculateBalance()}</Text>
-      </View>
-
-      {/* Input Transaction Screen */}
-      <TransactionModal
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)} // Close the modal
-        onAdd={handleAddTransaction} // Add transaction when modal submits
-        amount={amount}
-        setAmount={setAmount}
-        category={category}
-        setCategory={setCategory}
-        description={description}
-        setDescription={setDescription}
-        type={type}
-        setType={setType}
-        date={date}
-        setDate={setDate}
-        onRequestClose={() => setModalVisible(false)}
-        selectedIndex={selectedIndex}
-        handleIndexChange={handleIndexChange}
-        resetForm={resetForm}
-      />
-
-      {/* Transaction Table */}
-      <View style={styles.transactionTableContainer}>
-        <SwipeListView
-          data={transactions}
-          renderItem={renderItem}
-          renderHiddenItem={renderHiddenItem}
-          rightOpenValue={-75}
-          disableRightSwipe
-        />
-      </View>
-
+    <View style={[styles.rowBack, { height: isExpanded ? 70 : 60 }]}>
+      <TouchableOpacity style={[styles.trashBtn, { height: isExpanded ? 70 : 60 }]} onPress={onDelete}>
+        <Animated.View
+          style={[styles.trash, {
+            transform: [{
+              scale: swipeAnimatedValue.interpolate({
+                inputRange: [-90, -45],
+                outputRange: [1, 0],
+                extrapolate: 'clamp',
+              }),
+            },],
+          },]}>
+          <MaterialCommunityIcons
+            name="trash-can-outline"
+            size={35}
+            color="#fff"
+          />
+        </Animated.View>
+      </TouchableOpacity>
     </View>
+  )
+}
+
+// Render the hidden item when swiped
+const renderHiddenItem = (data, rowMap) => {
+  return (
+    <HiddenItemWithActions
+      data={data}
+      rowMap={rowMap}
+      onDelete={() => deleteTransaction(rowMap, data.item.key)}
+    />
   );
+}
+
+// Set headerRight option dynamically
+useEffect(() => {
+  navigation.setOptions({
+    headerRight: () => (
+      <TouchableOpacity
+        style={styles.addButton} // Adjust padding for placement
+        onPress={() => setModalVisible(true)} // Show the modal when pressed
+      >
+        <MaterialCommunityIcons name="plus" size={30} color="white" />
+      </TouchableOpacity>
+    ),
+  });
+}, [navigation]);
+
+return (
+  <View style={styles.container}>
+    {/* Balance Section */}
+    <View style={styles.balanceContainer}>
+      <Text style={styles.balanceText}>Current Balance:</Text>
+      <Text style={styles.balanceAmount}>${calculateBalance()}</Text>
+    </View>
+
+    {/* Input Transaction Screen */}
+    <TransactionModal
+      visible={modalVisible}
+      onClose={() => setModalVisible(false)} // Close the modal
+      onAdd={handleAddTransaction} // Add transaction when modal submits
+      amount={amount}
+      setAmount={setAmount}
+      category={category}
+      setCategory={setCategory}
+      description={description}
+      setDescription={setDescription}
+      type={type}
+      setType={setType}
+      date={date}
+      setDate={setDate}
+      onRequestClose={() => setModalVisible(false)}
+      selectedIndex={selectedIndex}
+      handleIndexChange={handleIndexChange}
+      resetForm={resetForm}
+    />
+
+    {/* Transaction Table */}
+    <View style={styles.transactionTableContainer}>
+      <SwipeListView
+        data={transactions}
+        renderItem={renderItem}
+        renderHiddenItem={renderHiddenItem}
+        rightOpenValue={-75}
+        disableRightSwipe
+      />
+    </View>
+
+  </View>
+);
 }
 
 const styles = {
