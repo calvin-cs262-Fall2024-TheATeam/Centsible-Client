@@ -1,5 +1,6 @@
 import React, { useState } from 'react'; 
 import { Text, View, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
+import { SwipeListView } from 'react-native-swipe-list-view';
 
 // Initial transactions and amounts
 const initialTransactions = [
@@ -208,13 +209,38 @@ const BudgetPlanner = () => {
     }, 0);
   };
   
-
   const getProgressBarColor = (spentAmount, totalAmount) => {
     const progress = (spentAmount / totalAmount) * 100;
     if (progress >= 100) return '#cc0000';
     if (progress >= 90) return '#ff9933';
     return '#006600';
   };
+
+  // const HiddenItemWithActions = ({ onDelete, data, rowMap }) => {
+  //   const isExpanded = expandedTransaction === data.item.key;
+  
+  //   return (
+  //     <View style={[styles.rowBack, { height: isExpanded ? 70 : 60 }]}>
+  //       <TouchableOpacity
+  //         style={[styles.trashBtn, { height: isExpanded ? 70 : 60 }]}
+  //         // onPress={() => onDelete(rowMap, data.item.key)} // Use the passed onDelete handler
+  //       >
+  //         <MaterialCommunityIcons name="trash-can-outline" size={25} color="#fff" />
+  //       </TouchableOpacity>
+  //     </View>
+  //   );
+  // };
+
+  // Render the hidden item when swiped
+  // const renderHiddenItem = (data, rowMap) => {
+  //   return (
+  //     <HiddenItemWithActions
+  //       data={data}
+  //       rowMap={rowMap}
+  //       // onDelete={deleteTransaction}
+  //     />
+  //   );
+  // };
 
   return (
     <View style={styles.container}>
@@ -227,32 +253,62 @@ const BudgetPlanner = () => {
           const categorySpent = transactions
             .filter(t => t.category === category)
             .reduce((sum, t) => sum + t.amount, 0);
-
+          
           const totalAmount = getTotalForCategory(category);
+
+          // calculate the amount left in the budget
+          let isOverBudget = false;
+          const amountRemaining = totalAmount - categorySpent;
+          if (amountRemaining < 0) {
+            isOverBudget = true;
+          };
 
           const progress = (categorySpent / totalAmount) * 100;
 
           return (
             <View key={category} style={styles.categoryContainer}>
-              {/* Move progress bar above category header */}
-              <View style={styles.progressBarContainer}>
-                <View
-                  style={{
-                    ...styles.progressBar,
-                    width: `${Math.min(progress, 100)}%`, // Cap the progress at 100%
-                    backgroundColor: getProgressBarColor(categorySpent, totalAmount),
-                  }}
-                />
-                {/* <Text style={styles.progressPercentage}>  
-                  {Math.min(progress, 100).toFixed(0)}%  
-                </Text>   */}
-              </View>
 
               <View style={styles.categoryHeader}>
                 <Text style={styles.categoryTitle}>{category}</Text>
-                <View  style={styles.amountText}>
-                  <Text style={styles.amountUsed}>${categorySpent.toFixed(2)} / </Text>
-                  <Text style={styles.amountTotal}>${totalAmount.toFixed(2)}</Text>
+                <View style={styles.spentRemaining}>
+                  {isOverBudget ? (
+                    <Text style={styles.spentRemaining}>
+                      ${(amountRemaining * -1).toFixed(2)} over budget
+                    </Text>
+                  ) : (
+                    <Text style={styles.spentRemaining}>
+                      ${amountRemaining.toFixed(2)} remaining
+                    </Text>
+                  )}
+                </View>
+
+              </View>
+
+              {/* Move progress bar above category header */}
+              <View style={styles.percentageAndBar}>
+                <View style={styles.percentageContainer}>
+                  <Text style={styles.progressPercentage}>  
+                    {Math.min(progress, 100).toFixed(0)}%  
+                  </Text>  
+                </View>          
+                <View style={styles.progressBarContainer}>
+                  <View
+                    style={{
+                      ...styles.progressBar,
+                      width: `${Math.min(progress, 100)}%`, // Cap the progress at 100%
+                      backgroundColor: getProgressBarColor(categorySpent, totalAmount),
+                    }}
+                  />
+                </View>
+              </View>
+
+              <View style={styles.amountTotalContainer}>
+                <View>
+                  <Text style={styles.amountTotal}>Total:</Text>
+                </View>
+                <View>
+                  {/* <Text style={styles.amountUsed}>${categorySpent.toFixed(2)} / </Text> */}
+                  <Text style={styles.amountTotalNumber}>${totalAmount.toFixed(2)}</Text>
                 </View>
               </View>
 
@@ -284,7 +340,6 @@ const styles = {
   // header and headerText are purple bar at the top
   header: {
     padding: 10,
-    marginLeft: 0,
     backgroundColor: 'purple',
     justifyContent: 'center',
     width: '100%',
@@ -312,8 +367,7 @@ const styles = {
     marginBottom: 10,
   },
   categoryContainer: {
-    marginTop: 5,
-    marginBottom: 5,
+    marginTop: 10,
     marginRight: 10,
     marginLeft: 10,
     padding: 10,
@@ -329,12 +383,21 @@ const styles = {
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 10,
+    marginLeft: 3,
   },
   categoryTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#333',
   },
+
+  spentRemaining: {
+    backgroundColor: '#f0f0f0',
+    color: '#666',
+    padding: 3,
+    borderRadius: 5,
+  },
+
   amountText: {
     flexDirection: 'row',
   },
@@ -342,12 +405,54 @@ const styles = {
     fontSize: 18,
     color: '#999',
   },
+
+  amountTotalContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 5,
+    paddingBottom: 10,
+    paddingTop: 5,
+  },
   
   amountTotal: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+
+  amountTotalNumber: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#333',
   },
+
+  percentageAndBar: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 5,
+    marginBottom: 10, 
+  },
+  percentageContainer: {
+    width: '10%',
+    alignItems: 'center',
+    height: 14,
+  },
+  progressBarContainer: {
+    width: '90%',
+    backgroundColor: '#f0f0f0',
+    borderRadius: 5,
+    height: 10,
+  },
+  progressBar: {
+    height: '100%',
+    borderRadius: 5,
+  },
+  progressPercentage: {  
+    color: 'gray',  
+    fontSize: 12,  
+  },  
 
   addSubCat: {
     flexDirection: 'row',
@@ -355,32 +460,12 @@ const styles = {
   },
 
   subAmountText: {
-    color: 'purple', // Updated to purple
+    color: 'purple',
     fontSize: 18,
   },
-
-  progressBarContainer: {
-    height: 10,
-    marginTop: 5,
-    marginBottom: 10, 
-    backgroundColor: '#f0f0f0',
-    borderRadius: 5,
-  },
-  progressBar: {
-    height: '100%',
-    borderRadius: 5,
-  },
-  progressPercentage: {  
-    position: 'absolute',  
-    top: 0,
-    color: 'white',  
-    fontSize: 10,  
-  },  
   subCategoryContainer: {
     paddingLeft: 5,
-    // paddingRight: 5,
     paddingBottom: 10,
-    // marginBottom: 5,
     borderRadius: 10,
     flexGrow: 1,
   },
@@ -388,8 +473,8 @@ const styles = {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 5, // Decrease padding to make it smaller
-    paddingHorizontal: 10, // Adjust horizontal padding
+    paddingVertical: 5,
+    paddingHorizontal: 10,
   },
   subCategoryText: {
     fontSize: 16,
