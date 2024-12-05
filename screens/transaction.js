@@ -16,7 +16,6 @@ export default function TransactionScreen({ navigation }) {
   const [transactions, setTransactions] = useState([]);
   const [expandedTransaction, setExpandedTransaction] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(0); // set state for expense/income segmented control tab
-  const [currentBalance] = useState(0); // Initialize with a default value of 0
 
   useEffect(() => {
     const fetchTransactions = async () => {
@@ -25,7 +24,7 @@ export default function TransactionScreen({ navigation }) {
         const response = await fetch('https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/transactions/1'); // Use the correct API endpoint
         if (response.ok) {
           const data = await response.json();
-  
+
           // Step 2: For each transaction, fetch the category name based on the category ID
           const updatedTransactions = await Promise.all(data.map(async (transaction, index) => {
             try {
@@ -56,7 +55,7 @@ export default function TransactionScreen({ navigation }) {
               };
             }
           }));
-  
+
           // Step 3: Sort transactions by date
           const sortedTransactions = updatedTransactions.sort((a, b) => new Date(b.transactiondate) - new Date(a.transactiondate));
           setTransactions(sortedTransactions);
@@ -68,75 +67,56 @@ export default function TransactionScreen({ navigation }) {
         Alert.alert("Error", "Something went wrong.");
       }
     };
-  
+
     fetchTransactions();
   }, []);
-  
+
 
   const handleAddTransaction = async () => {
+    // Ensure amount is valid
     const parsedAmount = parseFloat(amount);
+    if (isNaN(parsedAmount) || parsedAmount <= 0) {
+      alert("Please enter a valid amount.");
+      return;
+    }
 
-    // Create a new transaction object
     const newTransaction = {
-      appuserid: 1, // Ensure field matches the server's expected field
-      dollaramount: parsedAmount.toString(), // Ensure the amount is a string (if that's how the API expects it)
-      transactiontype: type, // "Expense" or "Income"
-      budgetcategoryid: category, // Assuming 'category' is the correct value to pass here
+      appuserID: 1,
+      dollaramount: parsedAmount.toFixed(2),  // Use the formatted amount
+      transactiontype: type,
+      budgetcategoryID: "1",  // Should be the selected category ID
       optionaldescription: description,
-      transactiondate: date.toISOString(), // Correct format for date
+      transactiondate: date.toISOString(), // Ensure date is a valid Date object
     };
 
+    console.log("New Amount: ", parseFloat(amount).toFixed(2));
+
+    //console.log("New Transaction:", newTransaction);
+
     try {
-      // Make the API call to create the transaction
       const response = await fetch('https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/transactions', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newTransaction), // Send the newTransaction object as JSON
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newTransaction),
       });
 
-      // Log the response status code and body for debugging
-      const responseText = await response.text();  // Read the response body as text
-      console.log('Response Status:', response.status);
-      console.log('Response Text:', responseText);
-
       if (response.ok) {
-        try {
-          const data = JSON.parse(responseText); // Try parsing the response text as JSON
-          setTransactions((prevTransactions) => {
-            const updatedTransactions = [data, ...prevTransactions];
-            return updatedTransactions.sort((a, b) => new Date(b.transactiondate) - new Date(a.transactiondate)); // Sort by date descending
-          });
-          resetForm(); // Reset the form after adding the transaction
-        } catch (jsonError) {
-          console.error('Error parsing JSON response:', jsonError);
-          alert('Error parsing the response data.');
-        }
+        const data = await response.json();
+        setTransactions(prevTransactions => {
+          const updatedTransactions = [data, ...prevTransactions];
+          return updatedTransactions.sort((a, b) => new Date(b.transactiondate) - new Date(a.transactiondate)); // Sort by date descending
+        });
+        resetForm();
       } else {
-        // Handle server errors or non-200 responses
-        try {
-          const errorData = JSON.parse(responseText); // Try parsing error data returned by the server
-          console.error('Error data from server:', errorData);
-          throw new Error(errorData.message || "Failed to add transaction");
-        } catch (jsonError) {
-          console.error('Error parsing error response:', jsonError);
-          throw new Error("Failed to add transaction. Unknown error.");
-        }
+        const responseText = await response.text();
+        console.error('Error:', responseText);
+        throw new Error('Failed to add transaction.');
       }
     } catch (error) {
       console.error("Error creating transaction:", error);
-      alert("Error creating transaction: " + error.message); // Show error message
+      alert("Error creating transaction: " + error.message);
     }
   };
-
-
-  // setTransactions(prevTransactions => {
-  //   const updatedTransactions = [newTransaction, ...prevTransactions];
-  //   return updatedTransactions.sort((a, b) => b.date - a.date);  // Sort by date descending
-  // });
-  // resetForm();
-
 
   // Resets the form fields and closes the modal
   const resetForm = () => {
@@ -167,16 +147,15 @@ export default function TransactionScreen({ navigation }) {
 
   // Calculate current balance
   const calculateBalance = () => {
-    let balance = parseFloat(currentBalance); // Start with the current balance from the database (stored in state)
+    let balance = 0;
 
-    // Iterate over transactions and adjust the balance
+    // Calculate balance based on transactions
     transactions.forEach(transaction => {
-      const amount = parseFloat(transaction.dollaramount); // Parse the transaction amount
-      // Update balance based on transaction type
+      const amount = parseFloat(transaction.dollaramount);
       if (transaction.transactiontype === 'Income') {
-        balance += amount; // Add income
+        balance += amount;
       } else if (transaction.transactiontype === 'Expense') {
-        balance -= amount; // Subtract expense
+        balance -= amount;
       }
     });
 
@@ -187,6 +166,7 @@ export default function TransactionScreen({ navigation }) {
   const TransactionItem = ({ data }) => {
     const options = { month: 'short', day: 'numeric', year: 'numeric' };
     const formattedDate = new Date(data.item.transactiondate).toLocaleDateString('en-US', options).replace(',', '');
+    //console.log("Formatted Date:", formattedDate);
     const isExpanded = expandedTransaction === data.item.key;
 
     return (
@@ -210,8 +190,8 @@ export default function TransactionScreen({ navigation }) {
               </Text>
             )}
           </View>
-          <Text style={[styles.amountText, { color: data.item.type === 'Income' ? 'green' : 'black' }]}>
-            {data.item.type === 'Income'
+          <Text style={[styles.amountText, { color: data.item.transactiontype === 'Income' ? 'green' : 'black' }]}>
+            {data.item.transactiontype === 'Income'
               ? `+$${parseFloat(data.item.dollaramount).toFixed(2)}`
               : `-$${parseFloat(data.item.dollaramount).toFixed(2)}`}
           </Text>
@@ -259,7 +239,7 @@ export default function TransactionScreen({ navigation }) {
         // If deletion was successful, remove the transaction from the local state
         const newTransactions = transactions.filter(item => item.key !== rowKey);
         setTransactions(newTransactions);
-        Alert.alert("Success", "Transaction deleted successfully!");
+        //Alert.alert("Success", "Transaction deleted successfully!");
       } else {
         // Handle server error
         Alert.alert("Error", responseData.message || "Failed to delete transaction.");
@@ -271,99 +251,99 @@ export default function TransactionScreen({ navigation }) {
   };
 
 
-const HiddenItemWithActions = ({ swipeAnimatedValue, onDelete, data }) => {
-  const isExpanded = expandedTransaction === data.item.key;
-  return (
-    <View style={[styles.rowBack, { height: isExpanded ? 70 : 60 }]}>
-      <TouchableOpacity style={[styles.trashBtn, { height: isExpanded ? 70 : 60 }]} onPress={onDelete}>
-        <Animated.View
-          style={[styles.trash, {
-            transform: [{
-              scale: swipeAnimatedValue.interpolate({
-                inputRange: [-90, -45],
-                outputRange: [1, 0],
-                extrapolate: 'clamp',
-              }),
-            },],
-          },]}>
-          <MaterialCommunityIcons
-            name="trash-can-outline"
-            size={35}
-            color="#fff"
-          />
-        </Animated.View>
-      </TouchableOpacity>
-    </View>
-  )
-}
+  const HiddenItemWithActions = ({ swipeAnimatedValue, onDelete, data }) => {
+    const isExpanded = expandedTransaction === data.item.key;
+    return (
+      <View style={[styles.rowBack, { height: isExpanded ? 70 : 60 }]}>
+        <TouchableOpacity style={[styles.trashBtn, { height: isExpanded ? 70 : 60 }]} onPress={onDelete}>
+          <Animated.View
+            style={[styles.trash, {
+              transform: [{
+                scale: swipeAnimatedValue.interpolate({
+                  inputRange: [-90, -45],
+                  outputRange: [1, 0],
+                  extrapolate: 'clamp',
+                }),
+              },],
+            },]}>
+            <MaterialCommunityIcons
+              name="trash-can-outline"
+              size={35}
+              color="#fff"
+            />
+          </Animated.View>
+        </TouchableOpacity>
+      </View>
+    )
+  }
 
-// Render the hidden item when swiped
-const renderHiddenItem = (data, rowMap) => {
-  return (
-    <HiddenItemWithActions
-      data={data}
-      rowMap={rowMap}
-      onDelete={() => deleteTransaction(rowMap, data.item.key)}
-    />
-  );
-}
-
-// Set headerRight option dynamically
-useEffect(() => {
-  navigation.setOptions({
-    headerRight: () => (
-      <TouchableOpacity
-        style={styles.addButton} // Adjust padding for placement
-        onPress={() => setModalVisible(true)} // Show the modal when pressed
-      >
-        <MaterialCommunityIcons name="plus" size={30} color="white" />
-      </TouchableOpacity>
-    ),
-  });
-}, [navigation]);
-
-return (
-  <View style={styles.container}>
-    {/* Balance Section */}
-    <View style={styles.balanceContainer}>
-      <Text style={styles.balanceText}>Current Balance:</Text>
-      <Text style={styles.balanceAmount}>${calculateBalance()}</Text>
-    </View>
-
-    {/* Input Transaction Screen */}
-    <TransactionModal
-      visible={modalVisible}
-      onClose={() => setModalVisible(false)} // Close the modal
-      onAdd={handleAddTransaction} // Add transaction when modal submits
-      amount={amount}
-      setAmount={setAmount}
-      category={category}
-      setCategory={setCategory}
-      description={description}
-      setDescription={setDescription}
-      type={type}
-      setType={setType}
-      date={date}
-      setDate={setDate}
-      onRequestClose={() => setModalVisible(false)}
-      selectedIndex={selectedIndex}
-      handleIndexChange={handleIndexChange}
-      resetForm={resetForm}
-    />
-
-    {/* Transaction Table */}
-    <View style={styles.transactionTableContainer}>
-      <SwipeListView
-        data={transactions}
-        renderItem={renderItem}
-        renderHiddenItem={renderHiddenItem}
-        rightOpenValue={-75}
-        disableRightSwipe
+  // Render the hidden item when swiped
+  const renderHiddenItem = (data, rowMap) => {
+    return (
+      <HiddenItemWithActions
+        data={data}
+        rowMap={rowMap}
+        onDelete={() => deleteTransaction(rowMap, data.item.key)}
       />
-    </View>
+    );
+  }
 
-  </View>
-);
+  // Set headerRight option dynamically
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          style={styles.addButton} // Adjust padding for placement
+          onPress={() => setModalVisible(true)} // Show the modal when pressed
+        >
+          <MaterialCommunityIcons name="plus" size={30} color="white" />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
+
+  return (
+    <View style={styles.container}>
+      {/* Balance Section */}
+      <View style={styles.balanceContainer}>
+        <Text style={styles.balanceText}>Current Balance:</Text>
+        <Text style={styles.balanceAmount}>${calculateBalance()}</Text>
+      </View>
+
+      {/* Input Transaction Screen */}
+      <TransactionModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)} // Close the modal
+        onAdd={handleAddTransaction} // Add transaction when modal submits
+        amount={amount}
+        setAmount={setAmount}
+        category={category}
+        setCategory={setCategory}
+        description={description}
+        setDescription={setDescription}
+        type={type}
+        setType={setType}
+        date={date}
+        setDate={setDate}
+        onRequestClose={() => setModalVisible(false)}
+        selectedIndex={selectedIndex}
+        handleIndexChange={handleIndexChange}
+        resetForm={resetForm}
+      />
+
+      {/* Transaction Table */}
+      <View style={styles.transactionTableContainer}>
+        <SwipeListView
+          data={transactions}
+          renderItem={renderItem}
+          renderHiddenItem={renderHiddenItem}
+          rightOpenValue={-75}
+          disableRightSwipe
+        />
+      </View>
+
+    </View>
+  );
 }
 
 const styles = {
