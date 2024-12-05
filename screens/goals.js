@@ -287,9 +287,7 @@ const BudgetPlanner = () => {
               {/* Move progress bar above category header */}
               <View style={styles.percentageAndBar}>
                 <View style={styles.percentageContainer}>
-                  <Text style={styles.progressPercentage}>  
-                    {Math.min(progress, 100).toFixed(0)}%  
-                  </Text>  
+                  <Text style={styles.progressPercentage}>{progress.toFixed(0)}%</Text>  
                 </View>          
                 <View style={styles.progressBarContainer}>
                   <View
