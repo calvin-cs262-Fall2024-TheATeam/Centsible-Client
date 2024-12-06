@@ -29,25 +29,26 @@ const initialTransactions = [
   { key: '47', amount: 25, category: 'Personal', description: 'Toiletries', type: 'expense', date: new Date(2024, 9, 28) },
   { key: '48', amount: 50, category: 'Food', description: 'Groceries for the weekend', type: 'expense', date: new Date(2024, 9, 28) },
   { key: '50', amount: 15, category: 'Entertainment', description: 'Monthly gaming subscription', type: 'expense', date: new Date(2024, 9, 30) },
-  { key: '51', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 8) },
-  { key: '52', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 15) },
-  { key: '53', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 22) },
-  { key: '54', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 29) },
+  // { key: '51', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 8) },
+  // { key: '52', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 15) },
+  // { key: '53', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 22) },
+  // { key: '54', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 29) },
 ];
 
 const initialAmounts = {
-  Groceries: '100.00',
-  Phone: '50.00',
+  'Groceries': '300.00',
+  'Phone': '50.00',
   'Fun Money': '20.00',
   'Hair/Cosmetics': '30.00',
-  Subscriptions: '15.00',
-  'Pet Care': '40.00',
-  'Child Care': '60.00',
-  Tuition: '500.00',
-  Books: '80.00',
+  'Subscriptions': '15.00',
+  'Gas': '85.00',
+  'Tuition': '500.00',
+  'Books': '80.00',
   'Spotify subscription': '10.00',
-  'Monthly Rent': '50',
-  'Internet bill': '50'
+  'Monthly rent': '275.00',
+  'Electricity bill': '50.00',
+  'Streaming services': '40.00',
+  'Fun things': '50.00',
 };
 
 const SubCategoryList = ({
@@ -132,7 +133,7 @@ const SubCategoryList = ({
                 value={amounts[subcat] || ''}
                 onChangeText={(text) => handleAmountChange(subcat, text)}
                 keyboardType="numeric"
-                style={styles.amountInput}
+                style={styles.individualAmountInput}
                 onBlur={() => handleAmountBlur(subcat)}
                 autoFocus
               />
@@ -147,7 +148,7 @@ const SubCategoryList = ({
 
       {!isAddingSubcategory ? (
         <TouchableOpacity onPress={() => setIsAddingSubcategory(true)}>
-          <Text style={styles.addSubcategoryText}>+ Add Item</Text>
+          <Text style={styles.addSubcategoryText}>+ Add a subcategory</Text>
         </TouchableOpacity>
       ) : (
         <View style={styles.addSubcategoryContainer}>
@@ -186,10 +187,10 @@ const BudgetPlanner = () => {
   const [categories, setCategories] = useState({
     Food: ["Groceries"],
     Personal: ["Phone", "Fun Money", "Hair/Cosmetics"],
-    Transportation: ["Pet Care", "Child Care"],
+    Transportation: ["Gas"],
     Education: ["Tuition", "Books"],
     Housing: ["Monthly rent", "Electricity bill"],
-    Entertainment: ["Spotify subscription", "Concert tickets"],
+    Entertainment: ["Spotify subscription", "Streaming services", "Fun things"],
   });
   const [amounts, setAmounts] = useState(initialAmounts); // Track budget goals for subcategories
 
@@ -424,6 +425,17 @@ const styles = {
     fontSize: 14, // Match font size
     borderRadius: 8,
   },
+
+  individualAmountInput: {
+    width: '100%',
+    height: 40,
+    backgroundColor: '#f0f0f0',
+    padding: 8,
+    marginBottom: 10,
+    fontSize: 18,
+    borderRadius: 8,
+  },
+
   addSubcategoryText: {
     color: 'purple',
     fontSize: 16,
