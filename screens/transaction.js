@@ -5,6 +5,7 @@ import {
 import TransactionModal from '../transactionComponents/transactionModal'; // Import the modal component
 import { SwipeListView } from 'react-native-swipe-list-view';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import React, { memo } from 'react';
 
 export default function TransactionScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
@@ -73,27 +74,27 @@ export default function TransactionScreen({ navigation }) {
 
 
   const handleAddTransaction = async () => {
-    // Ensure amount is valid
     const parsedAmount = parseFloat(amount);
+
     if (isNaN(parsedAmount) || parsedAmount <= 0) {
       alert("Please enter a valid amount.");
-      return;
+      return; // Don't proceed if the amount is invalid
     }
 
     const newTransaction = {
-      appuserID: 1,
-      dollaramount: parsedAmount.toFixed(2),  // Use the formatted amount
-      transactiontype: type,
-      budgetcategoryID: "1",  // Should be the selected category ID
-      optionaldescription: description,
-      transactiondate: date.toISOString(), // Ensure date is a valid Date object
+      appuserID: 1,  // Assuming this is hardcoded for now, adjust if needed
+      dollaramount: parsedAmount.toFixed(2),  // Format the amount to two decimal places
+      transactiontype: type,  // Assuming type is a variable holding transaction type (income, expense, etc.)
+      budgetcategoryID: 1,  // Use the selected category ID
+      optionaldescription: description,  // Optional description for the transaction
+      transactiondate: date,  
     };
 
-    console.log("New Amount: ", parseFloat(amount).toFixed(2));
-
-    //console.log("New Transaction:", newTransaction);
+    console.log(date);
+    //console.log("New Transaction:", newTransaction);  // Log the new transaction to verify
 
     try {
+      // Sending the transaction data to the server
       const response = await fetch('https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/transactions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -102,15 +103,20 @@ export default function TransactionScreen({ navigation }) {
 
       if (response.ok) {
         const data = await response.json();
+
+        // Update the transactions list with the new transaction
+        //console.log(data);
         setTransactions(prevTransactions => {
-          const updatedTransactions = [data, ...prevTransactions];
-          return updatedTransactions.sort((a, b) => new Date(b.transactiondate) - new Date(a.transactiondate)); // Sort by date descending
+          const updatedTransactions = [data, ...prevTransactions]; // Add the new transaction at the beginning
+          return updatedTransactions.sort((a, b) => new Date(b.transactiondate) - new Date(a.transactiondate));  // Sort by date descending
         });
+
+        // Reset the form fields after successful transaction creation
         resetForm();
       } else {
         const responseText = await response.text();
-        console.error('Error:', responseText);
-        throw new Error('Failed to add transaction.');
+        console.error('Error response:', responseText);  // Log the error response for debugging
+        throw new Error('Failed to add transaction: ' + responseText);
       }
     } catch (error) {
       console.error("Error creating transaction:", error);
@@ -163,11 +169,18 @@ export default function TransactionScreen({ navigation }) {
   };
 
   // Renders a single transaction item with correct layout 
-  const TransactionItem = ({ data }) => {
-    const options = { month: 'short', day: 'numeric', year: 'numeric' };
+  const TransactionItem = memo(({ data }) => {
+    const options = { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', 
+      minute: 'numeric', 
+      second: 'numeric'  };
     const formattedDate = new Date(data.item.transactiondate).toLocaleDateString('en-US', options).replace(',', '');
     //console.log("Formatted Date:", formattedDate);
     const isExpanded = expandedTransaction === data.item.key;
+
+    const formattedAmount = parseFloat(data.item.dollaramount).toFixed(2);
+    const amountText = data.item.transactiontype === 'Income'
+      ? `+$${formattedAmount}`
+      : `-$${formattedAmount}`;
 
     return (
       <TouchableHighlight
@@ -191,17 +204,17 @@ export default function TransactionScreen({ navigation }) {
             )}
           </View>
           <Text style={[styles.amountText, { color: data.item.transactiontype === 'Income' ? 'green' : 'black' }]}>
-            {data.item.transactiontype === 'Income'
-              ? `+$${parseFloat(data.item.dollaramount).toFixed(2)}`
-              : `-$${parseFloat(data.item.dollaramount).toFixed(2)}`}
+            {amountText}
           </Text>
         </View>
       </TouchableHighlight>
     );
-  };
+  });
 
   // Render function for individual transaction items
   const renderItem = (data) => {
+    //console.log("Transactions:", transactions); // Verify if the state contains the new transaction
+    //console.log(data.item.dollaramount);
     return (
       <TransactionItem data={data} />
     );
