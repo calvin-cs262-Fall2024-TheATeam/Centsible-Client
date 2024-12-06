@@ -531,7 +531,7 @@ const styles = {
     marginVertical: 0,
   },
   arrowButton: {
-    padding: 10,
+    padding: 10.3,
     backgroundColor: 'purple',
     borderRadius: 0,
   },
@@ -546,7 +546,7 @@ const styles = {
     alignItems: 'center',
     alignItems: 'center',
     borderRadius: 0,
-    width: '80%',
+    width: '82.5%',
   },
   picker: {
     width: '100%',
