@@ -105,7 +105,7 @@ export default function TransactionScreen({ navigation }) {
         const data = await response.json();
 
         // Update the transactions list with the new transaction
-        //console.log(data);
+        console.log(data);
         setTransactions(prevTransactions => {
           const updatedTransactions = [data, ...prevTransactions]; // Add the new transaction at the beginning
           return updatedTransactions.sort((a, b) => new Date(b.transactiondate) - new Date(a.transactiondate));  // Sort by date descending
