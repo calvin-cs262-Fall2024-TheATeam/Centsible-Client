@@ -1,6 +1,6 @@
 import { color } from 'chart.js/helpers';
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, FlatList, ScrollView, Modal } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, FlatList, ScrollView, Modal, VirtualizedScrollView } from 'react-native';
 import { BarChart, PieChart } from 'react-native-chart-kit';
 import { Picker } from '@react-native-picker/picker';
 
@@ -18,7 +18,7 @@ export default function ReportsScreen() {
     year: currentDate.getFullYear(), // Initialize with the current year
   });
   const [isPickerVisible, setPickerVisible] = useState(false);
-  
+
 
   const initialTransactions = [
     { key: '1', amount: 200, category: 'Housing', description: 'Monthly rent', type: 'expense', date: new Date(2024, 9, 1) },
@@ -193,20 +193,51 @@ export default function ReportsScreen() {
     "Entertainment": "#1c43da"
   };
 
+  const expenseDetails = () => {
+    return (
+      <View style={styles.detailBox}>
+        <Text style={[
+          styles.detailsTitle,
+          { color: categoryColors[selectedCategory] || "#000000" }
+        ]}>{selectedCategory} Expenses
+        </Text>
+        {/* <Text style={styles.totalPercentage}> {calculateCategoryPercentage(selectedCategory)}</Text> */}
+        <Text style={styles.totalCategoryExpense && totalPercentage}>
+          <Text style={styles.totalLabel}>Total: </Text>
+          <Text style={styles.totalAmount}>${calculateCategoryTotal(selectedCategory).toLocaleString()}</Text>
+        </Text>
+        <View style={styles.detailsContainer}>
+          {details[selectedCategory]?.map((item, index) => (
+            <View
+              style={[
+                styles.detailItem,
+                index === details[selectedCategory].length - 1 && { borderBottomWidth: 0 },
+              ]}
+              key={index}
+            >
+              <Text style={styles.date}>{item.date.toLocaleDateString()}</Text>
+              <Text style={styles.description}>{item.description}</Text>
+              <Text style={styles.amount}>${item.amount.toFixed()}</Text>
+            </View>
+          ))}
+        </View>
+      </View>
+    )
+  }
+
   return (
+
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.dropdownButtonContainer}>
         <TouchableOpacity
           style={styles.dropdownButton}
-          onPress={() => setPickerVisible(true)} // Show the modal
+          onPress={() => setPickerVisible(true)}
         >
           <Text style={styles.dropdownButtonText}>
             {new Date(selectedMonth.year, selectedMonth.month).toLocaleString('default', { month: 'long' })} {selectedMonth.year}
           </Text>
         </TouchableOpacity>
       </View>
-
-      <Text style={styles.title}></Text>
 
       <View style={styles.box}>
         <View style={styles.chartContainer}>
@@ -300,38 +331,11 @@ export default function ReportsScreen() {
       </View>
 
 
-      {/* Box for Category Details (if selected) */}
-      {selectedCategory && (
-        <View style={styles.detailBox}>
-          <Text style={[
-            styles.detailsTitle,
-            { color: categoryColors[selectedCategory] || "#000000" }
-          ]}>{selectedCategory} Expenses
-          </Text>
-          {/* <Text style={styles.totalPercentage}> {calculateCategoryPercentage(selectedCategory)}</Text> */}
-          <Text style={styles.totalCategoryExpense && totalPercentage}>
-            <Text style={styles.totalLabel}>Total: </Text>
-            <Text style={styles.totalAmount}>${calculateCategoryTotal(selectedCategory).toLocaleString()}</Text>
-          </Text>
 
-          <FlatList
-            data={details[selectedCategory]}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item, index }) => (
-              <View
-                style={[
-                  styles.detailItem,
-                  index === details[selectedCategory].length - 1 && { borderBottomWidth: 0 }, // Remove border on the last item
-                ]}
-              >
-                <Text style={styles.date}>{item.date.toLocaleDateString()}</Text>
-                <Text style={styles.description}>{item.description} </Text>
-                <Text style={styles.amount}>${item.amount.toFixed()}</Text>
-              </View>
-            )}
-          />
-        </View>
-      )}
+      {/* Box for Category Details (if selected) */}
+      {selectedCategory && expenseDetails()}
+
+      {/* Switch months button */}
       <Modal
         visible={isPickerVisible} // Show/hide modal
         transparent={true} // Makes the modal overlay transparent
@@ -367,8 +371,7 @@ export default function ReportsScreen() {
           </View>
         </View>
       </Modal>
-
-    </ScrollView>
+    </ScrollView >
   );
 }
 
@@ -517,7 +520,7 @@ const styles = StyleSheet.create({
   dropdownButtonContainer: {
     width: '100%',
     alignItems: 'center',
-    marginVertical: 10,
+    marginBottom: 10,
   },
   dropdownButton: {
     backgroundColor: 'purple',
