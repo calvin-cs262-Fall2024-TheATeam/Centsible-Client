@@ -26,29 +26,45 @@ export default function TransactionScreen({ navigation }) {
         if (response.ok) {
           const data = await response.json();
 
-          // Step 2: For each transaction, fetch the category name based on the category ID
+          // Step 2: For each transaction, fetch the category name or set to 'Income' for income transactions
           const updatedTransactions = await Promise.all(data.map(async (transaction, index) => {
             try {
-              // Fetch category name based on category ID
-              const categoryResponse = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/budgetCategoryName/${transaction.budgetcategoryid}`);
-              if (categoryResponse.ok) {
-                const categoryData = await categoryResponse.json();
-                // Update transaction with category name
+              // Check if it's an income or expense
+              if (transaction.transactiontype === 'Income') {
+                // For income, just set category to 'Income'
                 return {
                   ...transaction,
-                  category: categoryData.categoryname,  // Set category name
+                  category: 'Income',  // Set category name as "Income"
                   key: transaction.id || index.toString(),
                 };
+              } else if (transaction.transactiontype === 'Expense') {
+                // For expense, fetch category name based on category ID
+                const categoryResponse = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/budgetCategoryName/${transaction.budgetcategoryid}`);
+                if (categoryResponse.ok) {
+                  const categoryData = await categoryResponse.json();
+                  return {
+                    ...transaction,
+                    category: categoryData.categoryname,  // Set fetched category name
+                    key: transaction.id || index.toString(),
+                  };
+                } else {
+                  console.error(`Failed to fetch category for ID ${transaction.budgetcategoryid}`);
+                  return {
+                    ...transaction,
+                    category: 'Unknown Category',  // Default category if failed
+                    key: transaction.id || index.toString(),
+                  };
+                }
               } else {
-                console.error(`Failed to fetch category for ID ${transaction.budgetcategoryid}`);
+                // If neither 'income' nor 'expense', return the transaction with 'Unknown Category'
                 return {
                   ...transaction,
-                  category: 'Unknown Category',  // Default category if failed
+                  category: 'Unknown Category',
                   key: transaction.id || index.toString(),
                 };
               }
             } catch (err) {
-              console.error(`Error fetching category for ID ${transaction.budgetcategoryid}: `, err);
+              console.error(`Error processing transaction for ID ${transaction.id}: `, err);
               return {
                 ...transaction,
                 category: 'Unknown Category',  // Default category if error
@@ -81,16 +97,23 @@ export default function TransactionScreen({ navigation }) {
       return; // Don't proceed if the amount is invalid
     }
 
+    const transactionDate = new Date(date);  // This is the local time from your state
+    //console.log(transactionDate);
+    const transactionDateISOString = transactionDate.toISOString();  // Convert to UTC ISO string
+    //console.log(transactionDateISOString);
+
     const newTransaction = {
       appuserID: 1,  // Assuming this is hardcoded for now, adjust if needed
       dollaramount: parsedAmount.toFixed(2),  // Format the amount to two decimal places
       transactiontype: type,  // Assuming type is a variable holding transaction type (income, expense, etc.)
       budgetcategoryID: 1,  // Use the selected category ID
       optionaldescription: description,  // Optional description for the transaction
-      transactiondate: date,  
+      transactiondate: transactionDateISOString
     };
 
-    console.log(date);
+    console.log("New Transaction (final):", newTransaction);
+
+    //console.log(date);
     //console.log("New Transaction:", newTransaction);  // Log the new transaction to verify
 
     try {
@@ -105,7 +128,7 @@ export default function TransactionScreen({ navigation }) {
         const data = await response.json();
 
         // Update the transactions list with the new transaction
-        console.log(data);
+        //console.log(data);
         setTransactions(prevTransactions => {
           const updatedTransactions = [data, ...prevTransactions]; // Add the new transaction at the beginning
           return updatedTransactions.sort((a, b) => new Date(b.transactiondate) - new Date(a.transactiondate));  // Sort by date descending
@@ -123,6 +146,32 @@ export default function TransactionScreen({ navigation }) {
       alert("Error creating transaction: " + error.message);
     }
   };
+
+  const updateCurrentBalanceInDB = async (newBalance) => {
+    try {
+      const response = await fetch('https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/currentBalance', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: 1, // Assuming the user ID is hardcoded, replace this with dynamic user ID if needed
+          newbalance: newBalance,
+        }),
+      });
+      console.log(newBalance);
+
+      if (response.ok) {
+        console.log('Balance updated successfully!');
+      } else {
+        const responseText = await response.text();
+        console.error('Error updating balance:', responseText);
+      }
+    } catch (error) {
+      console.error('Error updating balance in the database:', error);
+    }
+  };
+
 
   // Resets the form fields and closes the modal
   const resetForm = () => {
@@ -151,6 +200,13 @@ export default function TransactionScreen({ navigation }) {
     }
   };
 
+  // Update the balance when the transactions state changes
+  useEffect(() => {
+    const newBalance = calculateBalance();
+    console.log(newBalance);
+    updateCurrentBalanceInDB(newBalance); // Update balance in DB whenever transactions change
+  }, [transactions]); // This hook will run whenever the transactions state is updated
+
   // Calculate current balance
   const calculateBalance = () => {
     let balance = 0;
@@ -170,9 +226,11 @@ export default function TransactionScreen({ navigation }) {
 
   // Renders a single transaction item with correct layout 
   const TransactionItem = memo(({ data }) => {
-    const options = { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', 
-      minute: 'numeric', 
-      second: 'numeric'  };
+    const options = {
+      month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric',
+      minute: 'numeric',
+      second: 'numeric'
+    };
     const formattedDate = new Date(data.item.transactiondate).toLocaleDateString('en-US', options).replace(',', '');
     //console.log("Formatted Date:", formattedDate);
     const isExpanded = expandedTransaction === data.item.key;
@@ -252,7 +310,6 @@ export default function TransactionScreen({ navigation }) {
         // If deletion was successful, remove the transaction from the local state
         const newTransactions = transactions.filter(item => item.key !== rowKey);
         setTransactions(newTransactions);
-        //Alert.alert("Success", "Transaction deleted successfully!");
       } else {
         // Handle server error
         Alert.alert("Error", responseData.message || "Failed to delete transaction.");
@@ -262,7 +319,6 @@ export default function TransactionScreen({ navigation }) {
       Alert.alert("Error", "Something went wrong while deleting the transaction.");
     }
   };
-
 
   const HiddenItemWithActions = ({ swipeAnimatedValue, onDelete, data }) => {
     const isExpanded = expandedTransaction === data.item.key;
