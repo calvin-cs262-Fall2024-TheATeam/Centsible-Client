@@ -534,6 +534,8 @@ const styles = {
     padding: 10.3,
     backgroundColor: 'purple',
     borderRadius: 0,
+    height: 42,
+    justifyContent: 'center',
   },
   dropdownButtonContainer: {
     width: '100%',
@@ -542,7 +544,7 @@ const styles = {
   },
   dropdownButton: {
     backgroundColor: 'purple',
-    padding: 10,
+    padding: 10.3,
     alignItems: 'center',
     alignItems: 'center',
     borderRadius: 0,

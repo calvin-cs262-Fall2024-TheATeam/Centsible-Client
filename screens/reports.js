@@ -559,7 +559,7 @@ const styles = StyleSheet.create({
   },
   dropdownButton: {
     backgroundColor: 'purple',
-    padding: 10,
+    padding: 10.3,
     alignItems: 'center',
     alignItems: 'center',
     borderRadius: 0,
@@ -641,6 +641,8 @@ const styles = StyleSheet.create({
     padding: 10.3,
     backgroundColor: 'purple',
     borderRadius: 0,
+    height: 42,
+    justifyContent: 'center',
   },
   
 });
