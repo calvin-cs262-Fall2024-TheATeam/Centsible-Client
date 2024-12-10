@@ -23,31 +23,44 @@ export default function ReportsScreen() {
   const colors = ['#f95d6a', '#ff9909', '#fbd309', '#7cb6dc', '#1c43da', '#2e3884'];
   const getColor = (index) => colors[index % colors.length];
 
-  // API to get transactions for a user (replace with your actual API URL)
-  const fetchTransactions = async () => {
-    try {
-      const userId = 1; // Replace with dynamic user ID
-      const response = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/transactions/${userId}`);
-      if (response.ok) {
-        const data = await response.json();
-        setTransactions(data);
-      } else {
-        Alert.alert("Error", "Failed to fetch transactions.");
-      }
-    } catch (error) {
-      console.error("Error fetching transactions:", error);
-      Alert.alert("Error", "Something went wrong.");
+  // Assuming userId is available in your component
+const fetchTransactions = async () => {
+  try {
+    const userId = 1; // Replace with dynamic user ID from context or props
+    const response = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/transactions/${userId}`); // Replace with your actual API URL
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log("Fetched Transactions: ", data);
+      setTransactions(data);  // Store fetched data in state
+    } else {
+      Alert.alert("Error", "Failed to fetch transactions.");
     }
-  };
+  } catch (error) {
+    console.error("Error fetching transactions:", error);
+    Alert.alert("Error", "Something went wrong.");
+  }
+};
+
+useEffect(() => {
+  fetchTransactions(); // Fetch data on component mount
+}, []);
 
   useEffect(() => {
     if (transactions.length > 0) {
-      // Filter transactions based on selected month and year
-      const filteredTransactions = transactions.filter(
-        (transaction) =>
-          transaction.date.getMonth() === selectedMonth.month &&
-          transaction.date.getFullYear() === selectedMonth.year
-      );
+      const filteredTransactions = transactions.filter((transaction) => {
+        const transactionDate = new Date(transaction.transactiondate);
+        if (transactionDate instanceof Date && !isNaN(transactionDate)) {
+          return (
+            transactionDate.getMonth() === selectedMonth.month &&
+            transactionDate.getFullYear() === selectedMonth.year
+          );
+        } else {
+          // Handle cases where date is invalid or missing
+          console.warn("Invalid transaction date:", transaction.transactiondate);
+          return false;
+        }
+      });
 
       const categoryTotals = {};
       const categoryDetails = {};
@@ -107,7 +120,6 @@ export default function ReportsScreen() {
   };
 
   const dataWithPercentage = calculatePercentage(filteredChartData);
-
   const sortedDataWithPercentage = [...dataWithPercentage].sort((b, a) => a.population - b.population);
 
   const Triangle = ({ color, isSelected }) => {
@@ -134,21 +146,21 @@ export default function ReportsScreen() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.dropdownButtonContainer}>
-  <TouchableOpacity
-    style={styles.dropdownButton}
-    onPress={() => setPickerVisible(true)} // Show the modal
-  >
-    <Text style={styles.dropdownButtonText}>
-      {new Date(selectedMonth.year, selectedMonth.month).toLocaleString('default', { month: 'long' })} {selectedMonth.year} 
-    </Text>
-  </TouchableOpacity>
-</View>
+        <TouchableOpacity
+          style={styles.dropdownButton}
+          onPress={() => setPickerVisible(true)} // Show the modal
+        >
+          <Text style={styles.dropdownButtonText}>
+            {new Date(selectedMonth.year, selectedMonth.month).toLocaleString('default', { month: 'long' })} {selectedMonth.year} 
+          </Text>
+        </TouchableOpacity>
+      </View>
 
       <Text style={styles.title}></Text>
 
       <View style={styles.box}>
-  <View style={styles.chartContainer}>
-    <Text style={styles.boxText}>Income vs. Expense</Text>
+        <View style={styles.chartContainer}>
+          <Text style={styles.boxText}>Income vs. Expense</Text>
 
     {/* Total Income Progress Bar */}
     <View style={styles.progressBarContainer}>
