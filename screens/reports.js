@@ -372,10 +372,10 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'flex-start',
-    backgroundColor: '#e8d0f4',
+    backgroundColor: 'white',
   },
   box: {
-    backgroundColor: '#fff',
+    backgroundColor: '#DEDEDE',
     borderRadius: 12,
     width: '95%',
     padding: 15,
@@ -386,7 +386,7 @@ const styles = StyleSheet.create({
   },
   boxText: {
     fontSize: 20,
-    color: 'purple',
+    color: 'black',
     fontWeight: 'bold',
     marginBottom: 10,
     alignSelf: 'center',
@@ -397,7 +397,7 @@ const styles = StyleSheet.create({
     left: '30%',
     width: 120, 
     height: 120, 
-    backgroundColor: '#fff',
+    backgroundColor: '#DEDEDE',
     borderRadius: 60, 
     transform: [{ translateX: -60 }, { translateY: -60 }],
   },
@@ -497,6 +497,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginVertical: 15,
     borderRadius: 12,
+    color: 'DCDCDC',
   },
   scrollableContent: {
     maxHeight: 200,
