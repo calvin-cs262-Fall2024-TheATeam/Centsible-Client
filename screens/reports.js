@@ -11,142 +11,90 @@ export default function ReportsScreen() {
   const [details, setDetails] = useState({});
   const [totalIncome, setTotalIncome] = useState(0);
   const [totalExpense, setTotalExpense] = useState(0);
+  const [transactions, setTransactions] = useState([]);
   
   const currentDate = new Date(); // Get today's date
   const [selectedMonth, setSelectedMonth] = useState({
     month: currentDate.getMonth(), // Initialize with the current month (0-based index)
     year: currentDate.getFullYear(), // Initialize with the current year
   });
-  const [isPickerVisible, setPickerVisible] = useState(false); 
-
-  const initialTransactions = [
-    { key: '1', amount: 200, category: 'Housing', description: 'Monthly rent', type: 'expense', date: new Date(2024, 9, 1) },
-    { key: '4', amount: 30, category: 'Transportation', description: 'Gas for the car', type: 'expense', date: new Date(2024, 9, 3) },
-    { key: '5', amount: 50, category: 'Personal', description: 'New clothes', type: 'expense', date: new Date(2024, 9, 2) },
-    { key: '7', amount: 10, category: 'Food', description: 'Takeout dinner', type: 'expense', date: new Date(2024, 9, 3) },
-    { key: '8', amount: 60, category: 'Housing', description: 'Electricity bill', type: 'expense', date: new Date(2024, 9, 5) },
-    { key: '10', amount: 10, category: 'Food', description: 'Lunch with friends', type: 'expense', date: new Date(2024, 9, 6) },
-    { key: '12', amount: 25, category: 'Personal', description: 'Coffee and bagels', type: 'expense', date: new Date(2024, 9, 6) },
-    { key: '13', amount: 90, category: 'Food', description: 'Groceries for the week', type: 'expense', date: new Date(2024, 9, 7) },
-    { key: '14', amount: 20, category: 'Personal', description: 'Shampoo and toiletries', type: 'expense', date: new Date(2024, 9, 7) },
-    { key: '15', amount: 50, category: 'Entertainment', description: 'Weekend trip', type: 'expense', date: new Date(2024, 9, 8) },
-    { key: '16', amount: 10, category: 'Food', description: 'Fast food lunch', type: 'expense', date: new Date(2024, 9, 9) },
-    { key: '18', amount: 25, category: 'Personal', description: 'Haircut', type: 'expense', date: new Date(2024, 9, 5) },
-    { key: '21', amount: 10, category: 'Personal', description: 'Coffee at campus cafe', type: 'expense', date: new Date(2024, 9, 10) },
-    { key: '22', amount: 100, category: 'Personal', description: 'New shoes', type: 'expense', date: new Date(2024, 9, 13) },
-    { key: '22', amount: 100, category: 'Personal', description: 'Amazon', type: 'expense', date: new Date(2024, 9, 13) },
-    { key: '24', amount: 50, category: 'Food', description: 'Groceries for the week', type: 'expense', date: new Date(2024, 9, 14) },
-    { key: '25', amount: 45, category: 'Education', description: 'School supplies', type: 'expense', date: new Date(2024, 9, 14) },
-    { key: '28', amount: 50, category: 'Personal', description: 'Earrings', type: 'expense', date: new Date(2024, 9, 16) },
-    { key: '30', amount: 10, category: 'Entertainment', description: 'Sports event tickets', type: 'expense', date: new Date(2024, 9, 16) },
-    { key: '32', amount: 5, category: 'Food', description: 'Coffee shop', type: 'expense', date: new Date(2024, 9, 18) },
-    { key: '34', amount: 15, category: 'Food', description: 'Lunch with friends', type: 'expense', date: new Date(2024, 9, 19) },
-    { key: '36', amount: 50, category: 'Transportation', description: 'Gas for the car', type: 'expense', date: new Date(2024, 9, 20) },
-    { key: '38', amount: 12, category: 'Entertainment', description: 'Movie night with friends', type: 'expense', date: new Date(2024, 9, 22) },
-    { key: '47', amount: 25, category: 'Personal', description: 'Toiletries', type: 'expense', date: new Date(2024, 9, 28) },
-    { key: '48', amount: 50, category: 'Food', description: 'Groceries for the weekend', type: 'expense', date: new Date(2024, 9, 28) },
-    { key: '50', amount: 15, category: 'Entertainment', description: 'Monthly gaming subscription', type: 'expense', date: new Date(2024, 9, 30) },
-    { key: '51', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 8) },
-    { key: '52', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 15) },
-    { key: '53', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 22) },
-    { key: '54', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 29) },
-  ];
+  const [isPickerVisible, setPickerVisible] = useState(false);
 
   const colors = ['#f95d6a', '#ff9909', '#fbd309', '#7cb6dc', '#1c43da', '#2e3884'];
   const getColor = (index) => colors[index % colors.length];
 
-  const processData = () => {
-    const categoryTotals = {};
-    let income = 0;
-    let expense = 0;
-
-    initialTransactions.forEach((transaction) => {
-      const { category, amount, type } = transaction;
-      if (type === 'expense') { 
-        if (!categoryTotals[category]) {
-          categoryTotals[category] = 0;
-        }
-        categoryTotals[category] += Math.abs(amount);
-        expense += Math.abs(amount);
-
-      } else if (type === 'income') { 
-        if (!categoryTotals[category]) {
-          categoryTotals[category] = 0;
-        }
-        categoryTotals[category] += amount;
-        income += amount;
+  // API to get transactions for a user (replace with your actual API URL)
+  const fetchTransactions = async () => {
+    try {
+      const userId = 1; // Replace with dynamic user ID
+      const response = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/transactions/${userId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setTransactions(data);
+      } else {
+        Alert.alert("Error", "Failed to fetch transactions.");
       }
-    });
-
-    setTotalIncome(income);
-    setTotalExpense(expense);
-
-    const chartData = Object.keys(categoryTotals).map((category, index) => ({
-      name: category,
-      population: categoryTotals[category],
-      color: getColor(index),
-      legendFontColor: '#000',
-      legendFontSize: 12,
-    }));
-
-    return chartData;
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+      Alert.alert("Error", "Something went wrong.");
+    }
   };
 
   useEffect(() => {
-    const data = initialTransactions.filter(
-      (transaction) =>
-        transaction.date.getMonth() === selectedMonth.month &&
-        transaction.date.getFullYear() === selectedMonth.year
-    );
-  
-    const categoryTotals = {};
-    const categoryDetails = {};
-    let income = 0;
-    let expense = 0;
-  
-    data.forEach((transaction) => {
-      const { category, amount, type, description = "No description", date = new Date() } = transaction;
-      if (type === 'expense') {
-        if (!categoryTotals[category]) categoryTotals[category] = 0;
-        categoryTotals[category] += Math.abs(amount);
-        expense += Math.abs(amount);
-      } else {
-        income += amount;
-      }
+    if (transactions.length > 0) {
+      // Filter transactions based on selected month and year
+      const filteredTransactions = transactions.filter(
+        (transaction) =>
+          transaction.date.getMonth() === selectedMonth.month &&
+          transaction.date.getFullYear() === selectedMonth.year
+      );
 
-      if (!categoryDetails[category]) {
-        categoryDetails[category] = [];
-      }
-      categoryDetails[category].push({ description:transaction.description || "No description", amount, date });
-    });
-  
-    setTotalIncome(income);
-    setTotalExpense(expense);
-  
-    setChartData(
-      Object.keys(categoryTotals).map((category, index) => ({
-        name: category,
-        population: categoryTotals[category],
-        color: colors[index % colors.length],
-      }))
-    );
-    setDetails(categoryDetails);
-  }, [selectedMonth]);
-  // Recalculate when selectedMonth changes
-  
+      const categoryTotals = {};
+      const categoryDetails = {};
+      let income = 0;
+      let expense = 0;
 
-  // calculating the toal of each categories..
+      filteredTransactions.forEach((transaction) => {
+        const { category, amount, type, description = "No description", date = new Date() } = transaction;
+        if (type === 'expense') {
+          if (!categoryTotals[category]) categoryTotals[category] = 0;
+          categoryTotals[category] += Math.abs(amount);
+          expense += Math.abs(amount);
+        } else {
+          income += amount;
+        }
+
+        if (!categoryDetails[category]) {
+          categoryDetails[category] = [];
+        }
+        categoryDetails[category].push({ description, amount, date });
+      });
+
+      setTotalIncome(income);
+      setTotalExpense(expense);
+
+      setChartData(
+        Object.keys(categoryTotals).map((category, index) => ({
+          name: category,
+          population: categoryTotals[category],
+          color: colors[index % colors.length],
+        }))
+      );
+      setDetails(categoryDetails);
+    }
+  }, [transactions, selectedMonth]);
+
   const calculateCategoryTotal = (category) => {
     if (!details[category]) return 0;
     return details[category].reduce((sum, item) => sum + item.amount, 0);
   };
 
   const handleCategoryPress = (category) => {
-    if (category !== 'Income') {  
+    if (category !== 'Income') {
       setSelectedCategory(category === selectedCategory ? null : category);
     }
   };
- 
+
   const sortedChartData = [...chartData].sort((a, b) => b.population - a.population);
   const filteredChartData = chartData.filter(item => item.name !== 'Income');
 
@@ -158,27 +106,19 @@ export default function ReportsScreen() {
     }));
   };
 
-  const calculateCategoryPercentage = (category) => {
-    const total = chartData.reduce((sum, item) => sum + item.population, 0);
-    const categoryTotal = calculateCategoryTotal(category);
-    return ((categoryTotal / total) * 100).toFixed(1) + '%';
-  };
-
   const dataWithPercentage = calculatePercentage(filteredChartData);
 
-  // for now, instead of percentages being shown,
-  // the labels with the most expense come first so in most-least order
   const sortedDataWithPercentage = [...dataWithPercentage].sort((b, a) => a.population - b.population);
 
-  //for legend box cateogry labels
   const Triangle = ({ color, isSelected }) => {
     return (
-      <View style={[styles.triangle, { borderTopColor: color, 
+      <View style={[styles.triangle, {
+        borderTopColor: color,
         transform: [
-        { rotate: isSelected ? '0deg' : '-90deg' }, 
-      ], 
-    },
-  ]} />
+          { rotate: isSelected ? '0deg' : '-90deg' },
+        ],
+      }]}
+      />
     );
   };
 
