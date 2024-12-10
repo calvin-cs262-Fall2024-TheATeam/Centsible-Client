@@ -49,23 +49,20 @@ export default function App() {
 
   // Home tab screens
   const HomeTabs = () => (
-    <Tab.Navigator>
+    <Tab.Navigator initialRouteName="Budget"
+      screenOptions={{
+        tabBarStyle: { backgroundColor: 'white' }, // Optional: Set the background color of the tab bar
+        tabBarActiveTintColor: 'purple', // Active icon and label color
+        tabBarInactiveTintColor: 'gray', // Inactive icon and label color
+      }}>
       <Tab.Screen
-        name="Transactions"
-        component={TransactionScreen}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="credit-card" color={color} size={size} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Goals"
+        name="Budget"
         component={GoalsScreen}
         options={{
           tabBarIcon: ({ color, size }) => (
             <Icon name="dollar" color={color} size={size} />
           ),
+          headerTitle: 'Budget',
         }}
       />
       <Tab.Screen
@@ -75,18 +72,30 @@ export default function App() {
           tabBarIcon: ({ color, size }) => (
             <Icon name="line-chart" color={color} size={size} />
           ),
+          headerTitle: 'Reports',
         }}
       />
       <Tab.Screen
-      name="Profile"
-      children={() => <ProfileScreen setIsLoggedIn={setIsLoggedIn} />}
-      options={{
-        tabBarIcon: ({ color, size }) => (
-          <Icon name="user" color={color} size={size} />
-        ),
-      }}
-    />
-  </Tab.Navigator>
+        name="Transactions"
+        component={TransactionScreen}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Icon name="credit-card" color={color} size={size} />
+          ),
+          headerTitle: 'Transactions',
+        }}
+      />
+      <Tab.Screen
+        name="Profile"
+        children={() => <ProfileScreen setIsLoggedIn={setIsLoggedIn} />}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Icon name="user" color={color} size={size} />
+          ),
+          headerTitle: 'Profile',
+        }}
+      />
+    </Tab.Navigator>
   );
 
   return (
@@ -102,7 +111,7 @@ export default function App() {
             />
             <Stack.Screen
               name="CreateAccount"
-              component={CreateAccountScreen} 
+              component={CreateAccountScreen}
               options={{ title: 'Create Account' }}
             />
           </>
@@ -112,7 +121,7 @@ export default function App() {
             component={HomeTabs}
             options={{ headerShown: false }} // No header for the home tabs
           />
-        )}                                  
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );
