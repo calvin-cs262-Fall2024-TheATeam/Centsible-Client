@@ -1,95 +1,194 @@
-import React, { useState } from 'react'; 
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Text, View, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
 
-// Initial transactions and amounts
-const initialTransactions = [
-  { key: '1', amount: 200, category: 'Housing', description: 'Monthly rent', type: 'expense', date: new Date(2024, 9, 1) },
-  { key: '4', amount: 30, category: 'Transportation', description: 'Gas for the car', type: 'expense', date: new Date(2024, 9, 3) },
-  { key: '5', amount: 50, category: 'Personal', description: 'New clothes', type: 'expense', date: new Date(2024, 9, 2) },
-  { key: '7', amount: 10, category: 'Food', description: 'Takeout dinner', type: 'expense', date: new Date(2024, 9, 3) },
-  { key: '8', amount: 60, category: 'Housing', description: 'Electricity bill', type: 'expense', date: new Date(2024, 9, 5) },
-  { key: '10', amount: 10, category: 'Food', description: 'Lunch with friends', type: 'expense', date: new Date(2024, 9, 6) },
-  { key: '12', amount: 25, category: 'Personal', description: 'Coffee and bagels', type: 'expense', date: new Date(2024, 9, 6) },
-  { key: '13', amount: 90, category: 'Food', description: 'Groceries for the week', type: 'expense', date: new Date(2024, 9, 7) },
-  { key: '14', amount: 20, category: 'Personal', description: 'Shampoo and toiletries', type: 'expense', date: new Date(2024, 9, 7) },
-  { key: '15', amount: 50, category: 'Entertainment', description: 'Weekend trip', type: 'expense', date: new Date(2024, 9, 8) },
-  { key: '16', amount: 10, category: 'Food', description: 'Fast food lunch', type: 'expense', date: new Date(2024, 9, 9) },
-  { key: '18', amount: 45, category: 'Personal', description: 'Haircut', type: 'expense', date: new Date(2024, 9, 5) },
-  { key: '21', amount: 10, category: 'Personal', description: 'Coffee at campus cafe', type: 'expense', date: new Date(2024, 9, 10) },
-  { key: '22', amount: 100, category: 'Personal', description: 'New shoes', type: 'expense', date: new Date(2024, 9, 13) },
-  { key: '22', amount: 100, category: 'Personal', description: 'Amazon', type: 'expense', date: new Date(2024, 9, 13) },
-  { key: '24', amount: 50, category: 'Food', description: 'Groceries for the week', type: 'expense', date: new Date(2024, 9, 14) },
-  { key: '25', amount: 15, category: 'Education', description: 'School supplies', type: 'expense', date: new Date(2024, 9, 14) },
-  { key: '28', amount: 50, category: 'Personal', description: 'Earrings', type: 'expense', date: new Date(2024, 9, 16) },
-  { key: '30', amount: 10, category: 'Entertainment', description: 'Sports event tickets', type: 'expense', date: new Date(2024, 9, 16) },
-  { key: '32', amount: 5, category: 'Food', description: 'Coffee shop', type: 'expense', date: new Date(2024, 9, 18) },
-  { key: '34', amount: 15, category: 'Food', description: 'Lunch with friends', type: 'expense', date: new Date(2024, 9, 19) },
-  { key: '36', amount: 50, category: 'Transportation', description: 'Gas for the car', type: 'expense', date: new Date(2024, 9, 20) },
-  { key: '38', amount: 10, category: 'Entertainment', description: 'Movie night with friends', type: 'expense', date: new Date(2024, 9, 22) },
-  { key: '47', amount: 25, category: 'Personal', description: 'Toiletries', type: 'expense', date: new Date(2024, 9, 28) },
-  { key: '48', amount: 50, category: 'Food', description: 'Groceries for the weekend', type: 'expense', date: new Date(2024, 9, 28) },
-  { key: '50', amount: 15, category: 'Entertainment', description: 'Monthly gaming subscription', type: 'expense', date: new Date(2024, 9, 30) },
-  { key: '51', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 8) },
-  { key: '52', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 15) },
-  { key: '53', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 22) },
-  { key: '54', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 29) },
-];
+const API_BASE_URL = "https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/";
 
-const initialAmounts = {
-  Groceries: '100.00',
-  Phone: '50.00',
-  'Fun Money': '20.00',
-  'Hair/Cosmetics': '30.00',
-  Subscriptions: '15.00',
-  'Pet Care': '40.00',
-  'Child Care': '60.00',
-  Tuition: '500.00',
-  Books: '80.00',
-  'Spotify subscription': '10.00',
-  'Monthly Rent': '50',
-  'Internet bill': '50'
+const BudgetPlanner = () => {
+  const [transactions, setTransactions] = useState([]);
+  const [categories, setCategories] = useState({});
+  const [amounts, setAmounts] = useState({});
+  const currentUserId = 1;
+  const currentMonth = 11;
+  const currentYear = 2024;
+
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      try {
+        // Ensure default month budget exists
+        const defaultBudgetResponse = await fetch(`${API_BASE_URL}defaultMonthBudget`, {
+          method: 'POST',
+          mode: "no-cors",
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            appuserID: 1,
+            month: currentMonth,
+            year: currentYear,
+          }),
+        });
+
+        if (!defaultBudgetResponse.ok) {
+          throw new Error("Failed to create or verify default budget.");
+        }
+
+        console.log("Default budget created or verified.");
+
+        // Fetch transactions and budget
+        const transactionsResponse = await fetch(`${API_BASE_URL}transactions/${currentUserId}`);
+        const categoriesResponse = await fetch(`${API_BASE_URL}monthBudget?appuserID=${currentUserId}&month=${currentMonth}&year=${currentYear}`);
+
+        if (!transactionsResponse.ok || !categoriesResponse.ok) {
+          throw new Error("Failed to fetch transactions or month budget.");
+        }
+
+        const transactionsData = await transactionsResponse.json();
+        const categoriesData = await categoriesResponse.json();
+
+              // Fetch details for each category one by one
+        const categoriesMap = {};
+        const amountsMap = {};
+
+        for (const category of categoriesData) {
+          const categoryDetailsResponse = await fetch(`${API_BASE_URL}budgetCategoryName/${category.id}`);
+          if (!categoryDetailsResponse.ok) {
+          throw new Error(`Failed to fetch details for category ${category.id}`);
+        }
+          const categoryDetails = await categoryDetailsResponse.json();
+
+          categoriesMap[categoryDetails.categoryname] = [];
+          amountsMap[categoryDetails.categoryname] = parseFloat(category.monthlydollaramount).toFixed(2);
+      }
+
+      setCategories(categoriesMap);
+      setAmounts(amountsMap);
+
+      console.log('Processed Categories:', categoriesMap);
+      console.log('Processed Amounts:', amountsMap);
+    } catch (error) {
+      console.error('Error initializing data:', error);
+      Alert.alert('Error', 'Failed to initialize budget data.');
+    }
+  };
+
+  fetchInitialData();
+}, []);
+
+  const addSubcategory = async (category, subcategoryName, subcategoryAmount) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}budgetSubcategory`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          budgetcategoryID: category, // Replace with actual category ID
+          subcategoryname: subcategoryName,
+          monthlydollaramount: parseFloat(subcategoryAmount),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to add subcategory.");
+      }
+
+      setCategories((prev) => ({
+        ...prev,
+        [category]: [...prev[category], subcategoryName],
+      }));
+
+      setAmounts((prev) => ({
+        ...prev,
+        [subcategoryName]: parseFloat(subcategoryAmount).toFixed(2),
+      }));
+    } catch (error) {
+      console.error("Error adding subcategory:", error);
+    }
+  };
+
+  const updateSubcategoryAmount = async (subcategoryId, newAmount) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}budgetSubcategoryAmount`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: subcategoryId,
+          monthlydollaramount: parseFloat(newAmount),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update subcategory amount.");
+      }
+
+      setAmounts((prev) => ({
+        ...prev,
+        [subcategoryId]: parseFloat(newAmount).toFixed(2),
+      }));
+    } catch (error) {
+      console.error("Error updating subcategory amount:", error);
+    }
+  };
+
+  const deleteSubcategory = async (subcategoryId, categoryName) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}budgetSubcategory/${subcategoryId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete subcategory.");
+      }
+
+      setCategories((prev) => ({
+        ...prev,
+        [categoryName]: prev[categoryName].filter((subcat) => subcat !== subcategoryId),
+      }));
+    } catch (error) {
+      console.error("Error deleting subcategory:", error);
+    }
+  };
+
+  const getTotalForCategory = (category) => {
+    const subcategories = categories[category] || [];
+    return subcategories.reduce((sum, subcat) => sum + parseFloat(amounts[subcat] || '0'), 0);
+  };
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerText}>October 2024</Text>
+      </View>
+
+      <ScrollView style={styles.scrollView}>
+        {Object.entries(categories).map(([category, subcategories]) => (
+          <View key={category} style={styles.categoryContainer}>
+            <Text style={styles.categoryTitle}>{category}</Text>
+
+            <SubCategoryList
+              category={category}
+              subcategories={subcategories}
+              setCategories={setCategories}
+              amounts={amounts}
+              setAmounts={setAmounts}
+              onAddSubcategory={addSubcategory}
+              onUpdateSubcategoryAmount={updateSubcategoryAmount}
+              onDeleteSubcategory={deleteSubcategory}
+            />
+          </View>
+        ))}
+      </ScrollView>
+    </View>
+  );
 };
 
-const SubCategoryList = ({
-  subcategories,
-  onAddTransaction,
-  transactions,
-  category,
-  setCategories,
-  amounts,
-  setAmounts,
-  onAmountUpdate,
-}) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [activeSubcategory, setActiveSubcategory] = useState(null);
+const SubCategoryList = ({ subcategories, category, setCategories, amounts, setAmounts, onAddSubcategory, onUpdateSubcategoryAmount, onDeleteSubcategory }) => {
+  const [isAddingSubcategory, setIsAddingSubcategory] = useState(false);
   const [newSubcategoryName, setNewSubcategoryName] = useState('');
   const [newSubcategoryAmount, setNewSubcategoryAmount] = useState('');
-  const [isAddingSubcategory, setIsAddingSubcategory] = useState(false);
-
-  const handleAmountPress = (subcategory) => {
-    setActiveSubcategory(subcategory);
-    setIsEditing(true);
-  };
-
-  const handleAmountChange = (subcategory, value) => {
-    const formattedValue = value.replace(/[^0-9.]/g, '');
-    const parts = formattedValue.split('.');
-    if (parts.length > 2 || (parts[1] && parts[1].length > 2)) return;
-
-    setAmounts((prev) => ({
-      ...prev,
-      [subcategory]: formattedValue,
-    }));
-  };
-
-  const handleAmountBlur = (subcategory) => {
-    const updatedAmount = parseFloat(amounts[subcategory] || '0');
-    setIsEditing(false);
-    setActiveSubcategory(null);
-
-    // Update parent state
-    onAmountUpdate(subcategory, isNaN(updatedAmount) ? 0 : updatedAmount);
-  };
 
   const handleAddSubcategory = () => {
     if (!newSubcategoryName || !newSubcategoryAmount) {
@@ -97,25 +196,14 @@ const SubCategoryList = ({
       return;
     }
 
-    const newAmount = parseFloat(newSubcategoryAmount);
-    if (isNaN(newAmount)) {
-      Alert.alert('Error', 'Please enter a valid numerical amount.');
+    const amount = parseFloat(newSubcategoryAmount);
+    if (isNaN(amount) || amount < 0) {
+      Alert.alert('Error', 'Please enter a valid positive amount.');
       return;
     }
 
-    // Add the new subcategory to the selected category
-    setCategories((prev) => ({
-      ...prev,
-      [category]: [...(prev[category] || []), newSubcategoryName],
-    }));
+    onAddSubcategory(category, newSubcategoryName, amount);
 
-    // Update the amount for the new subcategory
-    setAmounts((prev) => ({
-      ...prev,
-      [newSubcategoryName]: newAmount.toFixed(2),
-    }));
-
-    // Reset the form and close the input
     setNewSubcategoryName('');
     setNewSubcategoryAmount('');
     setIsAddingSubcategory(false);
@@ -126,21 +214,14 @@ const SubCategoryList = ({
       {subcategories.map((subcat) => (
         <View key={subcat} style={styles.subCategoryItem}>
           <Text style={styles.subCategoryText}>{subcat}</Text>
-          <TouchableOpacity onPress={() => handleAmountPress(subcat)}>
-            {isEditing && activeSubcategory === subcat ? (
-              <TextInput
-                value={amounts[subcat] || ''}
-                onChangeText={(text) => handleAmountChange(subcat, text)}
-                keyboardType="numeric"
-                style={styles.amountInput}
-                onBlur={() => handleAmountBlur(subcat)}
-                autoFocus
-              />
-            ) : (
-              <Text style={styles.subAmountText}>
-                ${parseFloat(amounts[subcat] || '0').toFixed(2)}
-              </Text>
-            )}
+          <TextInput
+            style={styles.amountInput}
+            keyboardType="numeric"
+            value={amounts[subcat]?.toString() || '0'}
+            onChangeText={(value) => onUpdateSubcategoryAmount(subcat, value)}
+          />
+          <TouchableOpacity onPress={() => onDeleteSubcategory(subcat, category)}>
+            <Text style={styles.deleteText}>Delete</Text>
           </TouchableOpacity>
         </View>
       ))}
@@ -154,16 +235,16 @@ const SubCategoryList = ({
           <View style={styles.addSubCat}>
             <TextInput
               style={styles.input}
+              placeholder="Subcategory Name"
               value={newSubcategoryName}
               onChangeText={setNewSubcategoryName}
-              placeholder="Enter subcategory name"
             />
             <TextInput
               style={styles.amountInput}
+              placeholder="Amount"
+              keyboardType="numeric"
               value={newSubcategoryAmount}
               onChangeText={setNewSubcategoryAmount}
-              placeholder="Enter amount"
-              keyboardType="numeric"
             />
           </View>
           <View style={styles.addSubcategoryActions}>
@@ -181,99 +262,6 @@ const SubCategoryList = ({
 };
 
 
-const BudgetPlanner = () => {
-  const [transactions, setTransactions] = useState(initialTransactions);
-  const [categories, setCategories] = useState({
-    Food: ["Groceries"],
-    Personal: ["Phone", "Fun Money", "Hair/Cosmetics"],
-    Transportation: ["Pet Care", "Child Care"],
-    Education: ["Tuition", "Books"],
-    Housing: ["Monthly rent", "Electricity bill"],
-    Entertainment: ["Spotify subscription", "Concert tickets"],
-  });
-  const [amounts, setAmounts] = useState(initialAmounts); // Track budget goals for subcategories
-
-  const onAmountUpdate = (subcategory, newAmount) => {
-    setAmounts((prev) => ({
-      ...prev,
-      [subcategory]: parseFloat(newAmount).toFixed(2),
-    }));
-  };
-
-  const getTotalForCategory = (category) => {
-    const subcategories = categories[category] || [];
-    return subcategories.reduce((sum, subcat) => {
-      return sum + parseFloat(amounts[subcat] || '0.00');
-    }, 0);
-  };
-  
-
-  const getProgressBarColor = (spentAmount, totalAmount) => {
-    const progress = (spentAmount / totalAmount) * 100;
-    if (progress >= 100) return '#cc0000';
-    if (progress >= 90) return '#ff9933';
-    return '#006600';
-  };
-
-  return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>October 2024</Text>
-      </View>
-
-      <ScrollView style={styles.scrollView}>
-        {Object.entries(categories).map(([category, subcategories]) => {
-          const categorySpent = transactions
-            .filter(t => t.category === category)
-            .reduce((sum, t) => sum + t.amount, 0);
-
-          const totalAmount = getTotalForCategory(category);
-
-          const progress = (categorySpent / totalAmount) * 100;
-
-          return (
-            <View key={category} style={styles.categoryContainer}>
-              {/* Move progress bar above category header */}
-              <View style={styles.progressBarContainer}>
-                <View
-                  style={{
-                    ...styles.progressBar,
-                    width: `${Math.min(progress, 100)}%`, // Cap the progress at 100%
-                    backgroundColor: getProgressBarColor(categorySpent, totalAmount),
-                  }}
-                />
-                {/* <Text style={styles.progressPercentage}>  
-                  {Math.min(progress, 100).toFixed(0)}%  
-                </Text>   */}
-              </View>
-
-              <View style={styles.categoryHeader}>
-                <Text style={styles.categoryTitle}>{category}</Text>
-                <View  style={styles.amountText}>
-                  <Text style={styles.amountUsed}>${categorySpent.toFixed(2)} / </Text>
-                  <Text style={styles.amountTotal}>${totalAmount.toFixed(2)}</Text>
-                </View>
-              </View>
-
-              <SubCategoryList
-                category={category}
-                subcategories={categories[category] || []} // Correctly pass updated subcategories
-                onAddTransaction={(subcategory, amount) =>
-                  setTransactions([...transactions, { category, subcategory, amount }])
-                }
-                transactions={transactions}
-                amounts={amounts}
-                setAmounts={setAmounts}
-                setCategories={setCategories}
-                onAmountUpdate={onAmountUpdate}
-              />
-            </View>
-          );
-        })}
-      </ScrollView>
-    </View>
-  );
-};
 const styles = {
   container: {
     backgroundColor: '#e8d0f4',
