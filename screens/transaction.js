@@ -12,6 +12,7 @@ export default function TransactionScreen({ navigation }) {
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState(new Date());
   const [category, setCategory] = useState('');
+  const [categoryId, setCategoryId] = useState(null);
   const [type, setType] = useState('Expense'); //setting the default to say expense
   const [description, setDescription] = useState('');
   const [transactions, setTransactions] = useState([]);
@@ -44,8 +45,7 @@ export default function TransactionScreen({ navigation }) {
                   const categoryData = await categoryResponse.json();
                   return {
                     ...transaction,
-                    category: categoryData.categoryname,  // Set fetched category name
-                    key: transaction.id || index.toString(),
+                    category: categoryData.categoryname  // Set fetched category name
                   };
                 } else {
                   console.error(`Failed to fetch category for ID ${transaction.budgetcategoryid}`);
@@ -106,7 +106,7 @@ export default function TransactionScreen({ navigation }) {
       appuserID: 1,  // Assuming this is hardcoded for now, adjust if needed
       dollaramount: parsedAmount.toFixed(2),  // Format the amount to two decimal places
       transactiontype: type,  // Assuming type is a variable holding transaction type (income, expense, etc.)
-      budgetcategoryID: 1,  // Use the selected category ID
+      budgetcategoryID: categoryId,  // Use the selected category ID
       optionaldescription: description,  // Optional description for the transaction
       transactiondate: transactionDateISOString
     };
@@ -127,6 +127,24 @@ export default function TransactionScreen({ navigation }) {
       if (response.ok) {
         const data = await response.json();
 
+        // Fetch the category name using the categoryId of the transaction
+        let categoryName = 'Unknown Category';  // Default category name if fetch fails
+        if (categoryId) {
+          try {
+            const categoryResponse = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/budgetCategoryName/${categoryId}`);
+            if (categoryResponse.ok) {
+              const categoryData = await categoryResponse.json();
+              categoryName = categoryData.categoryname; // Use fetched category name
+            } else {
+              console.error(`Failed to fetch category for ID ${categoryId}`);
+            }
+          } catch (err) {
+            console.error('Error fetching category name:', err);
+          }
+        }
+
+        // Add the categoryName to the transaction data
+        data.category = categoryName;
         // Update the transactions list with the new transaction
         //console.log(data);
         setTransactions(prevTransactions => {
@@ -249,7 +267,7 @@ export default function TransactionScreen({ navigation }) {
         <View style={styles.itemContainer}>
           <View>
             <Text style={styles.dateText}>{formattedDate.toUpperCase()}</Text>
-            {data.item.type === 'Income' ? (
+            {data.item.transactiontype === 'Income' ? (
               <Text style={[styles.categoryText, isExpanded && { paddingBottom: 0 }]}>Income</Text>
             ) : (
               <Text style={[styles.categoryText, isExpanded && { paddingBottom: 0 }]}>{data.item.category}</Text>
@@ -388,6 +406,8 @@ export default function TransactionScreen({ navigation }) {
         setAmount={setAmount}
         category={category}
         setCategory={setCategory}
+        setCategoryId={setCategoryId}  // Pass setCategoryId here
+        categoryId={categoryId}        // Pass the current categoryId
         description={description}
         setDescription={setDescription}
         type={type}

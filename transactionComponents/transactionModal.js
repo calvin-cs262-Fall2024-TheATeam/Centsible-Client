@@ -6,7 +6,23 @@ import SegmentedControlTab from "react-native-segmented-control-tab"; // me
 // may need to use command "npm install react-native-segmented-control-tab"
 
 //TODO get rid of unneeded global styles that shouldn't be found there
-const TransactionModal = ({ visible, onClose, onAdd, amount, setAmount, category, setCategory, date, setDate, selectedIndex, handleIndexChange, description, setDescription, resetForm }) => {
+const TransactionModal = (
+    { visible,
+        onClose,
+        onAdd,
+        amount,
+        setAmount,
+        category,
+        setCategory,
+        setCategoryId,  // Accept setCategoryId as a prop
+        categoryId,     // Accept categoryId as a prop
+        date,
+        setDate,
+        selectedIndex,
+        handleIndexChange,
+        description,
+        setDescription,
+        resetForm }) => {
     const [categoryModalVisible, setCategoryModalVisible] = useState(false);
     const [categories, setCategories] = useState([]);  // To store the categories fetched from the backend
 
@@ -18,12 +34,20 @@ const TransactionModal = ({ visible, onClose, onAdd, amount, setAmount, category
     }, [visible]);
 
     const fetchCategories = async () => {
+        if (!date) return; // Prevent fetching if date is not set
+
         try {
-            const response = await fetch('https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/monthBudget/1/12/2024');
+            // Extract month (0-based) and year from the selected date
+            const selectedMonth = date.getMonth() + 1;  // getMonth() returns 0-based month, so add 1
+            const selectedYear = date.getFullYear();  // getFullYear() returns the full year (e.g., 2024)
+
+            const response = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/monthBudget/1/${selectedMonth}/${selectedYear}`);
             if (response.ok) {
                 const data = await response.json();
-                // Assuming 'category_name' is the field returned by your backend with the category name
-                setCategories(data.map(item => item.categoryname));
+                setCategories(data.map(item => ({
+                    id: item.id, // ID for the category
+                    name: item.categoryname // Name for the category
+                })));
             } else {
                 console.error('Failed to fetch categories:', response.status);
                 // Handle failure here (maybe show an error message to the user)
@@ -161,8 +185,19 @@ const TransactionModal = ({ visible, onClose, onAdd, amount, setAmount, category
                             <View style={globalStyles.categoryModalContainer}>
                                 <FlatList
                                     data={categories}
-                                    renderItem={({ item }) => renderCategoryItem(item)}
-                                    keyExtractor={(item) => item}
+                                    renderItem={({ item }) => (
+                                        <TouchableOpacity
+                                            onPress={() => {
+                                                setCategory(item.name); // Set the category name
+                                                setCategoryId(item.id); // Set the category ID (use when submitting transaction)
+                                                setCategoryModalVisible(false); // Close the modal after selecting category
+                                            }}
+                                            style={globalStyles.categoryOption}
+                                        >
+                                            <Text style={globalStyles.categoryOptionText}>{item.name}</Text>
+                                        </TouchableOpacity>
+                                    )}
+                                    keyExtractor={item => item.id.toString()} // Use the category ID as the key
                                     style={globalStyles.categoryList}
                                 />
                                 <TouchableOpacity
