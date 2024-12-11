@@ -26,6 +26,8 @@ export default function TransactionScreen({ navigation }) {
         const response = await fetch('https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/transactions/1'); // Use the correct API endpoint
         if (response.ok) {
           const data = await response.json();
+          ('Fetched transactions:', data);  // Add this log to check the fetched data
+
 
           // Step 2: For each transaction, fetch the category name or set to 'Income' for income transactions
           const updatedTransactions = await Promise.all(data.map(async (transaction, index) => {
@@ -36,7 +38,7 @@ export default function TransactionScreen({ navigation }) {
                 return {
                   ...transaction,
                   category: 'Income',  // Set category name as "Income"
-                  key: transaction.id || index.toString(),
+                  key: transaction.id,
                 };
               } else if (transaction.transactiontype === 'Expense') {
                 // For expense, fetch category name based on category ID
@@ -45,7 +47,8 @@ export default function TransactionScreen({ navigation }) {
                   const categoryData = await categoryResponse.json();
                   return {
                     ...transaction,
-                    category: categoryData.categoryname  // Set fetched category name
+                    category: categoryData.categoryname,
+                    key: transaction.id  // Set fetched category name
                   };
                 } else {
                   console.error(`Failed to fetch category for ID ${transaction.budgetcategoryid}`);
@@ -126,6 +129,7 @@ export default function TransactionScreen({ navigation }) {
 
       if (response.ok) {
         const data = await response.json();
+        console.log('Created Transaction with ID:', data.id);
 
         // Fetch the category name using the categoryId of the transaction
         let categoryName = 'Unknown Category';  // Default category name if fetch fails
@@ -145,10 +149,15 @@ export default function TransactionScreen({ navigation }) {
 
         // Add the categoryName to the transaction data
         data.category = categoryName;
+        const transactionWithId = {
+          ...data,               // The returned data from backend (including id)
+          key: data.id.toString(),  // Use the backend-generated id as the key for React (if needed)
+        };
+  
         // Update the transactions list with the new transaction
         //console.log(data);
         setTransactions(prevTransactions => {
-          const updatedTransactions = [data, ...prevTransactions]; // Add the new transaction at the beginning
+          const updatedTransactions = [transactionWithId, ...prevTransactions]; // Add the new transaction at the beginning
           return updatedTransactions.sort((a, b) => new Date(b.transactiondate) - new Date(a.transactiondate));  // Sort by date descending
         });
 
@@ -177,7 +186,7 @@ export default function TransactionScreen({ navigation }) {
           newbalance: newBalance,
         }),
       });
-      console.log(newBalance);
+      //console.log(newBalance);
 
       if (response.ok) {
         console.log('Balance updated successfully!');
@@ -210,18 +219,14 @@ export default function TransactionScreen({ navigation }) {
   };
 
   const handleExpandTransaction = (transactionKey) => {
-    // Toggle between expanding and collapsing
-    if (expandedTransaction === transactionKey) {
-      setExpandedTransaction(null); // Collapse the transaction
-    } else {
-      setExpandedTransaction(transactionKey); // Expand the clicked transaction
-    }
+    // If the same transaction is clicked, collapse it, otherwise expand it
+    setExpandedTransaction(prevKey => prevKey === transactionKey ? null : transactionKey);
   };
 
   // Update the balance when the transactions state changes
   useEffect(() => {
     const newBalance = calculateBalance();
-    console.log(newBalance);
+    //console.log(newBalance);
     updateCurrentBalanceInDB(newBalance); // Update balance in DB whenever transactions change
   }, [transactions]); // This hook will run whenever the transactions state is updated
 
@@ -252,6 +257,7 @@ export default function TransactionScreen({ navigation }) {
     const formattedDate = new Date(data.item.transactiondate).toLocaleDateString('en-US', options).replace(',', '');
     //console.log("Formatted Date:", formattedDate);
     const isExpanded = expandedTransaction === data.item.key;
+    //console.log("TransactionKey:", data.item.key, "ExpandedKey:", expandedTransaction, "IsExpanded:", isExpanded);
 
     const formattedAmount = parseFloat(data.item.dollaramount).toFixed(2);
     const amountText = data.item.transactiontype === 'Income'
