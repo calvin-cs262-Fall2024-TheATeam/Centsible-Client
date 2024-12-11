@@ -1,22 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, TextInput, Text, View, Button, TouchableOpacity, FlatList, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { globalStyles } from '../styles/globalStyles';
 import SegmentedControlTab from "react-native-segmented-control-tab"; // me
 // may need to use command "npm install react-native-segmented-control-tab"
 
-const expenseCategories = [
-    'Housing',
-    'Entertainment',
-    'Food',
-    'Personal',
-    'Transportation',
-    'Education'
-];
-
 //TODO get rid of unneeded global styles that shouldn't be found there
 const TransactionModal = ({ visible, onClose, onAdd, amount, setAmount, category, setCategory, date, setDate, selectedIndex, handleIndexChange, description, setDescription, resetForm }) => {
     const [categoryModalVisible, setCategoryModalVisible] = useState(false);
+    const [categories, setCategories] = useState([]);  // To store the categories fetched from the backend
+
+    useEffect(() => {
+        if (visible) {
+            // Fetch categories when the modal is visible
+            fetchCategories();
+        }
+    }, [visible]);
+
+    const fetchCategories = async () => {
+        try {
+            const response = await fetch('https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/monthBudget/1/12/2024');
+            if (response.ok) {
+                const data = await response.json();
+                // Assuming 'category_name' is the field returned by your backend with the category name
+                setCategories(data.map(item => item.categoryname));
+            } else {
+                console.error('Failed to fetch categories:', response.status);
+                // Handle failure here (maybe show an error message to the user)
+            }
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+            // Handle error (e.g., show a message to the user)
+        }
+    };
 
     const renderCategoryItem = (categoryName) => (
         <TouchableOpacity
@@ -144,7 +160,7 @@ const TransactionModal = ({ visible, onClose, onAdd, amount, setAmount, category
                         >
                             <View style={globalStyles.categoryModalContainer}>
                                 <FlatList
-                                    data={expenseCategories}
+                                    data={categories}
                                     renderItem={({ item }) => renderCategoryItem(item)}
                                     keyExtractor={(item) => item}
                                     style={globalStyles.categoryList}
