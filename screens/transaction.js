@@ -105,18 +105,20 @@ export default function TransactionScreen({ navigation }) {
     const transactionDateISOString = transactionDate.toISOString();  // Convert to UTC ISO string
     //console.log(transactionDateISOString);
 
+    const budgetCategoryId = type === 'Income' ? null : categoryId;
+
     const newTransaction = {
       appuserID: 1,  // Assuming this is hardcoded for now, adjust if needed
       dollaramount: parsedAmount.toFixed(2),  // Format the amount to two decimal places
       transactiontype: type,  // Assuming type is a variable holding transaction type (income, expense, etc.)
-      budgetcategoryID: categoryId,  // Use the selected category ID
+      budgetcategoryID: budgetCategoryId,  // Use the selected category ID
       optionaldescription: description,  // Optional description for the transaction
       transactiondate: transactionDateISOString
     };
 
-    console.log("New Transaction (final):", newTransaction);
+    //console.log("New Transaction (final):", newTransaction);
 
-    //console.log(date);
+    console.log(date);
     //console.log("New Transaction:", newTransaction);  // Log the new transaction to verify
 
     try {
@@ -129,11 +131,13 @@ export default function TransactionScreen({ navigation }) {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Created Transaction with ID:', data.id);
+        //console.log('Created Transaction with ID:', data.id);
+        console.log(data);
+        //console.log(data.transactiondate);
 
         // Fetch the category name using the categoryId of the transaction
         let categoryName = 'Unknown Category';  // Default category name if fetch fails
-        if (categoryId) {
+        if (categoryId  && type !== 'Income') {
           try {
             const categoryResponse = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/budgetCategoryName/${categoryId}`);
             if (categoryResponse.ok) {
@@ -145,6 +149,8 @@ export default function TransactionScreen({ navigation }) {
           } catch (err) {
             console.error('Error fetching category name:', err);
           }
+        } else if (type === 'Income') {
+          categoryName = 'Income';  // For income transactions, set the category as 'Income'
         }
 
         // Add the categoryName to the transaction data
@@ -189,7 +195,7 @@ export default function TransactionScreen({ navigation }) {
       //console.log(newBalance);
 
       if (response.ok) {
-        console.log('Balance updated successfully!');
+        //console.log('Balance updated successfully!');
       } else {
         const responseText = await response.text();
         console.error('Error updating balance:', responseText);
