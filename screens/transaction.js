@@ -132,8 +132,8 @@ export default function TransactionScreen({ navigation }) {
       if (response.ok) {
         const data = await response.json();
         //console.log('Created Transaction with ID:', data.id);
-        console.log(data);
-        //console.log(data.transactiondate);
+        //console.log(data);
+        console.log(data.transactiondate);
 
         // Fetch the category name using the categoryId of the transaction
         let categoryName = 'Unknown Category';  // Default category name if fetch fails
@@ -256,9 +256,10 @@ export default function TransactionScreen({ navigation }) {
   // Renders a single transaction item with correct layout 
   const TransactionItem = memo(({ data }) => {
     const options = {
-      month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric',
-      minute: 'numeric',
-      second: 'numeric'
+      month: 'short', day: 'numeric', year: 'numeric',
+      // hour: 'numeric',
+      // minute: 'numeric',
+      // second: 'numeric'
     };
     const formattedDate = new Date(data.item.transactiondate).toLocaleDateString('en-US', options).replace(',', '');
     //console.log("Formatted Date:", formattedDate);
