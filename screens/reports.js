@@ -7,11 +7,12 @@ import { Picker } from '@react-native-picker/picker';
 export default function ReportsScreen() {
   const screenWidth = Dimensions.get('window').width;
   const [chartData, setChartData] = useState([]);
+  const [transactions, setTransactions] = useState([]);
+  
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [details, setDetails] = useState({});
   const [totalIncome, setTotalIncome] = useState(0);
   const [totalExpense, setTotalExpense] = useState(0);
-  const [transactions, setTransactions] = useState([]);
   const [isPickerVisible, setPickerVisible] = useState(false);
 
   const currentDate = new Date(); 
@@ -23,23 +24,74 @@ export default function ReportsScreen() {
   const colors = ['#f95d6a', '#ff9909', '#fbd309', '#7cb6dc', '#1c43da', '#2e3884'];
   const getColor = (index) => colors[index % colors.length];
 
-const fetchTransactions = async () => {
-  try {
-    const userId = 1; 
-    const response = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/transactions/${userId}`); 
+  const fetchTransactions = async () => {
+    try {
+      const userId = 1; 
+      const response = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/transactions/${userId}`); 
+  
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Fetched Transactions: ", data);
+        console.log("Chart Data before rendering PieChart: ", chartData);
 
-    if (response.ok) {
-      const data = await response.json();
-      console.log("Fetched Transactions: ", data);
-      setTransactions(data);  
-    } else {
-      Alert.alert("Error", "Failed to fetch transactions.");
+  
+        // Process each transaction to assign categories
+        const updatedTransactions = await Promise.all(data.map(async (transaction, index) => {
+          try {
+            // Check if it's an income or expense
+            if (transaction.transactiontype === 'Income') {
+              // For income, just set category to 'Income'
+              return {
+                ...transaction,
+                category: 'Income',  // Set category name as "Income"
+                key: transaction.id,
+              };
+            } else if (transaction.transactiontype === 'Expense') {
+              // For expense, fetch category name based on category ID
+              const categoryResponse = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/budgetCategoryName/${transaction.budgetcategoryid}`);
+              if (categoryResponse.ok) {
+                const categoryData = await categoryResponse.json();
+                return {
+                  ...transaction,
+                  category: categoryData.categoryname,
+                  key: transaction.id  // Set fetched category name
+                };
+              } else {
+                console.error(`Failed to fetch category for ID ${transaction.budgetcategoryid}`);
+                return {
+                  ...transaction,
+                  category: 'Unknown Category',  // Default category if failed
+                  key: transaction.id || index.toString(),
+                };
+              }
+            } else {
+              // If neither 'income' nor 'expense', return the transaction with 'Unknown Category'
+              return {
+                ...transaction,
+                category: 'Unknown Category',
+                key: transaction.id || index.toString(),
+              };
+            }
+          } catch (err) {
+            console.error(`Error processing transaction for ID ${transaction.id}: `, err);
+            return {
+              ...transaction,
+              category: 'Unknown Category',  // Default category if error
+              key: transaction.id || index.toString(),
+            };
+          }
+        }));
+  
+        // Set updated transactions with categories
+        setTransactions(updatedTransactions);
+      } else {
+        Alert.alert("Error", "Failed to fetch transactions.");
+      }
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+      Alert.alert("Error", "Something went wrong.");
     }
-  } catch (error) {
-    console.error("Error fetching transactions:", error);
-    Alert.alert("Error", "Something went wrong.");
-  }
-};
+  };
 
 useEffect(() => {
   fetchTransactions(); 
@@ -78,16 +130,16 @@ useEffect(() => {
 
     setTotalIncome(income);
     setTotalExpense(expense);
-    setDetails(categoryDetails);
 
     // Create data for Pie Chart
-    const chartData = Object.keys(categoryTotals).map((category, index) => ({
-      name: category,
-      population: categoryTotals[category],
-      color: getColor(index),
-    }));
-
-    setChartData(chartData);
+    setChartData(
+      Object.keys(categoryTotals).map((category, index) => ({
+        name: category,
+        population: categoryTotals[category],
+        color: getColor(index),
+    }))
+  );
+    setDetails(categoryDetails);
   }
 }, [transactions, selectedMonth]);
 
@@ -233,7 +285,7 @@ useEffect(() => {
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
             <View style={{ position: 'relative', alignItems: 'center', width: '50%' }}>
               <PieChart
-                data={chartData}
+                data={sortedChartData && filteredChartData && dataWithPercentage}
                 width={screenWidth * 0.8}
                 height={220}
                 chartConfig={{
@@ -272,7 +324,34 @@ useEffect(() => {
       </View>
 
       {/* Box for Category Details (if selected) */}
-      {selectedCategory && expenseDetails()}
+      {selectedCategory && (
+        <View style={styles.box}>
+          <Text style={[
+            styles.detailsTitle,
+            { color: categoryColors[selectedCategory] || "#000000" } 
+          ]}>What You Spent on {selectedCategory}
+        </Text>
+        {/* <Text style={styles.totalPercentage}> {calculateCategoryPercentage(selectedCategory)}</Text> */}
+          <Text style={styles.totalCategoryExpense && totalPercentage}> 
+          <Text style={styles.totalLabel}>Total: </Text>
+          <Text style={styles.totalAmount}>${calculateCategoryTotal(selectedCategory).toLocaleString()}</Text>
+          </Text>
+
+        <ScrollView contentContainerStyle={styles.scrollableContent}>
+          <FlatList
+            data={details[selectedCategory]}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => (
+              <View style={styles.detailItem}>
+                <Text style={styles.date}>{item.date.toLocaleDateString()}</Text>
+                <Text style={styles.description}>{item.description} </Text>
+                <Text style={styles.amount}>${item.amount.toFixed()}</Text>
+              </View>
+            )}
+          />
+        </ScrollView>
+      </View>
+      )}
 
       {/* Switch months button */}
       <Modal
