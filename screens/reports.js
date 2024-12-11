@@ -1,9 +1,10 @@
 import { color } from 'chart.js/helpers';
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, FlatList, ScrollView, Modal } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, FlatList, ScrollView, Modal, VirtualizedScrollView } from 'react-native';
 import { BarChart, PieChart } from 'react-native-chart-kit';
 import { Picker } from '@react-native-picker/picker';
 import { FontAwesome } from '@expo/vector-icons';
+import { useColorScheme } from 'react-native';
 
 export default function ReportsScreen() {
   const screenWidth = Dimensions.get('window').width;
@@ -12,13 +13,40 @@ export default function ReportsScreen() {
   const [details, setDetails] = useState({});
   const [totalIncome, setTotalIncome] = useState(0);
   const [totalExpense, setTotalExpense] = useState(0);
-  
+
+  const isDarkMode = useColorScheme() === 'dark';
+
+const pickerStyles = StyleSheet.create({
+  picker: {
+    width: '100%',
+    color: isDarkMode ? '#ffffff' : '#000000', // White text for dark mode, black for light mode
+    backgroundColor: isDarkMode ? '#333333' : '#ffffff', // Dark background for dark mode, light for light mode
+  },
+  pickerItem: {
+    color: isDarkMode ? '#ffffff' : '#000000', // Text color for items
+  },
+});
+
   const currentDate = new Date(); // Get today's date
   const [selectedMonth, setSelectedMonth] = useState({
     month: currentDate.getMonth(), // Initialize with the current month (0-based index)
     year: currentDate.getFullYear(), // Initialize with the current year
   });
-  const [isPickerVisible, setPickerVisible] = useState(false); 
+  const [isPickerVisible, setPickerVisible] = useState(false);
+
+    // Month Navigation Buttons
+    const handlePreviousMonth = () => {
+      const newMonth = selectedMonth.month === 0 ? 11 : selectedMonth.month - 1;
+      const newYear = selectedMonth.month === 0 ? selectedMonth.year - 1 : selectedMonth.year;
+      setSelectedMonth({ month: newMonth, year: newYear });
+    };
+  
+    const handleNextMonth = () => {
+      const newMonth = selectedMonth.month === 11 ? 0 : selectedMonth.month + 1;
+      const newYear = selectedMonth.month === 11 ? selectedMonth.year + 1 : selectedMonth.year;
+      setSelectedMonth({ month: newMonth, year: newYear });
+    };
+
 
   const initialTransactions = [
     { key: '1', amount: 200, category: 'Housing', description: 'Monthly rent', type: 'expense', date: new Date(2024, 9, 1) },
@@ -63,14 +91,14 @@ export default function ReportsScreen() {
 
     initialTransactions.forEach((transaction) => {
       const { category, amount, type } = transaction;
-      if (type === 'expense') { 
+      if (type === 'expense') {
         if (!categoryTotals[category]) {
           categoryTotals[category] = 0;
         }
         categoryTotals[category] += Math.abs(amount);
         expense += Math.abs(amount);
 
-      } else if (type === 'income') { 
+      } else if (type === 'income') {
         if (!categoryTotals[category]) {
           categoryTotals[category] = 0;
         }
@@ -99,12 +127,12 @@ export default function ReportsScreen() {
         transaction.date.getMonth() === selectedMonth.month &&
         transaction.date.getFullYear() === selectedMonth.year
     );
-  
+
     const categoryTotals = {};
     const categoryDetails = {};
     let income = 0;
     let expense = 0;
-  
+
     data.forEach((transaction) => {
       const { category, amount, type, description = "No description", date = new Date() } = transaction;
       if (type === 'expense') {
@@ -118,12 +146,12 @@ export default function ReportsScreen() {
       if (!categoryDetails[category]) {
         categoryDetails[category] = [];
       }
-      categoryDetails[category].push({ description:transaction.description || "No description", amount, date });
+      categoryDetails[category].push({ description: transaction.description || "No description", amount, date });
     });
-  
+
     setTotalIncome(income);
     setTotalExpense(expense);
-  
+
     setChartData(
       Object.keys(categoryTotals).map((category, index) => ({
         name: category,
@@ -134,7 +162,7 @@ export default function ReportsScreen() {
     setDetails(categoryDetails);
   }, [selectedMonth]);
   // Recalculate when selectedMonth changes
-  
+
 
   // calculating the toal of each categories..
   const calculateCategoryTotal = (category) => {
@@ -143,11 +171,11 @@ export default function ReportsScreen() {
   };
 
   const handleCategoryPress = (category) => {
-    if (category !== 'Income') {  
+    if (category !== 'Income') {
       setSelectedCategory(category === selectedCategory ? null : category);
     }
   };
- 
+
   const sortedChartData = [...chartData].sort((a, b) => b.population - a.population);
   const filteredChartData = chartData.filter(item => item.name !== 'Income');
 
@@ -174,132 +202,149 @@ export default function ReportsScreen() {
   //for legend box cateogry labels
   const Triangle = ({ color, isSelected }) => {
     return (
-      <View style={[styles.triangle, { borderTopColor: color, 
+      <View style={[styles.triangle, {
+        borderTopColor: color,
         transform: [
-        { rotate: isSelected ? '0deg' : '-90deg' }, 
-      ], 
-    },
-  ]} />
+          { rotate: isSelected ? '0deg' : '-90deg' },
+        ],
+      },
+      ]} />
     );
   };
 
   const categoryColors = {
-    "Housing":"#f95d6a",
-    "Transportation":"#ff9909",
+    "Housing": "#f95d6a",
+    "Transportation": "#ff9909",
     "Personal": "#fbd309",
-    "Food": "#7cb6dc", 
-    "Education":"#2e3884",
+    "Food": "#7cb6dc",
+    "Education": "#2e3884",
     "Entertainment": "#1c43da"
   };
-  
+
+  const expenseDetails = () => {
+    return (
+      <View style={styles.detailBox}>
+        <Text style={[
+          styles.detailsTitle,
+          { color: categoryColors[selectedCategory] || "#000000" }
+        ]}>{selectedCategory} Expenses
+        </Text>
+        {/* <Text style={styles.totalPercentage}> {calculateCategoryPercentage(selectedCategory)}</Text> */}
+        <Text style={styles.totalCategoryExpense && totalPercentage}>
+          <Text style={styles.totalLabel}>Total: </Text>
+          <Text style={styles.totalAmount}>${calculateCategoryTotal(selectedCategory).toLocaleString()}</Text>
+        </Text>
+        <View style={styles.detailsContainer}>
+          {details[selectedCategory]?.map((item, index) => (
+            <View
+              style={[
+                styles.detailItem,
+                index === details[selectedCategory].length - 1 && { borderBottomWidth: 0 },
+              ]}
+              key={index}
+            >
+              <Text style={styles.date}>{item.date.toLocaleDateString()}</Text>
+              <Text style={styles.description}>{item.description}</Text>
+              <Text style={styles.amount}>${item.amount.toFixed()}</Text>
+            </View>
+          ))}
+        </View>
+      </View>
+    )
+  }
+
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-  {/* Month Navigation with Arrows */}
-  <View style={styles.monthNavigationContainer}>
-    {/* Previous Month Arrow */}
-    <TouchableOpacity
-      onPress={() => {
-        if (selectedMonth.month !== 0 || selectedMonth.year !== currentDate.getFullYear() - 1) {
-          const newMonth = selectedMonth.month === 0 ? 11 : selectedMonth.month - 1;
-          const newYear = selectedMonth.month === 0 ? selectedMonth.year - 1 : selectedMonth.year;
-          setSelectedMonth({ month: newMonth, year: newYear });
-        }
-      }}
-      style={[
-        styles.arrowButton,
-        selectedMonth.month === 0 && selectedMonth.year === currentDate.getFullYear() - 1 && {
-          opacity: 0.5,
-        },
-      ]}
-      disabled={selectedMonth.month === 0 && selectedMonth.year === currentDate.getFullYear() - 1}
-    >
-      <FontAwesome name="chevron-left" size={20} color="white" />
-    </TouchableOpacity>
+
+    <View style= {styles.container}>
+      <View style={styles.monthNavigationContainer}>
+        <TouchableOpacity
+              style={styles.arrowButton}
+              onPress={() => {
+                const newMonth = selectedMonth.month === 0 ? 11 : selectedMonth.month - 1;
+                const newYear = selectedMonth.month === 0 ? selectedMonth.year - 1 : selectedMonth.year;
+                setSelectedMonth({ month: newMonth, year: newYear });
+              }}
+            >
+              <FontAwesome name="chevron-left" size={20} color="white" />
+
+        </TouchableOpacity>
 
     {/* Dropdown Button */}
     <TouchableOpacity
       style={styles.dropdownButton}
-      onPress={() => setPickerVisible(true)} // Show the modal
+      onPress={() => setPickerVisible(true)}
     >
       <Text style={styles.dropdownButtonText}>
         {new Date(selectedMonth.year, selectedMonth.month).toLocaleString('default', { month: 'long' })} {selectedMonth.year}
       </Text>
     </TouchableOpacity>
 
-    {/* Next Month Arrow */}
-    <TouchableOpacity
+        {/* Next Month Arrow */}
+        <TouchableOpacity
+      style={styles.arrowButton}
       onPress={() => {
-        if (
-          selectedMonth.month !== currentDate.getMonth() ||
-          selectedMonth.year !== currentDate.getFullYear()
-        ) {
-          const newMonth = selectedMonth.month === 11 ? 0 : selectedMonth.month + 1;
-          const newYear = selectedMonth.month === 11 ? selectedMonth.year + 1 : selectedMonth.year;
-          setSelectedMonth({ month: newMonth, year: newYear });
-        }
+        const newMonth = selectedMonth.month === 11 ? 0 : selectedMonth.month + 1;
+        const newYear = selectedMonth.month === 11 ? selectedMonth.year + 1 : selectedMonth.year;
+        setSelectedMonth({ month: newMonth, year: newYear });
       }}
-      style={[
-        styles.arrowButton,
-        selectedMonth.month === currentDate.getMonth() &&
-          selectedMonth.year === currentDate.getFullYear() && {
-            opacity: 0.5,
-          },
-      ]}
-      disabled={
-        selectedMonth.month === currentDate.getMonth() &&
-        selectedMonth.year === currentDate.getFullYear()
-      }
     >
       <FontAwesome name="chevron-right" size={20} color="white" />
     </TouchableOpacity>
-  </View>
 
-  {/* Title and Chart Container */}
-  <Text style={styles.title}></Text>
-  <View style={styles.box}>
-    <View style={styles.chartContainer}>
-      <Text style={styles.boxText}>Income vs. Expense</Text>
-
-
-    {/* Total Income Progress Bar */}
-    <View style={styles.progressBarContainer}>
-      <Text style={styles.progressBarLabel}>Total Income</Text>
-      <View style={styles.progressBarBackground}>
-        <View
-          style={[
-            styles.progressBarFill,
-            {
-              width: totalIncome > 0 ? `${(totalIncome / (totalIncome + totalExpense)) * 100}%` : '0%',
-              backgroundColor: 'rgba(0, 123, 255, 1)',
-            },
-          ]}
-        />
       </View>
-      <Text style={styles.progressBarValue}>
-        {totalIncome > 0 ? `$${totalIncome.toLocaleString()}` : '$0'}
-      </Text>
-    </View>
 
-    {/* Total Expense Progress Bar */}
-    <View style={styles.progressBarContainer}>
-      <Text style={styles.progressBarLabel}>Total Expense</Text>
-      <View style={styles.progressBarBackground}>
-        <View
-          style={[
-            styles.progressBarFill,
-            {
-              width: totalExpense > 0 ? `${(totalExpense / (totalIncome + totalExpense)) * 100}%` : '0%',
-              backgroundColor: 'rgba(255, 69, 58, 1)',
-            },
-          ]}
-        />
+      <ScrollView
+  style={styles.scrollView}
+  contentContainerStyle={{
+    alignItems: 'center', // Center horizontally
+    justifyContent: 'center', // Optional: center vertically if needed
+
+  }}
+>
+
+      <View style={styles.box}>
+        <View style={styles.chartContainer}>
+          <Text style={styles.boxText}>Income vs. Expense </Text>
+
+          {/* Total Income Progress Bar */}
+          <View style={styles.progressBarContainer}>
+            <Text style={styles.progressBarLabel}>Total Income</Text>
+            <View style={styles.progressBarBackground}>
+              <View
+                style={[
+                  styles.progressBarFill,
+                  {
+                    width: totalIncome > 0 ? `${(totalIncome / (totalIncome + totalExpense)) * 100}%` : '0%',
+                    backgroundColor: 'rgba(0, 123, 255, 1)',
+                  },
+                ]}
+              />
+            </View>
+            <Text style={styles.progressBarValue}>
+              {totalIncome > 0 ? `$${totalIncome.toLocaleString()}` : '$0'}
+            </Text>
+          </View>
+
+          {/* Total Expense Progress Bar */}
+          <View style={styles.progressBarContainer}>
+            <Text style={styles.progressBarLabel}>Total Expense</Text>
+            <View style={styles.progressBarBackground}>
+              <View
+                style={[
+                  styles.progressBarFill,
+                  {
+                    width: totalExpense > 0 ? `${(totalExpense / (totalIncome + totalExpense)) * 100}%` : '0%',
+                    backgroundColor: 'rgba(255, 69, 58, 1)',
+                  },
+                ]}
+              />
+            </View>
+            <Text style={styles.progressBarValue}>
+              {totalExpense > 0 ? `$${totalExpense.toLocaleString()}` : '$0'}
+            </Text>
+          </View>
+        </View>
       </View>
-      <Text style={styles.progressBarValue}>
-        {totalExpense > 0 ? `$${totalExpense.toLocaleString()}` : '$0'}
-      </Text>
-    </View>
-  </View>
-</View>
 
 
       {/* Box for Pie Chart */}
@@ -311,7 +356,7 @@ export default function ReportsScreen() {
             <View style={{ position: 'relative', alignItems: 'center', width: '50%' }}>
               <PieChart
                 data={sortedChartData && filteredChartData && dataWithPercentage}
-                width={screenWidth * 0.8}
+                width={screenWidth * 0.786}
                 height={220}
                 chartConfig={{
                   backgroundColor: '#1cc910',
@@ -329,100 +374,75 @@ export default function ReportsScreen() {
               />
               <View style={styles.donutCenter} />
               <Text style={styles.totalExpenseText}>${Math.round(totalExpense).toLocaleString()}</Text>
-      
-          </View>
 
-          {/* Legend for the Pie Chart */}
-          <View style={styles.legendContainer}>
-            {sortedDataWithPercentage.map((item, index) => (
-              <TouchableOpacity key={index} onPress={() => handleCategoryPress(item.name)}>
-                <View style={styles.legendItem}>
-                  <Triangle color= {item.color} isSelected={selectedCategory === item.name}/>
-                  <Text style={[styles.legendText, selectedCategory === item.name && {color: item.color}]}>{item.name}</Text>
-  
-                </View>
-              </TouchableOpacity>
-            ))}
+            </View>
+
+            {/* Legend for the Pie Chart */}
+            <View style={styles.legendContainer}>
+              {sortedDataWithPercentage.map((item, index) => (
+                <TouchableOpacity key={index} onPress={() => handleCategoryPress(item.name)}>
+                  <View style={styles.legendItem}>
+                    <Triangle color={item.color} isSelected={selectedCategory === item.name} />
+                    <Text style={[styles.legendText, selectedCategory === item.name && { color: item.color }]}>{item.name}</Text>
+
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
         </View>
       </View>
-    </View>
-  </View>
-        
-  
+
+
+
       {/* Box for Category Details (if selected) */}
-      {selectedCategory && (
-        <View style={styles.box}>
-          <Text style={[
-            styles.detailsTitle,
-            { color: categoryColors[selectedCategory] || "#000000" } 
-          ]}>What You Spent on {selectedCategory}
-        </Text>
-        {/* <Text style={styles.totalPercentage}> {calculateCategoryPercentage(selectedCategory)}</Text> */}
-          <Text style={styles.totalCategoryExpense && totalPercentage}> 
-          <Text style={styles.totalLabel}>Total: </Text>
-          <Text style={styles.totalAmount}>${calculateCategoryTotal(selectedCategory).toLocaleString()}</Text>
-          </Text>
+      {selectedCategory && expenseDetails()}
 
-        <ScrollView contentContainerStyle={styles.scrollableContent}>
-          <FlatList
-            data={details[selectedCategory]}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => (
-              <View style={styles.detailItem}>
-                <Text style={styles.date}>{item.date.toLocaleDateString()}</Text>
-                <Text style={styles.description}>{item.description} </Text>
-                <Text style={styles.amount}>${item.amount.toFixed()}</Text>
-              </View>
-            )}
-          />
-        </ScrollView>
-      </View>
-      )}
+      {/* Switch months button */}
       <Modal
-  visible={isPickerVisible} // Show/hide modal
-  transparent={true} // Makes the modal overlay transparent
-  animationType="slide" // Slide-in effect
-  onRequestClose={() => setPickerVisible(false)} // Close modal on back press
->
-  <View style={styles.modalContainer}>
-    <View style={styles.modalContent}>
-      <Text style={styles.modalTitle}>Select Month</Text>
-      <Picker
-        selectedValue={`${selectedMonth.month}-${selectedMonth.year}`} // Use a string as value
-        onValueChange={(itemValue) => {
-          const [month, year] = itemValue.split('-').map(Number); // Parse the selected value
-          setSelectedMonth({ month, year }); // Update state with parsed values
-          setPickerVisible(false); // Close modal after selection
-        }}
-        style={styles.picker}
+        visible={isPickerVisible} // Show/hide modal
+        transparent={true} // Makes the modal overlay transparent
+        animationType="slide" // Slide-in effect
+        onRequestClose={() => setPickerVisible(false)} // Close modal on back press
       >
-        {Array.from({ length: currentDate.getMonth() + 1 }, (_, i) => (
-          <Picker.Item
-            key={i}
-            label={`${new Date(currentDate.getFullYear(), i).toLocaleString('default', { month: 'long' })} ${currentDate.getFullYear()}`}
-            value={`${i}-${currentDate.getFullYear()}`} // Use a string representation
-          />
-        ))}
-      </Picker>
-      <TouchableOpacity
-        style={styles.closeButton}
-        onPress={() => setPickerVisible(false)} // Close modal without selection
-      >
-        <Text style={styles.closeButtonText}>Close</Text>
-      </TouchableOpacity>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Select Month</Text>
+            <Picker
+              selectedValue={`${selectedMonth.month}-${selectedMonth.year}`} // Use a string as value
+              onValueChange={(itemValue) => {
+                const [month, year] = itemValue.split('-').map(Number); // Parse the selected value
+                setSelectedMonth({ month, year }); // Update state with parsed values
+                setPickerVisible(false); // Close modal after selection
+              }}
+              style={styles.picker}
+              itemStyle={pickerStyles.pickerItem}
+            >
+              {Array.from({ length: currentDate.getMonth() + 1 }, (_, i) => (
+                <Picker.Item
+                  key={i}
+                  label={`${new Date(currentDate.getFullYear(), i).toLocaleString('default', { month: 'long' })} ${currentDate.getFullYear()}`}
+                  value={`${i}-${currentDate.getFullYear()}`} // Use a string representation
+                />
+              ))}
+            </Picker>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setPickerVisible(false)} // Close modal without selection
+            >
+              <Text style={styles.closeButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    </ScrollView >
     </View>
-  </View>
-</Modal>
-
-    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    alignItems: 'center',
-    justifyContent: 'flex-start',
     backgroundColor: '#e8d0f4',
   },
   box: {
@@ -432,8 +452,18 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 20,
   },
+  detailBox: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    width: '95%',
+    padding: 15,
+    marginBottom: 20,
+    paddingBottom: 5,
+  },
   chartContainer: {
-    alignItems: 'space-between',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '102%',
   },
   boxText: {
     fontSize: 20,
@@ -445,16 +475,16 @@ const styles = StyleSheet.create({
   donutCenter: {
     position: 'absolute',
     top: '50%',
-    left: '30%',
-    width: 120, 
-    height: 120, 
+    left: '31%',
+    width: 120,
+    height: 120,
     backgroundColor: '#fff',
-    borderRadius: 60, 
+    borderRadius: 60,
     transform: [{ translateX: -60 }, { translateY: -60 }],
   },
   totalExpenseText: {
     position: 'absolute',
-    top: '44%', 
+    top: '44%',
     left: '10%',
     fontSize: 24,
     fontWeight: 'bold',
@@ -527,7 +557,7 @@ const styles = StyleSheet.create({
     marginLeft: 6,
   },
   selectedLegendText: {
-    color: color, 
+    color: color,
   },
   legend2Text: {
     fontSize: 10,
@@ -555,7 +585,7 @@ const styles = StyleSheet.create({
   dropdownButtonContainer: {
     width: '100%',
     alignItems: 'center',
-    marginVertical: 0,
+    marginBottom: 10,
   },
   dropdownButton: {
     backgroundColor: 'purple',
@@ -563,7 +593,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     alignItems: 'center',
     borderRadius: 0,
-    width: '82.5%',
+    width: '100%',
   },
   dropdownButtonText: {
     color: 'white',
@@ -576,6 +606,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  
   modalContent: {
     backgroundColor: 'white',
     width: '80%',
@@ -634,13 +665,36 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     width: '100%',
-    paddingHorizontal: 0,
-    marginVertical: 0,
+    marginBottom: 10,
+    
   },
   arrowButton: {
-    padding: 10.3,
+    width: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
     backgroundColor: 'purple',
     borderRadius: 0,
+    height: 42
+    ,
+  },
+  dropdownButton: {
+
+    flex: 1,
+    backgroundColor: 'purple',
+    padding: 10,
+    borderRadius: 0,
+    marginHorizontal: 0,
+    height: 42
+  },
+  dropdownButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 18,
+    textAlign: 'center',
+  },
+  scrollView: {
+    marginBottom: 40,
   },
   
 });

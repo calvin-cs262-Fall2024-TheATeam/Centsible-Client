@@ -20,6 +20,10 @@
         "backgroundColor": "#ffffff"
       }
     },
+      "expo": {
+        "newArchEnabled": true
+      }
+    ,
     "web": {
       "favicon": "./assets/favicon.png"
     }
