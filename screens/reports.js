@@ -12,27 +12,26 @@ export default function ReportsScreen() {
   const [totalIncome, setTotalIncome] = useState(0);
   const [totalExpense, setTotalExpense] = useState(0);
   const [transactions, setTransactions] = useState([]);
-  
-  const currentDate = new Date(); // Get today's date
-  const [selectedMonth, setSelectedMonth] = useState({
-    month: currentDate.getMonth(), // Initialize with the current month (0-based index)
-    year: currentDate.getFullYear(), // Initialize with the current year
-  });
   const [isPickerVisible, setPickerVisible] = useState(false);
+
+  const currentDate = new Date(); 
+  const [selectedMonth, setSelectedMonth] = useState({
+    month: currentDate.getMonth(), 
+    year: currentDate.getFullYear(), 
+  });
 
   const colors = ['#f95d6a', '#ff9909', '#fbd309', '#7cb6dc', '#1c43da', '#2e3884'];
   const getColor = (index) => colors[index % colors.length];
 
-  // Assuming userId is available in your component
 const fetchTransactions = async () => {
   try {
-    const userId = 1; // Replace with dynamic user ID from context or props
-    const response = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/transactions/${userId}`); // Replace with your actual API URL
+    const userId = 1; 
+    const response = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/transactions/${userId}`); 
 
     if (response.ok) {
       const data = await response.json();
       console.log("Fetched Transactions: ", data);
-      setTransactions(data);  // Store fetched data in state
+      setTransactions(data);  
     } else {
       Alert.alert("Error", "Failed to fetch transactions.");
     }
@@ -43,63 +42,57 @@ const fetchTransactions = async () => {
 };
 
 useEffect(() => {
-  fetchTransactions(); // Fetch data on component mount
+  fetchTransactions(); 
 }, []);
 
-  useEffect(() => {
-    if (transactions.length > 0) {
-      const filteredTransactions = transactions.filter((transaction) => {
-        const transactionDate = new Date(transaction.transactiondate);
-        if (transactionDate instanceof Date && !isNaN(transactionDate)) {
-          return (
-            transactionDate.getMonth() === selectedMonth.month &&
-            transactionDate.getFullYear() === selectedMonth.year
-          );
-        } else {
-          // Handle cases where date is invalid or missing
-          console.warn("Invalid transaction date:", transaction.transactiondate);
-          return false;
-        }
-      });
-
-      const categoryTotals = {};
-      const categoryDetails = {};
-      let income = 0;
-      let expense = 0;
-
-      filteredTransactions.forEach((transaction) => {
-        const { category, amount, type, description = "No description", date = new Date() } = transaction;
-        if (type === 'expense') {
-          if (!categoryTotals[category]) categoryTotals[category] = 0;
-          categoryTotals[category] += Math.abs(amount);
-          expense += Math.abs(amount);
-        } else {
-          income += amount;
-        }
-
-        if (!categoryDetails[category]) {
-          categoryDetails[category] = [];
-        }
-        categoryDetails[category].push({ description, amount, date });
-      });
-
-      setTotalIncome(income);
-      setTotalExpense(expense);
-
-      setChartData(
-        Object.keys(categoryTotals).map((category, index) => ({
-          name: category,
-          population: categoryTotals[category],
-          color: colors[index % colors.length],
-        }))
+useEffect(() => {
+  if (transactions.length > 0) {
+    const filteredTransactions = transactions.filter((transaction) => {
+      const transactionDate = new Date(transaction.transactiondate);
+      return (
+        transactionDate.getMonth() === selectedMonth.month &&
+        transactionDate.getFullYear() === selectedMonth.year
       );
-      setDetails(categoryDetails);
-    }
-  }, [transactions, selectedMonth]);
+    });
+
+    const categoryTotals = {};
+    const categoryDetails = {};
+    let income = 0;
+    let expense = 0;
+
+    // Categorize and sum expenses and income
+    filteredTransactions.forEach((transaction) => {
+      const { category, amount, type, description = "No description", date = new Date() } = transaction;
+      if (type === 'expense') {
+        categoryTotals[category] = (categoryTotals[category] || 0) + Math.abs(amount);
+        expense += Math.abs(amount);
+      } else {
+        income += amount;
+      }
+
+      if (!categoryDetails[category]) {
+        categoryDetails[category] = [];
+      }
+      categoryDetails[category].push({ description, amount, date });
+    });
+
+    setTotalIncome(income);
+    setTotalExpense(expense);
+    setDetails(categoryDetails);
+
+    // Create data for Pie Chart
+    const chartData = Object.keys(categoryTotals).map((category, index) => ({
+      name: category,
+      population: categoryTotals[category],
+      color: getColor(index),
+    }));
+
+    setChartData(chartData);
+  }
+}, [transactions, selectedMonth]);
 
   const calculateCategoryTotal = (category) => {
-    if (!details[category]) return 0;
-    return details[category].reduce((sum, item) => sum + item.amount, 0);
+    return details[category]?.reduce((total, item) => total + item.amount, 0) || 0;
   };
 
   const handleCategoryPress = (category) => {
@@ -143,64 +136,93 @@ useEffect(() => {
     "Entertainment": "#1c43da"
   };
   
+  const expenseDetails = () => {
+    return (
+      <View style={styles.detailBox}>
+        <Text style={[
+          styles.detailsTitle,
+          { color: categoryColors[selectedCategory] || "#000000" }
+        ]}>{selectedCategory} Expenses</Text>
+        <Text style={styles.totalCategoryExpense && totalPercentage}>
+          <Text style={styles.totalLabel}>Total: </Text>
+          <Text style={styles.totalAmount}>${calculateCategoryTotal(selectedCategory).toLocaleString()}</Text>
+        </Text>
+        <View style={styles.detailsContainer}>
+          {details[selectedCategory]?.map((item, index) => (
+            <View
+              style={[
+                styles.detailItem,
+                index === details[selectedCategory].length - 1 && { borderBottomWidth: 0 },
+              ]}
+              key={index}
+            >
+              <Text style={styles.date}>{item.date.toLocaleDateString()}</Text>
+              <Text style={styles.description}>{item.description}</Text>
+              <Text style={styles.amount}>${item.amount.toFixed()}</Text>
+            </View>
+          ))}
+        </View>
+      </View>
+    );
+  };
+
   return (
+
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.dropdownButtonContainer}>
         <TouchableOpacity
           style={styles.dropdownButton}
-          onPress={() => setPickerVisible(true)} // Show the modal
+          onPress={() => setPickerVisible(true)}
         >
           <Text style={styles.dropdownButtonText}>
-            {new Date(selectedMonth.year, selectedMonth.month).toLocaleString('default', { month: 'long' })} {selectedMonth.year} 
+            {new Date(selectedMonth.year, selectedMonth.month).toLocaleString('default', { month: 'long' })} {selectedMonth.year}
           </Text>
         </TouchableOpacity>
       </View>
-
-      <Text style={styles.title}></Text>
 
       <View style={styles.box}>
         <View style={styles.chartContainer}>
           <Text style={styles.boxText}>Income vs. Expense</Text>
 
-    {/* Total Income Progress Bar */}
-    <View style={styles.progressBarContainer}>
-      <Text style={styles.progressBarLabel}>Total Income</Text>
-      <View style={styles.progressBarBackground}>
-        <View
-          style={[
-            styles.progressBarFill,
-            {
-              width: totalIncome > 0 ? `${(totalIncome / (totalIncome + totalExpense)) * 100}%` : '0%',
-              backgroundColor: 'rgba(0, 123, 255, 1)',
-            },
-          ]}
-        />
-      </View>
-      <Text style={styles.progressBarValue}>
-        {totalIncome > 0 ? `$${totalIncome.toLocaleString()}` : '$0'}
-      </Text>
-    </View>
+          {/* Total Income Progress Bar */}
+          <View style={styles.progressBarContainer}>
+            <Text style={styles.progressBarLabel}>Total Income</Text>
+            <View style={styles.progressBarBackground}>
+              <View
+                style={[
+                  styles.progressBarFill,
+                  {
+                    width: totalIncome > 0 ? `${(totalIncome / (totalIncome + totalExpense)) * 100}%` : '0%',
+                    backgroundColor: 'rgba(0, 123, 255, 1)',
+                  },
+                ]}
+              />
+            </View>
+            <Text style={styles.progressBarValue}>
+              {totalIncome > 0 ? `$${totalIncome.toLocaleString()}` : '$0'}
+            </Text>
+          </View>
 
-    {/* Total Expense Progress Bar */}
-    <View style={styles.progressBarContainer}>
-      <Text style={styles.progressBarLabel}>Total Expense</Text>
-      <View style={styles.progressBarBackground}>
-        <View
-          style={[
-            styles.progressBarFill,
-            {
-              width: totalExpense > 0 ? `${(totalExpense / (totalIncome + totalExpense)) * 100}%` : '0%',
-              backgroundColor: 'rgba(255, 69, 58, 1)',
-            },
-          ]}
-        />
+          {/* Total Expense Progress Bar */}
+          <View style={styles.progressBarContainer}>
+            <Text style={styles.progressBarLabel}>Total Expense</Text>
+            <View style={styles.progressBarBackground}>
+              <View
+                style={[
+                  styles.progressBarFill,
+                  {
+                    width: totalExpense > 0 ? `${(totalExpense / (totalIncome + totalExpense)) * 100}%` : '0%',
+                    backgroundColor: 'rgba(255, 69, 58, 1)',
+                  },
+                ]}
+              />
+            </View>
+            <Text style={styles.progressBarValue}>
+              {totalExpense > 0 ? `$${totalExpense.toLocaleString()}` : '$0'}
+            </Text>
+          </View>
+        </View>
       </View>
-      <Text style={styles.progressBarValue}>
-        {totalExpense > 0 ? `$${totalExpense.toLocaleString()}` : '$0'}
-      </Text>
-    </View>
-  </View>
-</View>
 
 
       {/* Box for Pie Chart */}
@@ -211,7 +233,7 @@ useEffect(() => {
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
             <View style={{ position: 'relative', alignItems: 'center', width: '50%' }}>
               <PieChart
-                data={sortedChartData && filteredChartData && dataWithPercentage}
+                data={chartData}
                 width={screenWidth * 0.8}
                 height={220}
                 chartConfig={{
@@ -230,92 +252,65 @@ useEffect(() => {
               />
               <View style={styles.donutCenter} />
               <Text style={styles.totalExpenseText}>${Math.round(totalExpense).toLocaleString()}</Text>
-      
-          </View>
 
-          {/* Legend for the Pie Chart */}
-          <View style={styles.legendContainer}>
-            {sortedDataWithPercentage.map((item, index) => (
-              <TouchableOpacity key={index} onPress={() => handleCategoryPress(item.name)}>
-                <View style={styles.legendItem}>
-                  <Triangle color= {item.color} isSelected={selectedCategory === item.name}/>
-                  <Text style={[styles.legendText, selectedCategory === item.name && {color: item.color}]}>{item.name}</Text>
-  
-                </View>
-              </TouchableOpacity>
-            ))}
+            </View>
+
+            {/* Legend for the Pie Chart */}
+            <View style={styles.legendContainer}>
+              {sortedDataWithPercentage.map((item, index) => (
+                <TouchableOpacity key={index} onPress={() => handleCategoryPress(item.name)}>
+                  <View style={styles.legendItem}>
+                    <Triangle color={item.color} isSelected={selectedCategory === item.name} />
+                    <Text style={[styles.legendText, selectedCategory === item.name && { color: item.color }]}>{item.name}</Text>
+
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
         </View>
       </View>
-    </View>
-  </View>
-        
-  
+
       {/* Box for Category Details (if selected) */}
-      {selectedCategory && (
-        <View style={styles.box}>
-          <Text style={[
-            styles.detailsTitle,
-            { color: categoryColors[selectedCategory] || "#000000" } 
-          ]}>What You Spent on {selectedCategory}
-        </Text>
-        {/* <Text style={styles.totalPercentage}> {calculateCategoryPercentage(selectedCategory)}</Text> */}
-          <Text style={styles.totalCategoryExpense && totalPercentage}> 
-          <Text style={styles.totalLabel}>Total: </Text>
-          <Text style={styles.totalAmount}>${calculateCategoryTotal(selectedCategory).toLocaleString()}</Text>
-          </Text>
+      {selectedCategory && expenseDetails()}
 
-        <ScrollView contentContainerStyle={styles.scrollableContent}>
-          <FlatList
-            data={details[selectedCategory]}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => (
-              <View style={styles.detailItem}>
-                <Text style={styles.date}>{item.date.toLocaleDateString()}</Text>
-                <Text style={styles.description}>{item.description} </Text>
-                <Text style={styles.amount}>${item.amount.toFixed()}</Text>
-              </View>
-            )}
-          />
-        </ScrollView>
-      </View>
-      )}
+      {/* Switch months button */}
       <Modal
-  visible={isPickerVisible} // Show/hide modal
-  transparent={true} // Makes the modal overlay transparent
-  animationType="slide" // Slide-in effect
-  onRequestClose={() => setPickerVisible(false)} // Close modal on back press
->
-  <View style={styles.modalContainer}>
-    <View style={styles.modalContent}>
-      <Text style={styles.modalTitle}>Select Month</Text>
-      <Picker
-        selectedValue={`${selectedMonth.month}-${selectedMonth.year}`} // Use a string as value
-        onValueChange={(itemValue) => {
-          const [month, year] = itemValue.split('-').map(Number); // Parse the selected value
-          setSelectedMonth({ month, year }); // Update state with parsed values
-          setPickerVisible(false); // Close modal after selection
-        }}
-        style={styles.picker}
+        visible={isPickerVisible} // Show/hide modal
+        transparent={true} // Makes the modal overlay transparent
+        animationType="slide" // Slide-in effect
+        onRequestClose={() => setPickerVisible(false)} // Close modal on back press
       >
-        {Array.from({ length: currentDate.getMonth() + 1 }, (_, i) => (
-          <Picker.Item
-            key={i}
-            label={`${new Date(currentDate.getFullYear(), i).toLocaleString('default', { month: 'long' })} ${currentDate.getFullYear()}`}
-            value={`${i}-${currentDate.getFullYear()}`} // Use a string representation
-          />
-        ))}
-      </Picker>
-      <TouchableOpacity
-        style={styles.closeButton}
-        onPress={() => setPickerVisible(false)} // Close modal without selection
-      >
-        <Text style={styles.closeButtonText}>Close</Text>
-      </TouchableOpacity>
-    </View>
-  </View>
-</Modal>
-
-    </ScrollView>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Select Month</Text>
+            <Picker
+              selectedValue={`${selectedMonth.month}-${selectedMonth.year}`} // Use a string as value
+              onValueChange={(itemValue) => {
+                const [month, year] = itemValue.split('-').map(Number); // Parse the selected value
+                setSelectedMonth({ month, year }); // Update state with parsed values
+                setPickerVisible(false); // Close modal after selection
+              }}
+              style={styles.picker}
+            >
+              {Array.from({ length: currentDate.getMonth() + 1 }, (_, i) => (
+                <Picker.Item
+                  key={i}
+                  label={`${new Date(currentDate.getFullYear(), i).toLocaleString('default', { month: 'long' })} ${currentDate.getFullYear()}`}
+                  value={`${i}-${currentDate.getFullYear()}`} // Use a string representation
+                />
+              ))}
+            </Picker>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setPickerVisible(false)} // Close modal without selection
+            >
+              <Text style={styles.closeButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    </ScrollView >
   );
 }
 
@@ -388,12 +383,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: 'red',
   },
-  // totalPercentage: {
-  //   textAlign: 'left',
-  //   fontSize: 18,
-  //   fontWeight: 'bold',
-  //   color: 'black',
-  // },
   description: {
     fontSize: 16,
     color: '#333',
