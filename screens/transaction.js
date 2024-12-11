@@ -154,11 +154,7 @@ export default function TransactionScreen({ navigation }) {
         }
 
         // Add the categoryName to the transaction data
-<<<<<<< HEAD
-        data.category = categoryName; 
-=======
         data.category = categoryName;
->>>>>>> origin/connect-trasactions-to-db
         const transactionWithId = {
           ...data,               // The returned data from backend (including id)
           key: data.id.toString(),  // Use the backend-generated id as the key for React (if needed)

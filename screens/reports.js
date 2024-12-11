@@ -33,6 +33,7 @@ export default function ReportsScreen() {
         const data = await response.json();
         console.log("Fetched Transactions: ", data);
         console.log("Chart Data before rendering PieChart: ", chartData);
+        console.log("Data with Percentage: ", dataWithPercentage);
 
   
         // Process each transaction to assign categories
@@ -54,7 +55,8 @@ export default function ReportsScreen() {
                 return {
                   ...transaction,
                   category: categoryData.categoryname,
-                  key: transaction.id  // Set fetched category name
+                  key: transaction.id,  // Set fetched category name
+                  amount: parseFloat(transaction.dollaramount),
                 };
               } else {
                 console.error(`Failed to fetch category for ID ${transaction.budgetcategoryid}`);
@@ -62,6 +64,7 @@ export default function ReportsScreen() {
                   ...transaction,
                   category: 'Unknown Category',  // Default category if failed
                   key: transaction.id || index.toString(),
+                  amount: parseFloat(transaction.dollaramount),
                 };
               }
             } else {
@@ -70,6 +73,7 @@ export default function ReportsScreen() {
                 ...transaction,
                 category: 'Unknown Category',
                 key: transaction.id || index.toString(),
+                amount: parseFloat(transaction.dollaramount),
               };
             }
           } catch (err) {
@@ -78,10 +82,12 @@ export default function ReportsScreen() {
               ...transaction,
               category: 'Unknown Category',  // Default category if error
               key: transaction.id || index.toString(),
+              amount: parseFloat(transaction.dollaramount),
             };
           }
         }));
-  
+
+        console.log("Updated Transactions: ", updatedTransactions);
         // Set updated transactions with categories
         setTransactions(updatedTransactions);
       } else {
@@ -127,6 +133,9 @@ useEffect(() => {
       }
       categoryDetails[category].push({ description, amount, date });
     });
+
+    console.log("Category Totals: ", categoryTotals); // Log here
+    console.log("Category Details: ", categoryDetails); // Log here
 
     setTotalIncome(income);
     setTotalExpense(expense);
