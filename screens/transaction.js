@@ -22,12 +22,11 @@ export default function TransactionScreen({ navigation }) {
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
+        const userId = 1;
         // Step 1: Fetch transactions
-        const response = await fetch('https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/transactions/1'); // Use the correct API endpoint
+        const response = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/transactions/${userId}`); 
         if (response.ok) {
           const data = await response.json();
-          ('Fetched transactions:', data);  // Add this log to check the fetched data
-
 
           // Step 2: For each transaction, fetch the category name or set to 'Income' for income transactions
           const updatedTransactions = await Promise.all(data.map(async (transaction, index) => {
@@ -95,23 +94,16 @@ export default function TransactionScreen({ navigation }) {
   const handleAddTransaction = async () => {
     const parsedAmount = parseFloat(amount);
 
-    if (isNaN(parsedAmount) || parsedAmount <= 0) {
-      alert("Please enter a valid amount.");
-      return; // Don't proceed if the amount is invalid
-    }
-
     const transactionDate = new Date(date);  // This is the local time from your state
-    //console.log(transactionDate);
     const transactionDateISOString = transactionDate.toISOString();  // Convert to UTC ISO string
-    //console.log(transactionDateISOString);
 
     const budgetCategoryId = type === 'Income' ? null : categoryId;
 
     const newTransaction = {
-      appuserID: 1,  // Assuming this is hardcoded for now, adjust if needed
+      appuserID: 1,  // TODO: update with user authentication
       dollaramount: parsedAmount.toFixed(2),  // Format the amount to two decimal places
-      transactiontype: type,  // Assuming type is a variable holding transaction type (income, expense, etc.)
-      budgetcategoryID: budgetCategoryId,  // Use the selected category ID
+      transactiontype: type,  // income or expense
+      budgetcategoryID: budgetCategoryId,  // selected categoryID
       optionaldescription: description,  // Optional description for the transaction
       transactiondate: transactionDateISOString
     };
@@ -182,13 +174,14 @@ export default function TransactionScreen({ navigation }) {
 
   const updateCurrentBalanceInDB = async (newBalance) => {
     try {
+      const userId = 1;
       const response = await fetch('https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/currentBalance', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          id: 1, // Assuming the user ID is hardcoded, replace this with dynamic user ID if needed
+          id: userId, // Assuming the user ID is hardcoded, replace this with dynamic user ID if needed
           newbalance: newBalance,
         }),
       });
@@ -257,14 +250,10 @@ export default function TransactionScreen({ navigation }) {
   const TransactionItem = memo(({ data }) => {
     const options = {
       month: 'short', day: 'numeric', year: 'numeric',
-      // hour: 'numeric',
-      // minute: 'numeric',
-      // second: 'numeric'
     };
     const formattedDate = new Date(data.item.transactiondate).toLocaleDateString('en-US', options).replace(',', '');
     //console.log("Formatted Date:", formattedDate);
     const isExpanded = expandedTransaction === data.item.key;
-    //console.log("TransactionKey:", data.item.key, "ExpandedKey:", expandedTransaction, "IsExpanded:", isExpanded);
 
     const formattedAmount = parseFloat(data.item.dollaramount).toFixed(2);
     const amountText = data.item.transactiontype === 'Income'
