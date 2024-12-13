@@ -83,7 +83,6 @@ export default function ReportsScreen() {
 
        // console.log("Updated Transactions: ", updatedTransactions);
         setTransactions(updatedTransactions);
-        calculateTotalIncomeExpense(updatedTransactions);
 
         // const income = updatedTransactions.filter(item => item.transactiontype === 'Income').reduce((acc, curr) => acc + curr.amount, 0);
         // const expense = updatedTransactions.filter(item => item.transactiontype === 'Expense').reduce((acc, curr) => acc + curr.amount, 0);
@@ -249,34 +248,47 @@ useEffect(() => {
       </View>
 
       <View style={styles.box}>
-        <View style={styles.chartContainer}>
-          <Text style={styles.boxText}>Income vs. Expense</Text>
-          <View style={styles.progressBarContainer}>
-            <View style={styles.progressBarLabels}>
-              <Text style={styles.progressBarLabel}>Income</Text>
-              <Text style={styles.progressBarLabel}>Expenses</Text>
-            </View>
-            {/* Progress is measured percentage of income over total income and expenses.
-                Value is found in prop width. tbh, not sure if it's going to work perfectly
-                in all edge cases */}
-            <View style={styles.progressBarBackground}>
-              <View
-                style={[
-                  styles.progressBarFill,
-                  {
-                    width: totalIncome > 0 ? `${(totalIncome / (totalIncome + totalExpense)) * 100}%` : '0%',
-                    backgroundColor: 'rgba(0, 123, 255, 1)',
-                  },
-                ]}
-              />
-            </View>
-            <View style={styles.progressBarLabels}>
-              <Text style={styles.progressBarLabel}>${totalIncome}</Text>
-              <Text style={styles.progressBarLabel}>${totalExpense}</Text>
-            </View>
-          </View>
-        </View>
+  <View style={styles.chartContainer}>
+    <Text style={styles.boxText}>Income vs. Expense</Text>
+    <View style={styles.progressBarContainer}>
+      <View style={styles.progressBarLabels}>
+        <Text style={styles.progressBarLabel}>Income</Text>
+        <Text style={styles.progressBarLabel}>Expenses</Text>
       </View>
+      
+      {/* Default progress bar background (gray) */}
+      <View style={styles.progressBarBackground}>
+
+        {/* Income section */}
+        <View
+          style={[
+            styles.progressBarFill,
+            {
+              width: totalIncome > 0 ? `${(totalIncome / (totalIncome + totalExpense)) * 100}%` : '0%',
+              backgroundColor: 'rgba(0, 123, 255, 1)',  // Blue for income
+            },
+          ]}
+        />
+        {/* Expense section */}
+        <View
+          style={[
+            styles.progressBarFill,
+            {
+              width: totalExpense > 0 ? `${(totalExpense / (totalIncome + totalExpense)) * 100}%` : '0%',
+              backgroundColor: 'rgba(255, 0, 0, 1)',  // Red for expense
+            },
+          ]}
+        />
+      </View>
+
+      <View style={styles.progressBarLabels}>
+        <Text style={styles.progressBarLabel}>${totalIncome}</Text>
+        <Text style={styles.progressBarLabel}>${totalExpense}</Text>
+      </View>
+    </View>
+  </View>
+</View>
+
 
 
       {/* Box for Pie Chart */}
@@ -400,7 +412,7 @@ const styles = StyleSheet.create({
   },
   boxText: {
     fontSize: 20,
-    color: 'black',
+    color: '#231942',
     fontWeight: 'bold',
     marginBottom: 10,
     alignSelf: 'center',
@@ -505,7 +517,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginVertical: 15,
     borderRadius: 12,
-    color: 'DCDCDC',
+    color: '#d0d0d0',
   },
   scrollableContent: {
     maxHeight: 200,
@@ -574,10 +586,11 @@ const styles = StyleSheet.create({
   progressBarBackground: {
     width: '100%',
     height: 10,
-    backgroundColor: 'red',
+    backgroundColor: '#d0d0d0',
     overflow: 'hidden',
     borderRadius: 5,
     marginVertical: 5,
+    flexDirection: 'row',
   },
   progressBarFill: {
     height: '100%',
