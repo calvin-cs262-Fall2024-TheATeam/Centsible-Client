@@ -32,14 +32,10 @@ export default function ReportsScreen() {
       if (response.ok) {
         const data = await response.json();
         console.log("Fetched Transactions: ", data);
-        console.log("Chart Data before rendering PieChart: ", chartData);
   
-        // Process each transaction to assign categories
         const updatedTransactions = await Promise.all(data.map(async (transaction, index) => {
           try {
-            // Check if it's an income or expense
             if (transaction.transactiontype === 'Income') {
-              // For income, just set category to 'Income'
               return {
                 ...transaction,
                 category: 'Income',  // Set category name as "Income"
@@ -47,27 +43,26 @@ export default function ReportsScreen() {
                 amount: parseFloat(transaction.dollaramount),
               };
             } else if (transaction.transactiontype === 'Expense') {
-              // For expense, fetch category name based on category ID
-              const categoryResponse = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/budgetCategoryName/${transaction.budgetcategoryid}`);
-              if (categoryResponse.ok) {
-                const categoryData = await categoryResponse.json();
-                return {
-                  ...transaction,
-                  category: categoryData.categoryname,
-                  key: transaction.id,  // Set fetched category name
-                  amount: parseFloat(transaction.dollaramount),
-                };
-              } else {
-                console.error(`Failed to fetch category for ID ${transaction.budgetcategoryid}`);
+              if (transaction.budgetcategoryid != null) {
+                const categoryResponse = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/budgetCategoryName/${transaction.budgetcategoryid}`);
+                if (categoryResponse.ok) {
+                  const categoryData = await categoryResponse.json();
+                  return {
+                    ...transaction,
+                    category: categoryData.categoryname,
+                    key: transaction.id,  // Set fetched category name
+                    amount: parseFloat(transaction.dollaramount),
+                  };
+                }
+              }
+                //console.error(`Failed to fetch category for ID ${transaction.budgetcategoryid}`);
                 return {
                   ...transaction,
                   category: 'Unknown Category',  // Default category if failed
                   key: transaction.id || index.toString(),
                   amount: parseFloat(transaction.dollaramount),
                 };
-              }
             } else {
-              // If neither 'income' nor 'expense', return the transaction with 'Unknown Category'
               return {
                 ...transaction,
                 category: 'Unknown Category',
@@ -86,18 +81,19 @@ export default function ReportsScreen() {
           }
         }));
 
-        console.log("Updated Transactions: ", updatedTransactions);
+       // console.log("Updated Transactions: ", updatedTransactions);
         setTransactions(updatedTransactions);
+        calculateTotalIncomeExpense(updatedTransactions);
 
-        const income = updatedTransactions.filter(item => item.transactiontype === 'Income').reduce((acc, curr) => acc + curr.amount, 0);
-        const expense = updatedTransactions.filter(item => item.transactiontype === 'Expense').reduce((acc, curr) => acc + curr.amount, 0);
+        // const income = updatedTransactions.filter(item => item.transactiontype === 'Income').reduce((acc, curr) => acc + curr.amount, 0);
+        // const expense = updatedTransactions.filter(item => item.transactiontype === 'Expense').reduce((acc, curr) => acc + curr.amount, 0);
         
-        console.log("Total Income: ", income);
-        console.log("Total Expense: ", expense);
+        // console.log("Total Income: ", income);
+        // console.log("Total Expense: ", expense);
         
-        setTotalIncome(income);
-        setTotalExpense(expense);
-        
+        // setTotalIncome(income);
+        // setTotalExpense(expense);
+
       } else {
         Alert.alert("Error", "Failed to fetch transactions.");
       }
@@ -128,8 +124,8 @@ useEffect(() => {
 
     // Categorize and sum expenses and income
     filteredTransactions.forEach((transaction) => {
-      const { category, amount, type, description = "No description", date = new Date() } = transaction;
-      if (type === 'expense') {
+      const { category, amount, transactiontype, optionaldescription = "No description", transactiondate = new Date() } = transaction;
+      if (transactiontype === 'Expense') {
         categoryTotals[category] = (categoryTotals[category] || 0) + Math.abs(amount);
         expense += Math.abs(amount);
       } else {
@@ -139,14 +135,12 @@ useEffect(() => {
       if (!categoryDetails[category]) {
         categoryDetails[category] = [];
       }
-      categoryDetails[category].push({ description, amount, date });
+      categoryDetails[category].push({ optionaldescription, amount, date: new Date(transactiondate) });
     });
-
+    
     console.log("Category Totals: ", categoryTotals); // Log here
     console.log("Category Details: ", categoryDetails); // Log here
 
-    setTotalIncome(income);
-    setTotalExpense(expense);
 
     // Create data for Pie Chart
     setChartData(
@@ -156,7 +150,11 @@ useEffect(() => {
         color: getColor(index),
     }))
   );
+
     setDetails(categoryDetails);
+    setTotalIncome(income);
+    setTotalExpense(expense);
+
   }
 }, [transactions, selectedMonth]);
 
@@ -236,7 +234,6 @@ useEffect(() => {
   };
 
   return (
-
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.dropdownButtonContainer}>
         <TouchableOpacity
