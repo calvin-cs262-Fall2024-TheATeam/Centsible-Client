@@ -266,7 +266,7 @@ export default function TransactionScreen({ navigation }) {
 const styles = {
   //entire screen 
   container: {
-    backgroundColor: '#e8d0f4',
+    backgroundColor: 'white',
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center'
@@ -280,11 +280,14 @@ const styles = {
     marginBottom: 12, // Add some bottom margin
   },
   rowFrontVisible: {
-    backgroundColor: '#FFF',
+    backgroundColor: '#f5f5f5',
     borderRadius: 5,
     marginBottom: 10,
     padding: 15,
     width: '100%', // Full width for the item
+    borderColor: '#231942',
+    borderWidth: 1,
+    marginHorizontal: 0,
   },
   itemContainer: {
     flexDirection: 'row',
@@ -348,7 +351,7 @@ const styles = {
   //add transaction button
   addButton: {
     padding: 2,
-    backgroundColor: 'purple',
+    backgroundColor: '#231942',
     borderRadius: 5,
     marginRight: 16,
   },
@@ -356,7 +359,7 @@ const styles = {
   //current balance
   balanceContainer: {
     padding: 10,
-    backgroundColor: 'purple',
+    backgroundColor: '#231942',
     justifyContent: 'space-between',
     alignItems: 'center',
     width: '100%',

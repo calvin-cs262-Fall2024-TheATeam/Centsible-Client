@@ -383,11 +383,19 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   box: {
-    backgroundColor: '#DEDEDE',
-    borderRadius: 12,
+    backgroundColor: '#F5F5F5',
+    borderRadius: 8,
+    borderWidth: 1,
     width: '95%',
     padding: 15,
-    marginBottom: 20,
+    marginBottom: 10,
+    flexGrow: 1,
+    borderColor: '#231942',
+    marginHorizontal: 5,
+    marginTop: 10,
+    marginRight: 10,
+    marginLeft: 10,
+
   },
   detailBox: {
     backgroundColor: '#fff',
@@ -413,7 +421,7 @@ const styles = StyleSheet.create({
     left: '30%',
     width: 120, 
     height: 120, 
-    backgroundColor: '#fff',
+    backgroundColor: '#F5F5F5',
     borderRadius: 60, 
     transform: [{ translateX: -60 }, { translateY: -60 }],
   },
@@ -452,12 +460,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: 'red',
   },
-  // totalPercentage: {
-  //   textAlign: 'left',
-  //   fontSize: 18,
-  //   fontWeight: 'bold',
-  //   color: 'black',
-  // },
   description: {
     fontSize: 16,
     color: '#333',
@@ -524,7 +526,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   dropdownButton: {
-    backgroundColor: 'purple',
+    backgroundColor: '#231942',
     padding: 10,
     alignItems: 'center',
     alignItems: 'center',
@@ -569,7 +571,7 @@ const styles = StyleSheet.create({
   },
   progressBarContainer: {
     width: '100%',
-    marginBottom: 15,
+    marginBottom: 10,
   },
   progressBarLabel: {
     fontSize: 14,

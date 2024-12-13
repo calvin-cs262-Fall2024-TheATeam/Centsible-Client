@@ -331,14 +331,14 @@ const BudgetPlanner = () => {
 };
 const styles = {
   container: {
-    backgroundColor: '#e8d0f4',
+    backgroundColor: 'white',
     flex: 1,
   },
 
   // header and headerText are purple bar at the top
   header: {
     padding: 10,
-    backgroundColor: 'purple',
+    backgroundColor: '#231942',
     justifyContent: 'center',
     width: '100%',
     flexDirection: 'row',
@@ -370,9 +370,9 @@ const styles = {
     marginLeft: 10,
     padding: 10,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#231942',
     borderRadius: 8,
-    backgroundColor: '#fff',
+    backgroundColor: '#F5F5F5',
     marginHorizontal: 5,
     flexGrow: 1,
   },
@@ -390,7 +390,7 @@ const styles = {
   },
 
   spentRemaining: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#dcdcdc',
     color: '#666',
     padding: 3,
     borderRadius: 5,
