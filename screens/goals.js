@@ -404,7 +404,7 @@ const BudgetPlanner = () => {
             </View>
           );
         })}
-\      <Modal
+      <Modal
         visible={isPickerVisible} // Show/hide modal
         transparent={true} // Makes the modal overlay transparent
         animationType="slide" // Slide-in effect
