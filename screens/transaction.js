@@ -145,7 +145,6 @@ export default function TransactionScreen({ navigation }) {
         };
 
         // Update the transactions list with the new transaction
-        //console.log(data);
         setTransactions(prevTransactions => {
           const updatedTransactions = [transactionWithId, ...prevTransactions]; // Add the new transaction at the beginning
           return updatedTransactions.sort((a, b) => new Date(b.transactiondate) - new Date(a.transactiondate));  // Sort by date descending
@@ -177,10 +176,7 @@ export default function TransactionScreen({ navigation }) {
           newbalance: newBalance,
         }),
       });
-      //console.log(newBalance);
-
-      if (response.ok) {
-        //console.log('Balance updated successfully!');
+            if (response.ok) {
       } else {
         const responseText = await response.text();
         console.error('Error updating balance:', responseText);
@@ -243,7 +239,6 @@ export default function TransactionScreen({ navigation }) {
       month: 'short', day: 'numeric', year: 'numeric',
     };
     const formattedDate = new Date(data.item.transactiondate).toLocaleDateString('en-US', options).replace(',', '');
-    //console.log("Formatted Date:", formattedDate);
     const isExpanded = expandedTransaction === data.item.key;
 
     const formattedAmount = parseFloat(data.item.dollaramount).toFixed(2);
@@ -282,8 +277,6 @@ export default function TransactionScreen({ navigation }) {
 
   // Render function for individual transaction items
   const renderItem = (data) => {
-    //console.log("Transactions:", transactions); // Verify if the state contains the new transaction
-    //console.log(data.item.dollaramount);
     return (
       <TransactionItem data={data} />
     );
