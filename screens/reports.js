@@ -1,6 +1,6 @@
 import { color } from 'chart.js/helpers';
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, FlatList, ScrollView, Modal } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, FlatList, ScrollView, Modal, VirtualizedScrollView } from 'react-native';
 import { BarChart, PieChart } from 'react-native-chart-kit';
 import { Picker } from '@react-native-picker/picker';
 
@@ -196,11 +196,11 @@ useEffect(() => {
   };
 
   const categoryColors = {
-    "Housing":"#f95d6a",
-    "Transportation":"#ff9909",
+    "Housing": "#f95d6a",
+    "Transportation": "#ff9909",
     "Personal": "#fbd309",
-    "Food": "#7cb6dc", 
-    "Education":"#2e3884",
+    "Food": "#7cb6dc",
+    "Education": "#2e3884",
     "Entertainment": "#1c43da"
   };
   
@@ -235,6 +235,7 @@ useEffect(() => {
   };
 
   return (
+
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.dropdownButtonContainer}>
         <TouchableOpacity
@@ -250,10 +251,14 @@ useEffect(() => {
       <View style={styles.box}>
         <View style={styles.chartContainer}>
           <Text style={styles.boxText}>Income vs. Expense</Text>
-
-          {/* Total Income Progress Bar */}
           <View style={styles.progressBarContainer}>
-            <Text style={styles.progressBarLabel}>Total Income</Text>
+            <View style={styles.progressBarLabels}>
+              <Text style={styles.progressBarLabel}>Income</Text>
+              <Text style={styles.progressBarLabel}>Expenses</Text>
+            </View>
+            {/* Progress is measured percentage of income over total income and expenses.
+                Value is found in prop width. tbh, not sure if it's going to work perfectly
+                in all edge cases */}
             <View style={styles.progressBarBackground}>
               <View
                 style={[
@@ -265,28 +270,10 @@ useEffect(() => {
                 ]}
               />
             </View>
-            <Text style={styles.progressBarValue}>
-              {totalIncome > 0 ? `$${totalIncome.toLocaleString()}` : '$0'}
-            </Text>
-          </View>
-
-          {/* Total Expense Progress Bar */}
-          <View style={styles.progressBarContainer}>
-            <Text style={styles.progressBarLabel}>Total Expense</Text>
-            <View style={styles.progressBarBackground}>
-              <View
-                style={[
-                  styles.progressBarFill,
-                  {
-                    width: totalExpense > 0 ? `${(totalExpense / (totalIncome + totalExpense)) * 100}%` : '0%',
-                    backgroundColor: 'rgba(255, 69, 58, 1)',
-                  },
-                ]}
-              />
+            <View style={styles.progressBarLabels}>
+              <Text style={styles.progressBarLabel}>${totalIncome}</Text>
+              <Text style={styles.progressBarLabel}>${totalExpense}</Text>
             </View>
-            <Text style={styles.progressBarValue}>
-              {totalExpense > 0 ? `$${totalExpense.toLocaleString()}` : '$0'}
-            </Text>
           </View>
         </View>
       </View>
@@ -338,35 +325,10 @@ useEffect(() => {
         </View>
       </View>
 
-      {/* Box for Category Details (if selected) */}
-      {selectedCategory && (
-        <View style={styles.box}>
-          <Text style={[
-            styles.detailsTitle,
-            { color: categoryColors[selectedCategory] || "#000000" } 
-          ]}>What You Spent on {selectedCategory}
-        </Text>
-        {/* <Text style={styles.totalPercentage}> {calculateCategoryPercentage(selectedCategory)}</Text> */}
-          <Text style={styles.totalCategoryExpense && totalPercentage}> 
-          <Text style={styles.totalLabel}>Total: </Text>
-          <Text style={styles.totalAmount}>${calculateCategoryTotal(selectedCategory).toLocaleString()}</Text>
-          </Text>
 
-        <ScrollView contentContainerStyle={styles.scrollableContent}>
-          <FlatList
-            data={details[selectedCategory]}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => (
-              <View style={styles.detailItem}>
-                <Text style={styles.date}>{item.date.toLocaleDateString()}</Text>
-                <Text style={styles.description}>{item.description} </Text>
-                <Text style={styles.amount}>${item.amount.toFixed()}</Text>
-              </View>
-            )}
-          />
-        </ScrollView>
-      </View>
-      )}
+
+      {/* Box for Category Details (if selected) */}
+      {selectedCategory && expenseDetails()}
 
       {/* Switch months button */}
       <Modal
@@ -422,6 +384,14 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 20,
   },
+  detailBox: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    width: '95%',
+    padding: 15,
+    marginBottom: 20,
+    paddingBottom: 5,
+  },
   chartContainer: {
     alignItems: 'space-between',
   },
@@ -436,15 +406,15 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: '50%',
     left: '30%',
-    width: 120, 
-    height: 120, 
+    width: 120,
+    height: 120,
     backgroundColor: '#fff',
-    borderRadius: 60, 
+    borderRadius: 60,
     transform: [{ translateX: -60 }, { translateY: -60 }],
   },
   totalExpenseText: {
     position: 'absolute',
-    top: '44%', 
+    top: '44%',
     left: '10%',
     fontSize: 24,
     fontWeight: 'bold',
@@ -511,7 +481,7 @@ const styles = StyleSheet.create({
     marginLeft: 6,
   },
   selectedLegendText: {
-    color: color, 
+    color: color,
   },
   legend2Text: {
     fontSize: 10,
@@ -539,7 +509,7 @@ const styles = StyleSheet.create({
   dropdownButtonContainer: {
     width: '100%',
     alignItems: 'center',
-    marginVertical: 10,
+    marginBottom: 10,
   },
   dropdownButton: {
     backgroundColor: 'purple',
@@ -587,24 +557,27 @@ const styles = StyleSheet.create({
   },
   progressBarContainer: {
     width: '100%',
-    marginBottom: 15,
+  },
+  progressBarLabels: {
+    flexDirection: 'row',
+    justifyContent: 'space-between'
   },
   progressBarLabel: {
     fontSize: 14,
     fontWeight: 'bold',
-    marginBottom: 5,
-    color: '#555',
+    color: '#333',
   },
   progressBarBackground: {
     width: '100%',
     height: 10,
-    backgroundColor: '#e0e0e0', // Light gray background for unfilled part
-    borderRadius: 5,
+    backgroundColor: 'red',
     overflow: 'hidden',
+    borderRadius: 5,
+    marginVertical: 5,
   },
   progressBarFill: {
     height: '100%',
-    borderRadius: 5,
+    // borderRadius: 5,
   },
   progressBarValue: {
     marginTop: 5,

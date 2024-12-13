@@ -156,6 +156,13 @@ export const globalStyles = StyleSheet.create({
     borderRadius: 10,
     padding: 20,
     marginHorizontal: 20,
+    // iOS shadow
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    // Android shadow
+    elevation: 5,
   },
   categoryList: {
     maxHeight: 300,
