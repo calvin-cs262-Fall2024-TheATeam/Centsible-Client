@@ -242,10 +242,14 @@ export default function ReportsScreen() {
       <View style={styles.box}>
         <View style={styles.chartContainer}>
           <Text style={styles.boxText}>Income vs. Expense</Text>
-
-          {/* Total Income Progress Bar */}
           <View style={styles.progressBarContainer}>
-            <Text style={styles.progressBarLabel}>Total Income</Text>
+            <View style={styles.progressBarLabels}>
+              <Text style={styles.progressBarLabel}>Income</Text>
+              <Text style={styles.progressBarLabel}>Expenses</Text>
+            </View>
+            {/* Progress is measured percentage of income over total income and expenses.
+                Value is found in prop width. tbh, not sure if it's going to work perfectly
+                in all edge cases */}
             <View style={styles.progressBarBackground}>
               <View
                 style={[
@@ -257,28 +261,10 @@ export default function ReportsScreen() {
                 ]}
               />
             </View>
-            <Text style={styles.progressBarValue}>
-              {totalIncome > 0 ? `$${totalIncome.toLocaleString()}` : '$0'}
-            </Text>
-          </View>
-
-          {/* Total Expense Progress Bar */}
-          <View style={styles.progressBarContainer}>
-            <Text style={styles.progressBarLabel}>Total Expense</Text>
-            <View style={styles.progressBarBackground}>
-              <View
-                style={[
-                  styles.progressBarFill,
-                  {
-                    width: totalExpense > 0 ? `${(totalExpense / (totalIncome + totalExpense)) * 100}%` : '0%',
-                    backgroundColor: 'rgba(255, 69, 58, 1)',
-                  },
-                ]}
-              />
+            <View style={styles.progressBarLabels}>
+              <Text style={styles.progressBarLabel}>${totalIncome}</Text>
+              <Text style={styles.progressBarLabel}>${totalExpense}</Text>
             </View>
-            <Text style={styles.progressBarValue}>
-              {totalExpense > 0 ? `$${totalExpense.toLocaleString()}` : '$0'}
-            </Text>
           </View>
         </View>
       </View>
@@ -568,24 +554,27 @@ const styles = StyleSheet.create({
   },
   progressBarContainer: {
     width: '100%',
-    marginBottom: 15,
+  },
+  progressBarLabels: {
+    flexDirection: 'row',
+    justifyContent: 'space-between'
   },
   progressBarLabel: {
     fontSize: 14,
     fontWeight: 'bold',
-    marginBottom: 5,
-    color: '#555',
+    color: '#333',
   },
   progressBarBackground: {
     width: '100%',
     height: 10,
-    backgroundColor: '#e0e0e0', // Light gray background for unfilled part
-    borderRadius: 5,
+    backgroundColor: 'red',
     overflow: 'hidden',
+    borderRadius: 5,
+    marginVertical: 5,
   },
   progressBarFill: {
     height: '100%',
-    borderRadius: 5,
+    // borderRadius: 5,
   },
   progressBarValue: {
     marginTop: 5,
