@@ -33,8 +33,6 @@ export default function ReportsScreen() {
         const data = await response.json();
         console.log("Fetched Transactions: ", data);
         console.log("Chart Data before rendering PieChart: ", chartData);
-        console.log("Data with Percentage: ", dataWithPercentage);
-
   
         // Process each transaction to assign categories
         const updatedTransactions = await Promise.all(data.map(async (transaction, index) => {
@@ -46,6 +44,7 @@ export default function ReportsScreen() {
                 ...transaction,
                 category: 'Income',  // Set category name as "Income"
                 key: transaction.id,
+                amount: parseFloat(transaction.dollaramount),
               };
             } else if (transaction.transactiontype === 'Expense') {
               // For expense, fetch category name based on category ID
@@ -88,8 +87,17 @@ export default function ReportsScreen() {
         }));
 
         console.log("Updated Transactions: ", updatedTransactions);
-        // Set updated transactions with categories
         setTransactions(updatedTransactions);
+
+        const income = updatedTransactions.filter(item => item.transactiontype === 'Income').reduce((acc, curr) => acc + curr.amount, 0);
+        const expense = updatedTransactions.filter(item => item.transactiontype === 'Expense').reduce((acc, curr) => acc + curr.amount, 0);
+        
+        console.log("Total Income: ", income);
+        console.log("Total Expense: ", expense);
+        
+        setTotalIncome(income);
+        setTotalExpense(expense);
+        
       } else {
         Alert.alert("Error", "Failed to fetch transactions.");
       }
