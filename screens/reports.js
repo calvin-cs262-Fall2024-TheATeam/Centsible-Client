@@ -140,6 +140,7 @@ useEffect(() => {
     
     console.log("Category Totals: ", categoryTotals); // Log here
     console.log("Category Details: ", categoryDetails); // Log here
+    console.log("Filtered Transactions:", filteredTransactions);
 
 
     // Create data for Pie Chart
