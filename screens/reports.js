@@ -84,15 +84,6 @@ export default function ReportsScreen() {
        // console.log("Updated Transactions: ", updatedTransactions);
         setTransactions(updatedTransactions);
 
-        // const income = updatedTransactions.filter(item => item.transactiontype === 'Income').reduce((acc, curr) => acc + curr.amount, 0);
-        // const expense = updatedTransactions.filter(item => item.transactiontype === 'Expense').reduce((acc, curr) => acc + curr.amount, 0);
-        
-        // console.log("Total Income: ", income);
-        // console.log("Total Expense: ", expense);
-        
-        // setTotalIncome(income);
-        // setTotalExpense(expense);
-
       } else {
         Alert.alert("Error", "Failed to fetch transactions.");
       }
@@ -234,7 +225,6 @@ useEffect(() => {
   };
 
   return (
-
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.dropdownButtonContainer}>
         <TouchableOpacity
@@ -430,7 +420,7 @@ const styles = StyleSheet.create({
   totalExpenseText: {
     position: 'absolute',
     top: '44%',
-    left: '10%',
+    left: '12%',
     fontSize: 24,
     fontWeight: 'bold',
     color: 'red',
