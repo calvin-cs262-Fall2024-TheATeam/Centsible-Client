@@ -10,7 +10,7 @@ const BudgetPlanner = () => {
   const [editingSubcategory, setEditingSubcategory] = useState(null);
   const [newAmount, setNewAmount] = useState('');
   const [newSubcategoryName, setNewSubcategoryName] = useState('');
-  const [isAddingSubcategory, setIsAddingSubcategory] = useState(false); 
+  const [isAddingSubcategory, setIsAddingSubcategory] = useState(false);
   const [newSubcategoryAmount, setNewSubcategoryAmount] = useState('')
 
   // Fetch initial data on component mount
@@ -30,6 +30,7 @@ const BudgetPlanner = () => {
         const transactionsData = await transactionsResponse.json();
 
         setCategories(categoriesData);
+        console.log(categoriesResponse);
         setSubcategories(subcatData);
         setTransactions(transactionsData);
 
@@ -46,12 +47,12 @@ const BudgetPlanner = () => {
 
     fetchInitialData();
   }, []);
-  
+
   const updateSubcategoryAmount = async (subcategoryId, newAmount) => {
     try {
       // Ensure the amount is valid and format it to 2 decimal places
       const formattedAmount = parseFloat(newAmount).toFixed(2);
-  
+
       // Call the backend API to update the subcategory amount
       const response = await fetch(
         'https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/budgetSubcategoryAmount',
@@ -66,18 +67,18 @@ const BudgetPlanner = () => {
           }),
         }
       );
-  
+
       // Check if the response is successful
       if (!response.ok) {
         throw new Error('Failed to update subcategory amount.');
       }
-  
+
       // Update the state with the new amount after backend confirms the update
       setAmounts((prevAmounts) => ({
         ...prevAmounts,
         [subcategoryId]: formattedAmount,
       }));
-  
+
       // Reset the editing state
       setEditingAmount(null);
       setNewAmount('');
@@ -86,13 +87,13 @@ const BudgetPlanner = () => {
       Alert.alert('Error', error.message); // Display error to the user
     }
   };
-  
+
   const updateSubcategoryName = async (subcategoryId, newSubcategoryName) => {
     if (!newSubcategoryName.trim()) {
       Alert.alert('Error', 'Subcategory name cannot be empty.');
       return;
     }
-  
+
     try {
       // Call the backend API to update the subcategory name
       const response = await fetch(
@@ -108,12 +109,12 @@ const BudgetPlanner = () => {
           }),
         }
       );
-  
+
       // Check if the response is successful
       if (!response.ok) {
         throw new Error('Failed to update subcategory name.');
       }
-  
+
       // Update the subcategories state with the new name
       setSubcategories((prevSubcategories) =>
         prevSubcategories.map((subcat) =>
@@ -122,7 +123,7 @@ const BudgetPlanner = () => {
             : subcat
         )
       );
-  
+
       // Reset the editing state
       setEditingSubcategory(null);
       setNewSubcategoryName('');
@@ -137,58 +138,62 @@ const BudgetPlanner = () => {
       Alert.alert('Error', 'Subcategory name and amount cannot be empty.');
       return;
     }
-  
+
     try {
       // Ensure the amount is a valid number
       const formattedAmount = parseFloat(monthlyAmount).toFixed(2);
-  
+
+      const subcategory = {
+        budgetcategoryID: categoryId, // ID of the parent category
+        subcategoryname: subcategoryName, // Name of the new subcategory
+        monthlydollaramount: formattedAmount,
+      }
       // Call the backend API to add the new subcategory
       const response = await fetch(
-        'https://cors-anywhere.herokuapp.com/https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/budgetSubcategory',
+        'https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/budgetSubcategory',
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            budgetcategoryid: categoryId, // ID of the parent category
-            subcategoryname: subcategoryName, // Name of the new subcategory
-            monthlydollaramount: formattedAmount, // Initial monthly amount
-          }),
+          body: JSON.stringify(subcategory),
         }
       );
-  
-      // Check if the response is successful
-      if (!response.ok) {
-        throw new Error('Failed to add new subcategory.');
+
+      if (response.ok) {
+        const newSubcategory = await response.json();
+
+        console.log("newSubcategory: " + newSubcategory);
+        // Update the subcategories state to include the new subcategory
+        setSubcategories((prevSubcategories) => [...prevSubcategories, newSubcategory]);
+
+        // Update the amounts state for the new subcategory
+        setAmounts((prevAmounts) => ({
+          ...prevAmounts,
+          [newSubcategory.id]: formattedAmount, // Add the new subcategory amount
+        }));
+
+        // Clear the input fields or any UI state related to adding subcategories
+        setNewSubcategoryName('');
+        setNewAmount('');
+      } else {
+        const responseText = await response.text();
+        console.error('Error response:', responseText);  // Log the error response for debugging
+        throw new Error('Failed to add transaction: ' + responseText);
       }
-  
-      // Parse the response to get the new subcategory data
-      const newSubcategory = await response.json();
-  
-      // Update the subcategories state to include the new subcategory
-      setSubcategories((prevSubcategories) => [...prevSubcategories, newSubcategory]);
-  
-      // Update the amounts state for the new subcategory
-      setAmounts((prevAmounts) => ({
-        ...prevAmounts,
-        [newSubcategory.id]: formattedAmount, // Add the new subcategory amount
-      }));
-  
-      // Clear the input fields or any UI state related to adding subcategories
-      setNewSubcategoryName('');
-      setNewAmount('');
     } catch (error) {
       console.error('Error adding subcategory:', error);
       Alert.alert('Error', error.message); // Display error to the user
     }
   };
-  
 
   const groupedSubcategories = categories.reduce((acc, category) => {
     acc[category.id] = subcategories.filter((subcat) => subcat.budgetcategoryid === category.id);
     return acc;
   }, {});
+
+  //console.log(groupedSubcategories);
+
 
   const calculateCategorySpent = (categoryName) => {
     return transactions
@@ -215,7 +220,7 @@ const BudgetPlanner = () => {
       <View style={styles.header}>
         <Text style={styles.headerText}>October 2024</Text>
       </View>
-  
+
       <ScrollView style={styles.scrollView}>
         {categories.map((category) => {
           const categorySpent = calculateCategorySpent(category.categoryname);
@@ -223,7 +228,7 @@ const BudgetPlanner = () => {
           const amountRemaining = totalAmount - categorySpent;
           const isOverBudget = amountRemaining < 0;
           const progress = totalAmount ? (categorySpent / totalAmount) * 100 : 0;
-  
+
           return (
             <View key={category.id} style={styles.categoryContainer}>
               <View style={styles.percentageAndBar}>
@@ -240,7 +245,7 @@ const BudgetPlanner = () => {
                   />
                 </View>
               </View>
-  
+
               <View style={styles.categoryHeader}>
                 <Text style={styles.categoryTitle}>{category.categoryname}</Text>
                 <View style={styles.spentRemaining}>
@@ -255,12 +260,12 @@ const BudgetPlanner = () => {
                   )}
                 </View>
               </View>
-  
+
               <View style={styles.amountTotalContainer}>
                 <Text style={styles.amountTotal}>Total:</Text>
                 <Text style={styles.amountTotalNumber}>${totalAmount.toFixed(2)}</Text>
               </View>
-  
+
               {groupedSubcategories[category.id]?.map((subcat) => (
                 <View key={subcat.id} style={styles.subCategoryItem}>
                   {editingSubcategory === subcat.id ? (
@@ -284,7 +289,7 @@ const BudgetPlanner = () => {
                       </Text>
                     </TouchableOpacity>
                   )}
-  
+
                   {editingAmount === subcat.id ? (
                     <TextInput
                       style={styles.individualAmountInput}
@@ -307,52 +312,52 @@ const BudgetPlanner = () => {
                   )}
                 </View>
               ))}
-  
-            {!isAddingSubcategory[category.id] ? (
-            <TouchableOpacity onPress={() => setIsAddingSubcategory({ ...isAddingSubcategory, [category.id]: true })}>
-              <Text style={styles.addSubcategoryText}>+ Add a subcategory</Text>
-            </TouchableOpacity>
-          ) : (
-            <View style={styles.addSubcategoryContainer}>
-              <View style={styles.addSubCat}>
-                <TextInput
-                  style={styles.input}
-                  value={newSubcategoryName}
-                  onChangeText={setNewSubcategoryName}
-                  placeholder="Enter subcategory name"
-                />
-                <TextInput
-                  style={styles.amountInput}
-                  value={newSubcategoryAmount}
-                  onChangeText={setNewSubcategoryAmount}
-                  placeholder="Enter amount"
-                  keyboardType="numeric"
-                />
-              </View>
-              <View style={styles.addSubcategoryActions}>
-                <TouchableOpacity
-                  style={styles.addButton}
-                  onPress={() => {
-                    addSubcategory(category.id, newSubcategoryName, newSubcategoryAmount); // Call addSubcategory
-                    setIsAddingSubcategory({ ...isAddingSubcategory, [category.id]: false }); // Reset the UI state for that category
-                  }}
-                >
-                  <Text style={styles.addButtonText}>Add</Text>
+
+              {!isAddingSubcategory[category.id] ? (
+                <TouchableOpacity onPress={() => setIsAddingSubcategory({ ...isAddingSubcategory, [category.id]: true })}>
+                  <Text style={styles.addSubcategoryText}>+ Add a subcategory</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => setIsAddingSubcategory({ ...isAddingSubcategory, [category.id]: false })}>
-                  <Text style={styles.cancelButtonText}>Cancel</Text>
-                </TouchableOpacity>
-              </View>
+              ) : (
+                <View style={styles.addSubcategoryContainer}>
+                  <View style={styles.addSubCat}>
+                    <TextInput
+                      style={styles.input}
+                      value={newSubcategoryName}
+                      onChangeText={setNewSubcategoryName}
+                      placeholder="Enter subcategory name"
+                    />
+                    <TextInput
+                      style={styles.amountInput}
+                      value={newSubcategoryAmount}
+                      onChangeText={setNewSubcategoryAmount}
+                      placeholder="Enter amount"
+                      keyboardType="numeric"
+                    />
+                  </View>
+                  <View style={styles.addSubcategoryActions}>
+                    <TouchableOpacity
+                      style={styles.addButton}
+                      onPress={() => {
+                        addSubcategory(category.id, newSubcategoryName, newSubcategoryAmount); // Call addSubcategory
+                        setIsAddingSubcategory({ ...isAddingSubcategory, [category.id]: false }); // Reset the UI state for that category
+                      }}
+                    >
+                      <Text style={styles.addButtonText}>Add</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => setIsAddingSubcategory({ ...isAddingSubcategory, [category.id]: false })}>
+                      <Text style={styles.cancelButtonText}>Cancel</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              )}
             </View>
-          )}
-          </View>
           );
         })}
       </ScrollView>
     </View>
   );
 }
-  
+
 const styles = {
   container: {
     backgroundColor: '#e8d0f4',
@@ -436,7 +441,7 @@ const styles = {
     paddingBottom: 10,
     paddingTop: 5,
   },
-  
+
   amountTotal: {
     fontSize: 16,
     fontWeight: 'bold',
@@ -454,7 +459,7 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 5,
-    marginBottom: 10, 
+    marginBottom: 10,
   },
   percentageContainer: {
     width: '10%',
@@ -471,10 +476,10 @@ const styles = {
     height: '100%',
     borderRadius: 5,
   },
-  progressPercentage: {  
-    color: 'gray',  
-    fontSize: 12,  
-  },  
+  progressPercentage: {
+    color: 'gray',
+    fontSize: 12,
+  },
 
   addSubCat: {
     flexDirection: 'row',
@@ -508,17 +513,17 @@ const styles = {
     backgroundColor: '#f0f0f0',
     borderColor: '#ccc',
     paddingLeft: 10,
-    marginBottom: 10, 
+    marginBottom: 10,
     fontSize: 14,
     borderRadius: 8,
   },
   editSubcatAmount: {
     width: 100,
-    height: 40, 
+    height: 40,
     backgroundColor: '#f0f0f0',
     borderColor: '#ccc',
     paddingLeft: 10,
-    marginBottom: 10, 
+    marginBottom: 10,
     fontSize: 14,
     borderRadius: 8,
   },
