@@ -1,6 +1,11 @@
 import React, { useState } from 'react'; 
-import { Text, View, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
+
+import { Text, View, StyleSheet, TouchableOpacity, TextInput, ScrollView, Alert, Modal } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
+import { Picker } from '@react-native-picker/picker';
+import { useColorScheme } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons';
+
 
 // Initial transactions and amounts
 const initialTransactions = [
@@ -35,6 +40,18 @@ const initialTransactions = [
   // { key: '53', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 22) },
   // { key: '54', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 29) },
 ];
+
+
+const getColors = (isDarkMode) => ({
+  background: isDarkMode ? '#121212' : '#e8d0f4',
+  text: isDarkMode ? '#ffffff' : '#333333',
+  header: isDarkMode ? '#1f1f1f' : 'purple',
+  card: isDarkMode ? '#1e1e1e' : '#fff',
+  buttonText: isDarkMode ? '#ffffff' : '#ffffff',
+  buttonBackground: isDarkMode ? '#333333' : 'purple',
+  borderColor: isDarkMode ? '#444444' : '#ddd',
+});
+
 
 const initialAmounts = {
   'Groceries': '300.00',
@@ -184,6 +201,41 @@ const SubCategoryList = ({
 
 
 const BudgetPlanner = () => {
+
+  const isDarkMode = useColorScheme() === 'dark';
+
+  const pickerStyles = StyleSheet.create({
+    picker: {
+      width: '100%',
+      color: isDarkMode ? '#ffffff' : '#000000', // White text for dark mode, black for light mode
+      backgroundColor: isDarkMode ? '#333333' : '#ffffff', // Dark background for dark mode, light for light mode
+    },
+    pickerItem: {
+      color: isDarkMode ? '#ffffff' : '#000000', // Text color for items
+    },
+  });
+
+  const currentDate = new Date(); // Get today's date
+  const [selectedMonth, setSelectedMonth] = useState({
+    month: currentDate.getMonth(), // Initialize with the current month (0-based index)
+    year: currentDate.getFullYear(), // Initialize with the current year
+  });
+  const [isPickerVisible, setPickerVisible] = useState(false);
+
+    // Month Navigation Buttons
+    const handlePreviousMonth = () => {
+      const newMonth = selectedMonth.month === 0 ? 11 : selectedMonth.month - 1;
+      const newYear = selectedMonth.month === 0 ? selectedMonth.year - 1 : selectedMonth.year;
+      setSelectedMonth({ month: newMonth, year: newYear });
+    };
+  
+    const handleNextMonth = () => {
+      const newMonth = selectedMonth.month === 11 ? 0 : selectedMonth.month + 1;
+      const newYear = selectedMonth.month === 11 ? selectedMonth.year + 1 : selectedMonth.year;
+      setSelectedMonth({ month: newMonth, year: newYear });
+    };
+  
+
   const [transactions, setTransactions] = useState(initialTransactions);
   const [categories, setCategories] = useState({
     Food: ["Groceries"],
@@ -243,10 +295,45 @@ const BudgetPlanner = () => {
   // };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>October 2024</Text>
+    <View style= {styles.container}>
+      <View style={styles.monthNavigationContainer}>
+        <TouchableOpacity
+              style={styles.arrowButton}
+              onPress={() => {
+                const newMonth = selectedMonth.month === 0 ? 11 : selectedMonth.month - 1;
+                const newYear = selectedMonth.month === 0 ? selectedMonth.year - 1 : selectedMonth.year;
+                setSelectedMonth({ month: newMonth, year: newYear });
+              }}
+            >
+              <FontAwesome name="chevron-left" size={20} color="white" />
+
+
+        </TouchableOpacity>
+
+    {/* Dropdown Button */}
+    <TouchableOpacity
+      style={styles.dropdownButton}
+      onPress={() => setPickerVisible(true)}
+    >
+      <Text style={styles.dropdownButtonText}>
+        {new Date(selectedMonth.year, selectedMonth.month).toLocaleString('default', { month: 'long' })} {selectedMonth.year}
+      </Text>
+    </TouchableOpacity>
+
+        {/* Next Month Arrow */}
+        <TouchableOpacity
+      style={styles.arrowButton}
+      onPress={() => {
+        const newMonth = selectedMonth.month === 11 ? 0 : selectedMonth.month + 1;
+        const newYear = selectedMonth.month === 11 ? selectedMonth.year + 1 : selectedMonth.year;
+        setSelectedMonth({ month: newMonth, year: newYear });
+      }}
+    >
+      <FontAwesome name="chevron-right" size={20} color="white" />
+    </TouchableOpacity>
+
       </View>
+
 
       <ScrollView style={styles.scrollView}>
         {Object.entries(categories).map(([category, subcategories]) => {
@@ -282,6 +369,7 @@ const BudgetPlanner = () => {
                   )}
                 </View>
 
+
               </View>
 
               {/* Move progress bar above category header */}
@@ -299,6 +387,7 @@ const BudgetPlanner = () => {
                   />
                 </View>
               </View>
+
 
               <View style={styles.amountTotalContainer}>
                 <View>
@@ -325,15 +414,55 @@ const BudgetPlanner = () => {
             </View>
           );
         })}
-      </ScrollView>
+      <Modal
+        visible={isPickerVisible} // Show/hide modal
+        transparent={true} // Makes the modal overlay transparent
+        animationType="slide" // Slide-in effect
+        onRequestClose={() => setPickerVisible(false)} // Close modal on back press
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Select Month</Text>
+            <Picker
+              selectedValue={`${selectedMonth.month}-${selectedMonth.year}`} // Use a string as value
+              onValueChange={(itemValue) => {
+                const [month, year] = itemValue.split('-').map(Number); // Parse the selected value
+                setSelectedMonth({ month, year }); // Update state with parsed values
+                setPickerVisible(false); // Close modal after selection
+              }}
+              style={styles.picker}
+              itemStyle={pickerStyles.pickerItem}
+            >
+              {Array.from({ length: currentDate.getMonth() + 1 }, (_, i) => (
+                <Picker.Item
+                  key={i}
+                  label={`${new Date(currentDate.getFullYear(), i).toLocaleString('default', { month: 'long' })} ${currentDate.getFullYear()}`}
+                  value={`${i}-${currentDate.getFullYear()}`} // Use a string representation
+                />
+              ))}
+            </Picker>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setPickerVisible(false)} // Close modal without selection
+            >
+              <Text style={styles.closeButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    </ScrollView >
     </View>
   );
 };
-const styles = {
+
+const styles = StyleSheet.create({
+
   container: {
+    flexGrow: 1,
     backgroundColor: '#e8d0f4',
-    flex: 1,
   },
+
+  
 
   // header and headerText are purple bar at the top
   header: {
@@ -507,6 +636,7 @@ const styles = {
     marginBottom: 10,
     fontSize: 14, // Match font size
     borderRadius: 8,
+
   },
 
   individualAmountInput: {
@@ -518,6 +648,7 @@ const styles = {
     fontSize: 18,
     borderRadius: 8,
   },
+
 
   addSubcategoryText: {
     color: 'purple',
@@ -547,6 +678,120 @@ const styles = {
     fontSize: 18,
     alignSelf: 'center',
   },
-};
+  container: {
+    flex: 1,
+    backgroundColor: '#e8d0f4',
+  },
+  header: {
+    padding: 10,
+    backgroundColor: 'purple',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  headerText: {
+    fontSize: 20,
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  monthNavigationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: 10,
+  },
+  arrowButton: {
+    width: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
+    backgroundColor: 'purple',
+    borderRadius: 0,
+    height: 42
+  },
+  dropdownButton: {
+    flex: 1,
+    backgroundColor: 'purple',
+    padding: 10,
+    borderRadius: 0,
+    marginHorizontal: 0,
+    height: 42
+  },
+  dropdownButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 18,
+    textAlign: 'center',
+  },
+  scrollView: {
+    flex: 1,
+    marginTop: -10,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    width: '80%',
+    alignItems: 'center',
+  },
+  monthNavigationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: 10,
+    
+  },
+  arrowButton: {
+    width: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
+    backgroundColor: 'purple',
+    borderRadius: 0,
+    height: 42
+    ,
+  },
+  dropdownButton: {
+
+    flex: 1,
+    backgroundColor: 'purple',
+    padding: 10,
+    borderRadius: 0,
+    marginHorizontal: 0,
+    height: 42
+  },
+  dropdownButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 18,
+    textAlign: 'center',
+  },
+  closeButton: {
+    marginTop: 10,
+    backgroundColor: 'red',
+    padding: 10,
+    borderRadius: 5,
+  },
+  closeButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  picker: {
+    width: '100%',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+
+});
 
 export default BudgetPlanner;
