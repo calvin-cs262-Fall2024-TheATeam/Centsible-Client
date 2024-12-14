@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 export const globalStyles = StyleSheet.create({
   splashContainer: {
     flex: 1,
-    backgroundColor: 'purple',
+    backgroundColor: '#231942',
     alignItems: 'center',
     justifyContent: 'flex-start', // Align items at the start
   },

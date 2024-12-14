@@ -152,7 +152,7 @@ styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    backgroundColor: '#e8d0f4',
+    backgroundColor: 'white',
   },
   rowDisplay: {
     flexDirection: 'row',
@@ -162,10 +162,14 @@ styles = StyleSheet.create({
   },
   rowWithBorder: {
     borderBottomWidth: 1, // Horizontal line
-    borderBottomColor: '#ddd', // Light gray border
+    borderBottomColor: '#231942', // Light gray border
   },
   infoBox: {
-    backgroundColor: 'white',
+    backgroundColor: '#F5F5F5',
+    marginBottom: 15,
+    borderColor: '#231942',
+    borderWidth: 1,
+    marginTop: 2,
     paddingLeft: 10,
     paddingRight: 10,
     borderRadius: 8,
@@ -189,17 +193,19 @@ styles = StyleSheet.create({
     paddingRight: 5,
   },
   notificationBox: {
-    backgroundColor: 'white',
+    backgroundColor: '#F5F5F5',
     marginVertical: 10,
     borderRadius: 8,
     width: '95%',
     paddingHorizontal: 7,
+    borderColor: '#231942',
+    borderWidth: 1,
     paddingTop: 13,
     paddingBottom: 4,
   },
   notificationText: {
     fontSize: 18,
-    color: '#333',
+    color: '#231942',
     paddingLeft: 5,
     flex: 1,
   },
@@ -212,7 +218,7 @@ styles = StyleSheet.create({
   },
   checkboxLabel: {
     fontSize: 16,
-    color: '#333',
+    color: '#231942',
     marginLeft: 20,
     flex: 1,
     fontWeight: 300,
@@ -221,14 +227,16 @@ styles = StyleSheet.create({
     marginLeft: 0,
   },
   logoutButtonContainer: {
-    backgroundColor: 'white',
+    backgroundColor: '#F5F5F5',
+    borderColor: '#231942',
+    borderWidth: 1,
     padding: 13,
     borderRadius: 8,
     width: '95%',
   },
   buttonText: {
     fontSize: 18,
-    color: 'purple',
+    color: '#231942',
     paddingLeft: 5,
   },
   passwordContainer: {

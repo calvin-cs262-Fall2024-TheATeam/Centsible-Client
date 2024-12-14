@@ -49,12 +49,22 @@ export default function App() {
 
   // Home tab screens
   const HomeTabs = () => (
-    <Tab.Navigator initialRouteName="Budget"
+    <Tab.Navigator initialRouteName="Reports"
       screenOptions={{
         tabBarStyle: { backgroundColor: 'white' }, // Optional: Set the background color of the tab bar
-        tabBarActiveTintColor: 'purple', // Active icon and label color
+        tabBarActiveTintColor: '#231942', // Active icon and label color
         tabBarInactiveTintColor: 'gray', // Inactive icon and label color
       }}>
+        <Tab.Screen
+        name="Reports"
+        component={ReportScreen}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Icon name="line-chart" color={color} size={size} />
+          ),
+          headerTitle: 'Reports',
+        }}
+      />
       <Tab.Screen
         name="Budget"
         component={GoalsScreen}
@@ -63,16 +73,6 @@ export default function App() {
             <Icon name="dollar" color={color} size={size} />
           ),
           headerTitle: 'Budget',
-        }}
-      />
-      <Tab.Screen
-        name="Reports"
-        component={ReportScreen}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="line-chart" color={color} size={size} />
-          ),
-          headerTitle: 'Reports',
         }}
       />
       <Tab.Screen
