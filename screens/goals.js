@@ -17,28 +17,56 @@ const BudgetPlanner = () => {
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
+        // Fetch categories
         const categoriesResponse = await fetch('https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/monthBudget/1/12/2024');
-        const subcatResponse = await fetch('https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/budgetSubcategory/1');
-        const transactionsResponse = await fetch('https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/transactions/1');
 
-        if (!categoriesResponse.ok || !subcatResponse.ok || !transactionsResponse.ok) {
-          throw new Error('Failed to fetch data.');
+        if (!categoriesResponse.ok) {
+          throw new Error('Failed to fetch categories.');
+        }
+        const categoriesData = await categoriesResponse.json();
+        // Extract category IDs from categoriesData
+        const categoryIDs = categoriesData.map(category => category.id);
+
+        // Initialize an array to store subcategories
+        const subcategoriesData = [];
+
+        // Loop through each categoryId to fetch subcategories
+        for (let categoryId of categoryIDs) {
+          const subcatResponse = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/budgetSubcategory/${categoryId}`);
+
+          if (subcatResponse.ok) {
+            const subcatData = await subcatResponse.json();
+            subcategoriesData.push(...subcatData);  // Add the subcategory data to the array
+          } else {
+            console.error(`Failed to fetch subcategories for category ID ${categoryId}`);
+          }
         }
 
-        const categoriesData = await categoriesResponse.json();
-        const subcatData = await subcatResponse.json();
+        // Fetch transactions data
+        const transactionsResponse = await fetch('https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/transactions/1');
+
+        if (!transactionsResponse.ok) {
+          throw new Error('Failed to fetch transactions.');
+        }
+
         const transactionsData = await transactionsResponse.json();
 
+        // Set the data in state
         setCategories(categoriesData);
-        console.log(categoriesResponse);
-        setSubcategories(subcatData);
+        setSubcategories(subcategoriesData);
         setTransactions(transactionsData);
 
+        // Create amounts map for subcategories
         const amountsMap = {};
-        subcatData.forEach((subcat) => {
+        subcategoriesData.forEach((subcat) => {
           amountsMap[subcat.id] = parseFloat(subcat.monthlydollaramount).toFixed(2);
         });
         setAmounts(amountsMap);
+
+        // Optionally log the data
+        console.log('Categories:', categoriesData);
+        console.log('Subcategories:', subcategoriesData);
+        console.log('Transactions:', transactionsData);
       } catch (error) {
         console.error('Error initializing data:', error);
         Alert.alert('Error', error.message);
