@@ -3,12 +3,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Dimensions, TouchableOpacity, FlatList, ScrollView, Modal, VirtualizedScrollView } from 'react-native';
 import { BarChart, PieChart } from 'react-native-chart-kit';
 import { Picker } from '@react-native-picker/picker';
+import { FontAwesome } from '@expo/vector-icons';
+import { useColorScheme } from 'react-native';
 
 export default function ReportsScreen() {
   const screenWidth = Dimensions.get('window').width;
   const [chartData, setChartData] = useState([]);
   const [transactions, setTransactions] = useState([]);
-  
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [details, setDetails] = useState({});
   const [totalIncome, setTotalIncome] = useState(0);
@@ -21,7 +22,32 @@ export default function ReportsScreen() {
     year: currentDate.getFullYear(), 
   });
 
-  const colors = ['#2e3884', '#f95d6a', '#ff9909', '#fbd309', '#7cb6dc', '#1c43da'];
+  const isDarkMode = useColorScheme() === 'dark';
+  const pickerStyles = StyleSheet.create({
+    picker: {
+      width: '100%',
+      color: isDarkMode ? '#ffffff' : '#000000', // White text for dark mode, black for light mode
+      backgroundColor: isDarkMode ? '#333333' : '#ffffff', // Dark background for dark mode, light for light mode
+    },
+    pickerItem: {
+      color: isDarkMode ? '#ffffff' : '#000000', // Text color for items
+    },
+  });
+
+  // Month Navigation Buttons
+  const handlePreviousMonth = () => {
+    const newMonth = selectedMonth.month === 0 ? 11 : selectedMonth.month - 1;
+    const newYear = selectedMonth.month === 0 ? selectedMonth.year - 1 : selectedMonth.year;
+    setSelectedMonth({ month: newMonth, year: newYear });
+  };
+  
+  const handleNextMonth = () => {
+    const newMonth = selectedMonth.month === 11 ? 0 : selectedMonth.month + 1;
+    const newYear = selectedMonth.month === 11 ? selectedMonth.year + 1 : selectedMonth.year;
+    setSelectedMonth({ month: newMonth, year: newYear });
+  };
+
+  const colors = ['#f95d6a', '#ff9909', '#fbd309', '#7cb6dc', '#1c43da', '#2e3884'];
   const getColor = (index) => colors[index % colors.length];
 
   const fetchTransactions = async () => {
@@ -211,7 +237,7 @@ useEffect(() => {
         <Text style={[
           styles.detailsTitle,
           { color: categoryColors[selectedCategory] || "#000000" }
-        ]}>{selectedCategory} Expenses</Text>
+        ]}> {selectedCategory} Expenses</Text>
         <Text style={styles.totalCategoryExpense && totalPercentage}>
           <Text style={styles.totalLabel}>Total: </Text>
           <Text style={styles.totalAmount}>${calculateCategoryTotal(selectedCategory).toLocaleString()}</Text>
@@ -234,10 +260,23 @@ useEffect(() => {
       </View>
     );
   };
-
+  
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.dropdownButtonContainer}>
+    <View style={styles.container}>
+      <View style={styles.monthNavigationContainer}>
+        {/* Previous Month Arrow */}
+        <TouchableOpacity
+          style={styles.arrowButton}
+          onPress={() => {
+            const newMonth = selectedMonth.month === 0 ? 11 : selectedMonth.month - 1;
+            const newYear = selectedMonth.month === 0 ? selectedMonth.year - 1 : selectedMonth.year;
+            setSelectedMonth({ month: newMonth, year: newYear });
+          }}
+        >
+          <FontAwesome name="chevron-left" size={20} color="white" />
+        </TouchableOpacity>
+  
+        {/* Dropdown Button */}
         <TouchableOpacity
           style={styles.dropdownButton}
           onPress={() => setPickerVisible(true)}
@@ -246,56 +285,100 @@ useEffect(() => {
             {new Date(selectedMonth.year, selectedMonth.month).toLocaleString('default', { month: 'long' })} {selectedMonth.year}
           </Text>
         </TouchableOpacity>
+  
+        {/* Next Month Arrow */}
+        <TouchableOpacity
+          style={styles.arrowButton}
+          onPress={() => {
+            const newMonth = selectedMonth.month === 11 ? 0 : selectedMonth.month + 1;
+            const newYear = selectedMonth.month === 11 ? selectedMonth.year + 1 : selectedMonth.year;
+            setSelectedMonth({ month: newMonth, year: newYear });
+          }}
+        >
+          <FontAwesome name="chevron-right" size={20} color="white" />
+        </TouchableOpacity>
       </View>
-
-      <View style={styles.box}>
-  <View style={styles.chartContainer}>
-    <Text style={styles.boxText}>Income vs. Expense</Text>
-    <View style={styles.progressBarContainer}>
-      <View style={styles.progressBarLabels}>
-        <Text style={styles.progressBarLabel}>Income</Text>
-        <Text style={styles.progressBarLabel}>Expenses</Text>
-      </View>
-      
-      {/* Default progress bar background (gray) */}
-      <View style={styles.progressBarBackground}>
-
-        {/* Income section */}
-        <View
-          style={[
-            styles.progressBarFill,
-            {
-              width: totalIncome > 0 ? `${(totalIncome / (totalIncome + totalExpense)) * 100}%` : '0%',
-              backgroundColor: 'rgba(0, 123, 255, 1)',  // Blue for income
-            },
-          ]}
-        />
-        {/* Expense section */}
-        <View
-          style={[
-            styles.progressBarFill,
-            {
-              width: totalExpense > 0 ? `${(totalExpense / (totalIncome + totalExpense)) * 100}%` : '0%',
-              backgroundColor: 'rgba(255, 0, 0, 1)',  // Red for expense
-            },
-          ]}
-        />
-      </View>
-
-      <View style={styles.progressBarLabels}>
-        <Text style={styles.progressBarLabel}>${totalIncome}</Text>
-        <Text style={styles.progressBarLabel}>${totalExpense}</Text>
-      </View>
-    </View>
-  </View>
-</View>
-
-
-      {/* Box for Pie Chart */}
-      <View style={styles.box}>
+  
+      {/* ScrollView Container */}
+      <ScrollView>
+        <View style={styles.box}>
+          <View style={styles.chartContainer}>
+            <Text style={styles.boxText}>Income vs. Expense</Text>
+  
+            {/* Total Income Progress Bar */}
+            <View style={styles.progressBarContainer}>
+              <Text style={styles.progressBarLabel}>Total Income</Text>
+              <View style={styles.progressBarBackground}>
+                <View
+                  style={[
+                    styles.progressBarFill,
+                    {
+                      width: totalIncome > 0 ? `${(totalIncome / (totalIncome + totalExpense)) * 100}%` : '0%',
+                      backgroundColor: 'rgba(0, 123, 255, 1)',
+                    },
+                  ]}
+                />
+              </View>
+              <Text style={styles.progressBarValue}>
+                {totalIncome > 0 ? `$${totalIncome.toLocaleString()}` : '$0'}
+              </Text>
+            </View>
+  
+            {/* Total Expense Progress Bar */}
+            <View style={styles.progressBarContainer}>
+              <Text style={styles.progressBarLabel}>Total Expense</Text>
+              <View style={styles.progressBarBackground}>
+                <View
+                  style={[
+                    styles.progressBarFill,
+                    {
+                      width: totalExpense > 0 ? `${(totalExpense / (totalIncome + totalExpense)) * 100}%` : '0%',
+                      backgroundColor: 'rgba(255, 69, 58, 1)',
+                    },
+                  ]}
+                />
+              </View>
+              <Text style={styles.progressBarValue}>
+                {totalExpense > 0 ? `$${totalExpense.toLocaleString()}` : '$0'}
+              </Text>
+            </View>
+          </View>
+        </View>
+  
+        {/* Default progress bar background (gray) */}
+        <View style={styles.progressBarBackground}>
+          {/* Income section */}
+          <View
+            style={[
+              styles.progressBarFill,
+              {
+                width: totalIncome > 0 ? `${(totalIncome / (totalIncome + totalExpense)) * 100}%` : '0%',
+                backgroundColor: 'rgba(0, 123, 255, 1)',  // Blue for income
+              },
+            ]}
+          />
+          {/* Expense section */}
+          <View
+            style={[
+              styles.progressBarFill,
+              {
+                width: totalExpense > 0 ? `${(totalExpense / (totalIncome + totalExpense)) * 100}%` : '0%',
+                backgroundColor: 'rgba(255, 0, 0, 1)',  // Red for expense
+              },
+            ]}
+          />
+        </View>
+  
+        <View style={styles.progressBarLabels}>
+          <Text style={styles.progressBarLabel}>${totalIncome}</Text>
+          <Text style={styles.progressBarLabel}>${totalExpense}</Text>
+        </View>
+  
+        {/* Box for Pie Chart */}
+        <View style={styles.box}>
         <View style={styles.chartContainer}>
           <Text style={styles.boxText}>Total Expenses</Text>
-
+  
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
             <View style={{ position: 'relative', alignItems: 'center', width: '50%' }}>
               <PieChart
@@ -312,42 +395,40 @@ useEffect(() => {
                 accessor="population"
                 backgroundColor="transparent"
                 paddingLeft="45"
-                // hid the freakin labels that come with pie chart :) yay
-                hasLegend={false}
+                hasLegend={false} // Hide legend
                 absolute={false}
               />
               <View style={styles.donutCenter} />
               <Text style={styles.totalExpenseText}>${Math.round(totalExpense).toLocaleString()}</Text>
-
             </View>
-
+  
             {/* Legend for the Pie Chart */}
             <View style={styles.legendContainer}>
               {sortedDataWithPercentage.map((item, index) => (
                 <TouchableOpacity key={index} onPress={() => handleCategoryPress(item.name)}>
                   <View style={styles.legendItem}>
                     <Triangle color={categoryColors[item.name] || "#000000"} isSelected={selectedCategory === item.name} />
-                    <Text style={[styles.legendText, selectedCategory === item.name && { color: categoryColors[item.name] }]} >
+                    <Text style={[styles.legendText, selectedCategory === item.name && { color: categoryColors[item.name] }]}>
                       {item.name}
                     </Text>
                   </View>
                 </TouchableOpacity>
               ))}
+              </View>
             </View>
           </View>
         </View>
-      </View>
-
-      {/* Box for Category Details (if selected) */}
-      {selectedCategory && expenseDetails()}
-
-      {/* Switch months button */}
-      <Modal
+  
+        {/* Box for Category Details (if selected) */}
+        {selectedCategory && expenseDetails()}
+  
+        {/* Switch months button */}
+        <Modal
         visible={isPickerVisible} // Show/hide modal
         transparent={true} // Makes the modal overlay transparent
         animationType="slide" // Slide-in effect
         onRequestClose={() => setPickerVisible(false)} // Close modal on back press
-      >
+        >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Select Month</Text>
@@ -359,6 +440,7 @@ useEffect(() => {
                 setPickerVisible(false); // Close modal after selection
               }}
               style={styles.picker}
+              itemStyle={pickerStyles.pickerItem}
             >
               {Array.from({ length: currentDate.getMonth() + 1 }, (_, i) => (
                 <Picker.Item
@@ -376,10 +458,14 @@ useEffect(() => {
             </TouchableOpacity>
           </View>
         </View>
-      </Modal>
-    </ScrollView >
+        </Modal>
+
+      </ScrollView>
+          
+    </View>
   );
 }
+  
 
 const styles = StyleSheet.create({
   container: {
@@ -405,9 +491,12 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 20,
     paddingBottom: 5,
+
   },
   chartContainer: {
-    alignItems: 'space-between',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '102%',
   },
   boxText: {
     fontSize: 20,
@@ -419,7 +508,7 @@ const styles = StyleSheet.create({
   donutCenter: {
     position: 'absolute',
     top: '50%',
-    left: '30%',
+    left: '31%',
     width: 120,
     height: 120,
     backgroundColor: '#F5F5F5',
@@ -432,6 +521,7 @@ const styles = StyleSheet.create({
     left: '8%',
     fontSize: 24,
     fontWeight: 'bold',
+
     color: 'red',
   },
   detailsTitle: {
@@ -447,6 +537,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
+
   },
   totalLabel: {
     textAlign: 'right',
@@ -454,6 +545,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: 'gray',
   },
+
   totalAmount: {
     fontSize: 18,
     flex: 1,
@@ -489,6 +581,18 @@ const styles = StyleSheet.create({
   },
   legendText: {
     fontSize: 13,
+
+    fontWeight: 'bold',
+    fontWeight: '600',
+    color: '#333',
+    marginLeft: 6,
+  },
+  selectedLegendText: {
+    color: color,
+  },
+  legend2Text: {
+    fontSize: 10,
+
     fontWeight: 'bold',
     fontWeight: '600',
     color: '#333',
@@ -500,6 +604,17 @@ const styles = StyleSheet.create({
   legend2Text: {
     fontSize: 10,
     fontWeight: 'bold',
+  },
+  triangle: {
+    width: 0,
+    height: 0,
+    borderLeftWidth: 7,
+    borderRightWidth: 7,
+    borderTopWidth: 10,
+    borderStyle: 'solid',
+    backgroundColor: 'transparent',
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
   },
   triangle: {
     width: 0,
@@ -525,6 +640,7 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     marginBottom: 10,
+
   },
   dropdownButton: {
     backgroundColor: '#231942',
@@ -534,6 +650,7 @@ const styles = StyleSheet.create({
     borderRadius: 0,
     width: '100%',
   },
+
   dropdownButtonText: {
     color: 'white',
     fontWeight: 'bold',
@@ -545,6 +662,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+
   modalContent: {
     backgroundColor: 'white',
     width: '80%',
@@ -580,7 +698,8 @@ const styles = StyleSheet.create({
   progressBarLabel: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#333',
+    marginBottom: 5,
+    color: '#555',
   },
   progressBarBackground: {
     width: '100%',
@@ -593,7 +712,7 @@ const styles = StyleSheet.create({
   },
   progressBarFill: {
     height: '100%',
-    // borderRadius: 5,
+    borderRadius: 5,
   },
   progressBarValue: {
     marginTop: 5,
@@ -602,4 +721,42 @@ const styles = StyleSheet.create({
     color: '#555',
     textAlign: 'right', // Align the value to the right
   },
+  monthNavigationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: 10,
+    
+  },
+  arrowButton: {
+    width: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
+    backgroundColor: 'purple',
+    borderRadius: 0,
+    height: 42
+    ,
+  },
+  dropdownButton: {
+
+    flex: 1,
+    backgroundColor: 'purple',
+    padding: 10,
+    borderRadius: 0,
+    marginHorizontal: 0,
+    height: 42
+  },
+  dropdownButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 18,
+    textAlign: 'center',
+  },
+  scrollView: {
+    marginBottom: 40,
+  },
+  
+
 });

@@ -25,6 +25,8 @@ const TransactionModal = (
         resetForm }) => {
     const [categoryModalVisible, setCategoryModalVisible] = useState(false);
     const [categories, setCategories] = useState([]);  // To store the categories fetched from the backend
+    const [lastFetchedMonth, setLastFetchedMonth] = useState(null);
+    const [lastFetchedYear, setLastFetchedYear] = useState(null);
 
     useEffect(() => {
         if (visible) {
@@ -41,13 +43,20 @@ const TransactionModal = (
             const selectedMonth = date.getMonth() + 1;  // getMonth() returns 0-based month, so add 1
             const selectedYear = date.getFullYear();  // getFullYear() returns the full year (e.g., 2024)
 
+            if (selectedMonth === lastFetchedMonth && selectedYear === lastFetchedYear) {
+                return;  // Skip fetching if categories for this month/year already exist
+            }
+
             const response = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/monthBudget/1/${selectedMonth}/${selectedYear}`);
             if (response.ok) {
                 const data = await response.json();
+
                 setCategories(data.map(item => ({
                     id: item.id, // ID for the category
                     name: item.categoryname // Name for the category
                 })));
+                setLastFetchedMonth(selectedMonth);
+                setLastFetchedYear(selectedYear);
             } else {
                 console.error('Failed to fetch categories:', response.status);
                 // Handle failure here (maybe show an error message to the user)

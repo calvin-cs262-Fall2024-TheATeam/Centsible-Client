@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   View, Text, Animated, TouchableHighlight, TouchableOpacity, Alert
 } from 'react-native';
@@ -22,12 +22,11 @@ export default function TransactionScreen({ navigation }) {
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
+        const userId = 1;
         // Step 1: Fetch transactions
-        const response = await fetch('https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/transactions/1'); // Use the correct API endpoint
+        const response = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/transactions/${userId}`);
         if (response.ok) {
           const data = await response.json();
-          ('Fetched transactions:', data);  // Add this log to check the fetched data
-
 
           // Step 2: For each transaction, fetch the category name or set to 'Income' for income transactions
           const updatedTransactions = await Promise.all(data.map(async (transaction, index) => {
@@ -95,31 +94,19 @@ export default function TransactionScreen({ navigation }) {
   const handleAddTransaction = async () => {
     const parsedAmount = parseFloat(amount);
 
-    if (isNaN(parsedAmount) || parsedAmount <= 0) {
-      alert("Please enter a valid amount.");
-      return; // Don't proceed if the amount is invalid
-    }
-
     const transactionDate = new Date(date);  // This is the local time from your state
-    //console.log(transactionDate);
     const transactionDateISOString = transactionDate.toISOString();  // Convert to UTC ISO string
-    //console.log(transactionDateISOString);
 
     const budgetCategoryId = type === 'Income' ? null : categoryId;
 
     const newTransaction = {
-      appuserID: 1,  // Assuming this is hardcoded for now, adjust if needed
+      appuserID: 1,  // TODO: update with user authentication
       dollaramount: parsedAmount.toFixed(2),  // Format the amount to two decimal places
-      transactiontype: type,  // Assuming type is a variable holding transaction type (income, expense, etc.)
-      budgetcategoryID: budgetCategoryId,  // Use the selected category ID
+      transactiontype: type,  // income or expense
+      budgetcategoryID: budgetCategoryId,  // selected categoryID
       optionaldescription: description,  // Optional description for the transaction
       transactiondate: transactionDateISOString
     };
-
-    //console.log("New Transaction (final):", newTransaction);
-
-    console.log(date);
-    //console.log("New Transaction:", newTransaction);  // Log the new transaction to verify
 
     try {
       // Sending the transaction data to the server
@@ -131,13 +118,10 @@ export default function TransactionScreen({ navigation }) {
 
       if (response.ok) {
         const data = await response.json();
-        //console.log('Created Transaction with ID:', data.id);
-        //console.log(data);
-        console.log(data.transactiondate);
 
         // Fetch the category name using the categoryId of the transaction
         let categoryName = 'Unknown Category';  // Default category name if fetch fails
-        if (categoryId  && type !== 'Income') {
+        if (categoryId && type !== 'Income') {
           try {
             const categoryResponse = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/budgetCategoryName/${categoryId}`);
             if (categoryResponse.ok) {
@@ -159,9 +143,8 @@ export default function TransactionScreen({ navigation }) {
           ...data,               // The returned data from backend (including id)
           key: data.id.toString(),  // Use the backend-generated id as the key for React (if needed)
         };
-  
+
         // Update the transactions list with the new transaction
-        //console.log(data);
         setTransactions(prevTransactions => {
           const updatedTransactions = [transactionWithId, ...prevTransactions]; // Add the new transaction at the beginning
           return updatedTransactions.sort((a, b) => new Date(b.transactiondate) - new Date(a.transactiondate));  // Sort by date descending
@@ -182,20 +165,18 @@ export default function TransactionScreen({ navigation }) {
 
   const updateCurrentBalanceInDB = async (newBalance) => {
     try {
+      const userId = 1;
       const response = await fetch('https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/currentBalance', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          id: 1, // Assuming the user ID is hardcoded, replace this with dynamic user ID if needed
+          id: userId, // Assuming the user ID is hardcoded, replace this with dynamic user ID if needed
           newbalance: newBalance,
         }),
       });
-      //console.log(newBalance);
-
-      if (response.ok) {
-        //console.log('Balance updated successfully!');
+            if (response.ok) {
       } else {
         const responseText = await response.text();
         console.error('Error updating balance:', responseText);
@@ -229,18 +210,17 @@ export default function TransactionScreen({ navigation }) {
     setExpandedTransaction(prevKey => prevKey === transactionKey ? null : transactionKey);
   };
 
-  // Update the balance when the transactions state changes
+  // Update the balance in the database whenever the calculateBalance changes
   useEffect(() => {
-    const newBalance = calculateBalance();
-    //console.log(newBalance);
-    updateCurrentBalanceInDB(newBalance); // Update balance in DB whenever transactions change
-  }, [transactions]); // This hook will run whenever the transactions state is updated
+    if (calculateBalance) {
+      updateCurrentBalanceInDB(calculateBalance); // Update balance in DB
+    }
+  }, [calculateBalance]); // This hook will run only when the memoized balance changes
 
-  // Calculate current balance
-  const calculateBalance = () => {
+  // Memoize the balance calculation so it only recalculates when transactions change
+  const calculateBalance = useMemo(() => {
     let balance = 0;
-
-    // Calculate balance based on transactions
+    // Loop through the transactions and calculate the balance
     transactions.forEach(transaction => {
       const amount = parseFloat(transaction.dollaramount);
       if (transaction.transactiontype === 'Income') {
@@ -251,20 +231,15 @@ export default function TransactionScreen({ navigation }) {
     });
 
     return balance.toFixed(2); // Return balance rounded to two decimal places
-  };
+  }, [transactions]); // This will recalculate the balance only when transactions change
 
   // Renders a single transaction item with correct layout 
   const TransactionItem = memo(({ data }) => {
     const options = {
       month: 'short', day: 'numeric', year: 'numeric',
-      // hour: 'numeric',
-      // minute: 'numeric',
-      // second: 'numeric'
     };
     const formattedDate = new Date(data.item.transactiondate).toLocaleDateString('en-US', options).replace(',', '');
-    //console.log("Formatted Date:", formattedDate);
     const isExpanded = expandedTransaction === data.item.key;
-    //console.log("TransactionKey:", data.item.key, "ExpandedKey:", expandedTransaction, "IsExpanded:", isExpanded);
 
     const formattedAmount = parseFloat(data.item.dollaramount).toFixed(2);
     const amountText = data.item.transactiontype === 'Income'
@@ -302,8 +277,6 @@ export default function TransactionScreen({ navigation }) {
 
   // Render function for individual transaction items
   const renderItem = (data) => {
-    //console.log("Transactions:", transactions); // Verify if the state contains the new transaction
-    //console.log(data.item.dollaramount);
     return (
       <TransactionItem data={data} />
     );
@@ -407,7 +380,7 @@ export default function TransactionScreen({ navigation }) {
       {/* Balance Section */}
       <View style={styles.balanceContainer}>
         <Text style={styles.balanceText}>Current Balance:</Text>
-        <Text style={styles.balanceAmount}>${calculateBalance()}</Text>
+        <Text style={styles.balanceAmount}>${calculateBalance}</Text>
       </View>
 
       {/* Input Transaction Screen */}
