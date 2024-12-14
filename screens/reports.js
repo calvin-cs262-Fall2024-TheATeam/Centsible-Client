@@ -21,7 +21,7 @@ export default function ReportsScreen() {
     year: currentDate.getFullYear(), 
   });
 
-  const colors = ['#f95d6a', '#ff9909', '#fbd309', '#7cb6dc', '#1c43da', '#2e3884'];
+  const colors = ['#2e3884', '#f95d6a', '#ff9909', '#fbd309', '#7cb6dc', '#1c43da'];
   const getColor = (index) => colors[index % colors.length];
 
   const fetchTransactions = async () => {
@@ -55,7 +55,7 @@ export default function ReportsScreen() {
                   };
                 }
               }
-                //console.error(`Failed to fetch category for ID ${transaction.budgetcategoryid}`);
+            
                 return {
                   ...transaction,
                   category: 'Unknown Category',  // Default category if failed
@@ -81,7 +81,6 @@ export default function ReportsScreen() {
           }
         }));
 
-       // console.log("Updated Transactions: ", updatedTransactions);
         setTransactions(updatedTransactions);
 
       } else {
@@ -173,6 +172,27 @@ useEffect(() => {
   const dataWithPercentage = calculatePercentage(filteredChartData);
   const sortedDataWithPercentage = [...dataWithPercentage].sort((b, a) => a.population - b.population);
 
+  const categoryColors = {
+    "Education": "#fbd309",
+    "Transportation": "#f95d6a",
+    "Housing": "#1c43da",
+    "Entertainment": "#7cb6dc",
+    "Food": "#ff9909",
+    "Personal": "#2e3884",
+  };
+
+  const dataWithFixedColors = sortedChartData.map(item => ({
+    ...item,
+    color: categoryColors[item.name] || "#000000", 
+  }));
+
+  const dataForPieChart = dataWithFixedColors.map(item => ({
+    name: item.name,
+    population: item.population,
+    color: item.color, 
+  }));
+  
+
   const Triangle = ({ color, isSelected }) => {
     return (
       <View style={[styles.triangle, {
@@ -183,15 +203,6 @@ useEffect(() => {
       }]}
       />
     );
-  };
-
-  const categoryColors = {
-    "Housing": "#f95d6a",
-    "Transportation": "#ff9909",
-    "Personal": "#fbd309",
-    "Food": "#7cb6dc",
-    "Education": "#2e3884",
-    "Entertainment": "#1c43da"
   };
   
   const expenseDetails = () => {
@@ -280,7 +291,6 @@ useEffect(() => {
 </View>
 
 
-
       {/* Box for Pie Chart */}
       <View style={styles.box}>
         <View style={styles.chartContainer}>
@@ -289,7 +299,7 @@ useEffect(() => {
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
             <View style={{ position: 'relative', alignItems: 'center', width: '50%' }}>
               <PieChart
-                data={sortedChartData && filteredChartData && dataWithPercentage}
+                data={dataForPieChart}
                 width={screenWidth * 0.8}
                 height={220}
                 chartConfig={{
@@ -316,9 +326,10 @@ useEffect(() => {
               {sortedDataWithPercentage.map((item, index) => (
                 <TouchableOpacity key={index} onPress={() => handleCategoryPress(item.name)}>
                   <View style={styles.legendItem}>
-                    <Triangle color={item.color} isSelected={selectedCategory === item.name} />
-                    <Text style={[styles.legendText, selectedCategory === item.name && { color: item.color }]}>{item.name}</Text>
-
+                    <Triangle color={categoryColors[item.name] || "#000000"} isSelected={selectedCategory === item.name} />
+                    <Text style={[styles.legendText, selectedCategory === item.name && { color: categoryColors[item.name] }]} >
+                      {item.name}
+                    </Text>
                   </View>
                 </TouchableOpacity>
               ))}
@@ -326,8 +337,6 @@ useEffect(() => {
           </View>
         </View>
       </View>
-
-
 
       {/* Box for Category Details (if selected) */}
       {selectedCategory && expenseDetails()}
