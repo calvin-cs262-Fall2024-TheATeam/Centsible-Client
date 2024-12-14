@@ -647,9 +647,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
 
-
   addSubcategoryText: {
-    color: 'purple',
+    color: '#231942',
     fontSize: 16,
     textDecorationLine: 'underline',
     marginTop: 10,
@@ -678,11 +677,11 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: '#e8d0f4',
+    backgroundColor: 'white',
   },
   header: {
     padding: 10,
-    backgroundColor: 'purple',
+    backgroundColor: '#231942',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -703,13 +702,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 10,
-    backgroundColor: 'purple',
+    backgroundColor: '#231942',
     borderRadius: 0,
     height: 42
   },
   dropdownButton: {
     flex: 1,
-    backgroundColor: 'purple',
+    backgroundColor: '#231942',
     padding: 10,
     borderRadius: 0,
     marginHorizontal: 0,
@@ -751,15 +750,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 10,
-    backgroundColor: 'purple',
+    backgroundColor: '#231942',
     borderRadius: 0,
-    height: 42
-    ,
+    height: 42,
   },
   dropdownButton: {
-
     flex: 1,
-    backgroundColor: 'purple',
+    backgroundColor: '#231942',
     padding: 10,
     borderRadius: 0,
     marginHorizontal: 0,

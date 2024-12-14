@@ -343,41 +343,41 @@ useEffect(() => {
 
         {/* Box for Pie Chart */}
         <View style={styles.box}>
-        <View style={styles.chartContainer}>
-          <Text style={styles.boxText}>Total Expenses</Text>
+          <View style={styles.chartContainer}>
+            <Text style={styles.boxText}>Total Expenses</Text>
   
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-            <View style={{ position: 'relative', alignItems: 'center', width: '50%' }}>
-              <PieChart
-                data={dataForPieChart}
-                width={screenWidth * 0.8}
-                height={220}
-                chartConfig={{
-                  backgroundColor: '#1cc910',
-                  backgroundGradientFrom: '#eff3ff',
-                  backgroundGradientTo: '#efefef',
-                  color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                  labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                }}
-                accessor="population"
-                backgroundColor="transparent"
-                paddingLeft="45"
-                hasLegend={false} // Hide legend
-                absolute={false}
-              />
-              <View style={styles.donutCenter} />
-              <Text style={styles.totalExpenseText}>${Math.round(totalExpense).toLocaleString()}</Text>
-            </View>
-  
-            {/* Legend for the Pie Chart */}
-            <View style={styles.legendContainer}>
-              {sortedDataWithPercentage.map((item, index) => (
-                <TouchableOpacity key={index} onPress={() => handleCategoryPress(item.name)}>
-                  <View style={styles.legendItem}>
-                    <Triangle color={categoryColors[item.name] || "#000000"} isSelected={selectedCategory === item.name} />
-                    <Text style={[styles.legendText, selectedCategory === item.name && { color: categoryColors[item.name] }]}>
-                      {item.name}
-                    </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ position: 'relative', alignItems: 'center', width: '50%' }}>
+                <PieChart
+                  data={dataForPieChart}
+                  width={screenWidth * 0.8}
+                  height={220}
+                  chartConfig={{
+                    backgroundColor: '#1cc910',
+                    backgroundGradientFrom: '#eff3ff',
+                    backgroundGradientTo: '#efefef',
+                    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                  }}
+                  accessor="population"
+                  backgroundColor="transparent"
+                  paddingLeft="45"
+                  hasLegend={false} // Hide legend
+                  absolute={false}
+                />
+                <View style={styles.donutCenter} />
+                <Text style={styles.totalExpenseText}>${Math.round(totalExpense).toLocaleString()}</Text>
+              </View>
+    
+              {/* Legend for the Pie Chart */}
+              <View style={styles.legendContainer}>
+                {sortedDataWithPercentage.map((item, index) => (
+                  <TouchableOpacity key={index} onPress={() => handleCategoryPress(item.name)}>
+                    <View style={styles.legendItem}>
+                      <Triangle color={categoryColors[item.name] || "#000000"} isSelected={selectedCategory === item.name} />
+                      <Text style={[styles.legendText, selectedCategory === item.name && { color: categoryColors[item.name] }]}>
+                        {item.name}</Text>
+
                   </View>
                 </TouchableOpacity>
               ))}
@@ -421,10 +421,10 @@ useEffect(() => {
               style={styles.closeButton}
               onPress={() => setPickerVisible(false)} // Close modal without selection
             >
-              <Text style={styles.closeButtonText}>Close</Text>
-            </TouchableOpacity>
+                <Text style={styles.closeButtonText}>Close</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
         </Modal>
       </ScrollView>
     </View>
@@ -445,8 +445,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     width: '95%',
     padding: 15,
-    marginBottom: 15,
+    marginBottom: 10,
+    flexGrow: 1,
     borderColor: '#231942',
+    marginHorizontal: 10,
     marginTop: 5,
   },
   detailBox: {
@@ -456,12 +458,9 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 20,
     paddingBottom: 5,
-
   },
   chartContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '102%',
+    alignItems: 'space-between',
   },
   boxText: {
     fontSize: 20,
@@ -473,7 +472,7 @@ const styles = StyleSheet.create({
   donutCenter: {
     position: 'absolute',
     top: '50%',
-    left: '31%',
+    left: '30%',
     width: 120,
     height: 120,
     backgroundColor: '#F5F5F5',
@@ -486,7 +485,6 @@ const styles = StyleSheet.create({
     left: '8%',
     fontSize: 24,
     fontWeight: 'bold',
-
     color: 'red',
   },
   detailsTitle: {
@@ -510,7 +508,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: 'gray',
   },
-
   totalAmount: {
     fontSize: 18,
     flex: 1,
@@ -557,7 +554,6 @@ const styles = StyleSheet.create({
   },
   legend2Text: {
     fontSize: 10,
-
     fontWeight: 'bold',
     fontWeight: '600',
     color: '#333',
@@ -677,7 +673,6 @@ const styles = StyleSheet.create({
   },
   progressBarFill: {
     height: '100%',
-    borderRadius: 5,
   },
   progressBarValue: {
     marginTop: 5,
@@ -692,22 +687,19 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: '100%',
     marginBottom: 10,
-    
   },
   arrowButton: {
     width: 50,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 10,
-    backgroundColor: 'purple',
+    backgroundColor: '#231942',
     borderRadius: 0,
-    height: 42
-    ,
+    height: 42,
   },
   dropdownButton: {
-
     flex: 1,
-    backgroundColor: 'purple',
+    backgroundColor: '#231942',
     padding: 10,
     borderRadius: 0,
     marginHorizontal: 0,
@@ -719,9 +711,4 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'center',
   },
-  scrollView: {
-    marginBottom: 40,
-  },
-  
-
 });
