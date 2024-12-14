@@ -6,6 +6,7 @@ import { Picker } from '@react-native-picker/picker';
 import { FontAwesome } from '@expo/vector-icons';
 import { useColorScheme } from 'react-native';
 
+
 export default function ReportsScreen() {
   const screenWidth = Dimensions.get('window').width;
   const [chartData, setChartData] = useState([]);
@@ -13,6 +14,7 @@ export default function ReportsScreen() {
   const [details, setDetails] = useState({});
   const [totalIncome, setTotalIncome] = useState(0);
   const [totalExpense, setTotalExpense] = useState(0);
+
 
   const isDarkMode = useColorScheme() === 'dark';
 
@@ -27,12 +29,14 @@ const pickerStyles = StyleSheet.create({
   },
 });
 
+
   const currentDate = new Date(); // Get today's date
   const [selectedMonth, setSelectedMonth] = useState({
     month: currentDate.getMonth(), // Initialize with the current month (0-based index)
     year: currentDate.getFullYear(), // Initialize with the current year
   });
   const [isPickerVisible, setPickerVisible] = useState(false);
+
 
     // Month Navigation Buttons
     const handlePreviousMonth = () => {
@@ -46,6 +50,7 @@ const pickerStyles = StyleSheet.create({
       const newYear = selectedMonth.month === 11 ? selectedMonth.year + 1 : selectedMonth.year;
       setSelectedMonth({ month: newMonth, year: newYear });
     };
+
 
 
   const initialTransactions = [
@@ -309,6 +314,7 @@ const pickerStyles = StyleSheet.create({
           {/* Total Income Progress Bar */}
           <View style={styles.progressBarContainer}>
             <Text style={styles.progressBarLabel}>Total Income</Text>
+
             <View style={styles.progressBarBackground}>
               <View
                 style={[
@@ -320,6 +326,7 @@ const pickerStyles = StyleSheet.create({
                 ]}
               />
             </View>
+
             <Text style={styles.progressBarValue}>
               {totalIncome > 0 ? `$${totalIncome.toLocaleString()}` : '$0'}
             </Text>
@@ -342,6 +349,7 @@ const pickerStyles = StyleSheet.create({
             <Text style={styles.progressBarValue}>
               {totalExpense > 0 ? `$${totalExpense.toLocaleString()}` : '$0'}
             </Text>
+
           </View>
         </View>
       </View>
@@ -356,7 +364,9 @@ const pickerStyles = StyleSheet.create({
             <View style={{ position: 'relative', alignItems: 'center', width: '50%' }}>
               <PieChart
                 data={sortedChartData && filteredChartData && dataWithPercentage}
+
                 width={screenWidth * 0.786}
+
                 height={220}
                 chartConfig={{
                   backgroundColor: '#1cc910',
@@ -416,7 +426,9 @@ const pickerStyles = StyleSheet.create({
                 setPickerVisible(false); // Close modal after selection
               }}
               style={styles.picker}
+
               itemStyle={pickerStyles.pickerItem}
+
             >
               {Array.from({ length: currentDate.getMonth() + 1 }, (_, i) => (
                 <Picker.Item
@@ -436,13 +448,16 @@ const pickerStyles = StyleSheet.create({
         </View>
       </Modal>
     </ScrollView >
+
     </View>
+
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
+
     backgroundColor: '#e8d0f4',
   },
   box: {
@@ -459,6 +474,7 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 20,
     paddingBottom: 5,
+
   },
   chartContainer: {
     alignItems: 'center',
@@ -488,6 +504,7 @@ const styles = StyleSheet.create({
     left: '10%',
     fontSize: 24,
     fontWeight: 'bold',
+
     color: 'red',
   },
   detailsTitle: {
@@ -503,6 +520,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
+
   },
   totalLabel: {
     textAlign: 'right',
@@ -510,6 +528,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: 'gray',
   },
+
   totalAmount: {
     fontSize: 18,
     flex: 1,
@@ -551,6 +570,18 @@ const styles = StyleSheet.create({
   },
   legendText: {
     fontSize: 13,
+
+    fontWeight: 'bold',
+    fontWeight: '600',
+    color: '#333',
+    marginLeft: 6,
+  },
+  selectedLegendText: {
+    color: color,
+  },
+  legend2Text: {
+    fontSize: 10,
+
     fontWeight: 'bold',
     fontWeight: '600',
     color: '#333',
@@ -562,6 +593,17 @@ const styles = StyleSheet.create({
   legend2Text: {
     fontSize: 10,
     fontWeight: 'bold',
+  },
+  triangle: {
+    width: 0,
+    height: 0,
+    borderLeftWidth: 7,
+    borderRightWidth: 7,
+    borderTopWidth: 10,
+    borderStyle: 'solid',
+    backgroundColor: 'transparent',
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
   },
   triangle: {
     width: 0,
@@ -586,6 +628,7 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     marginBottom: 10,
+
   },
   dropdownButton: {
     backgroundColor: 'purple',
@@ -595,6 +638,7 @@ const styles = StyleSheet.create({
     borderRadius: 0,
     width: '100%',
   },
+
   dropdownButtonText: {
     color: 'white',
     fontWeight: 'bold',
@@ -606,7 +650,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  
+
   modalContent: {
     backgroundColor: 'white',
     width: '80%',
@@ -697,4 +741,5 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   
+
 });

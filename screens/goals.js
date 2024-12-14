@@ -1,9 +1,11 @@
 import React, { useState } from 'react'; 
+
 import { Text, View, StyleSheet, TouchableOpacity, TextInput, ScrollView, Alert, Modal } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { Picker } from '@react-native-picker/picker';
 import { useColorScheme } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+
 
 // Initial transactions and amounts
 const initialTransactions = [
@@ -39,6 +41,7 @@ const initialTransactions = [
   // { key: '54', amount: 180, category: 'Income', description: 'Weekly income', type: 'income', date: new Date(2024, 9, 29) },
 ];
 
+
 const getColors = (isDarkMode) => ({
   background: isDarkMode ? '#121212' : '#e8d0f4',
   text: isDarkMode ? '#ffffff' : '#333333',
@@ -48,6 +51,7 @@ const getColors = (isDarkMode) => ({
   buttonBackground: isDarkMode ? '#333333' : 'purple',
   borderColor: isDarkMode ? '#444444' : '#ddd',
 });
+
 
 const initialAmounts = {
   'Groceries': '300.00',
@@ -197,6 +201,7 @@ const SubCategoryList = ({
 
 
 const BudgetPlanner = () => {
+
   const isDarkMode = useColorScheme() === 'dark';
 
   const pickerStyles = StyleSheet.create({
@@ -230,6 +235,7 @@ const BudgetPlanner = () => {
       setSelectedMonth({ month: newMonth, year: newYear });
     };
   
+
   const [transactions, setTransactions] = useState(initialTransactions);
   const [categories, setCategories] = useState({
     Food: ["Groceries"],
@@ -301,6 +307,7 @@ const BudgetPlanner = () => {
             >
               <FontAwesome name="chevron-left" size={20} color="white" />
 
+
         </TouchableOpacity>
 
     {/* Dropdown Button */}
@@ -326,6 +333,7 @@ const BudgetPlanner = () => {
     </TouchableOpacity>
 
       </View>
+
 
       <ScrollView style={styles.scrollView}>
         {Object.entries(categories).map(([category, subcategories]) => {
@@ -361,6 +369,7 @@ const BudgetPlanner = () => {
                   )}
                 </View>
 
+
               </View>
 
               {/* Move progress bar above category header */}
@@ -378,6 +387,7 @@ const BudgetPlanner = () => {
                   />
                 </View>
               </View>
+
 
               <View style={styles.amountTotalContainer}>
                 <View>
@@ -444,7 +454,9 @@ const BudgetPlanner = () => {
     </View>
   );
 };
+
 const styles = StyleSheet.create({
+
   container: {
     flexGrow: 1,
     backgroundColor: '#e8d0f4',
@@ -624,6 +636,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontSize: 14, // Match font size
     borderRadius: 8,
+
   },
 
   individualAmountInput: {
@@ -635,6 +648,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     borderRadius: 8,
   },
+
 
   addSubcategoryText: {
     color: 'purple',
