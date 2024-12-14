@@ -298,82 +298,49 @@ useEffect(() => {
           <FontAwesome name="chevron-right" size={20} color="white" />
         </TouchableOpacity>
       </View>
-  
+
+    <ScrollView>
       {/* ScrollView Container */}
-      <ScrollView>
         <View style={styles.box}>
           <View style={styles.chartContainer}>
             <Text style={styles.boxText}>Income vs. Expense</Text>
-  
-            {/* Total Income Progress Bar */}
             <View style={styles.progressBarContainer}>
-              <Text style={styles.progressBarLabel}>Total Income</Text>
+            <View style={styles.progressBarLabels}>
+              <Text style={styles.progressBarLabel}>Income</Text>
+              <Text style={styles.progressBarLabel}>Expenses</Text>
+            </View>
+  
               <View style={styles.progressBarBackground}>
+
+                {/* Income section */}
                 <View
                   style={[
                     styles.progressBarFill,
                     {
                       width: totalIncome > 0 ? `${(totalIncome / (totalIncome + totalExpense)) * 100}%` : '0%',
-                      backgroundColor: 'rgba(0, 123, 255, 1)',
+                      backgroundColor: 'rgba(0, 123, 255, 1)',  // Blue for income
                     },
                   ]}
                 />
-              </View>
-              <Text style={styles.progressBarValue}>
-                {totalIncome > 0 ? `$${totalIncome.toLocaleString()}` : '$0'}
-              </Text>
-            </View>
-  
-            {/* Total Expense Progress Bar */}
-            <View style={styles.progressBarContainer}>
-              <Text style={styles.progressBarLabel}>Total Expense</Text>
-              <View style={styles.progressBarBackground}>
+                {/* Expense section */}
                 <View
                   style={[
                     styles.progressBarFill,
                     {
                       width: totalExpense > 0 ? `${(totalExpense / (totalIncome + totalExpense)) * 100}%` : '0%',
-                      backgroundColor: 'rgba(255, 69, 58, 1)',
+                      backgroundColor: 'rgba(255, 0, 0, 1)',  // Red for expense
                     },
                   ]}
                 />
               </View>
-              <Text style={styles.progressBarValue}>
-                {totalExpense > 0 ? `$${totalExpense.toLocaleString()}` : '$0'}
-              </Text>
+              <View style={styles.progressBarLabels}>
+              <Text style={styles.progressBarLabel}>${totalIncome}</Text>
+              <Text style={styles.progressBarLabel}>${totalExpense}</Text>
             </View>
           </View>
         </View>
-  
-        {/* Default progress bar background (gray) */}
-        <View style={styles.progressBarBackground}>
-          {/* Income section */}
-          <View
-            style={[
-              styles.progressBarFill,
-              {
-                width: totalIncome > 0 ? `${(totalIncome / (totalIncome + totalExpense)) * 100}%` : '0%',
-                backgroundColor: 'rgba(0, 123, 255, 1)',  // Blue for income
-              },
-            ]}
-          />
-          {/* Expense section */}
-          <View
-            style={[
-              styles.progressBarFill,
-              {
-                width: totalExpense > 0 ? `${(totalExpense / (totalIncome + totalExpense)) * 100}%` : '0%',
-                backgroundColor: 'rgba(255, 0, 0, 1)',  // Red for expense
-              },
-            ]}
-          />
-        </View>
-  
-        <View style={styles.progressBarLabels}>
-          <Text style={styles.progressBarLabel}>${totalIncome}</Text>
-          <Text style={styles.progressBarLabel}>${totalExpense}</Text>
-        </View>
-  
+      </View>
+
         {/* Box for Pie Chart */}
         <View style={styles.box}>
         <View style={styles.chartContainer}>
@@ -459,9 +426,7 @@ useEffect(() => {
           </View>
         </View>
         </Modal>
-
       </ScrollView>
-          
     </View>
   );
 }
