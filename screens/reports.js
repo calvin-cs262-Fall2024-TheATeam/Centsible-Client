@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
   totalExpenseText: {
     position: 'absolute',
     top: '44%',
-    left: '12%',
+    left: '8%',
     fontSize: 24,
     fontWeight: 'bold',
     color: 'red',
