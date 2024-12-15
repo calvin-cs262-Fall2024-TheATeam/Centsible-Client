@@ -291,7 +291,9 @@ const BudgetPlanner = () => {
 
               <View style={styles.amountTotalContainer}>
                 <Text style={styles.amountTotal}>Total:</Text>
-                <Text style={styles.amountTotalNumber}>${totalAmount.toFixed(2)}</Text>
+                <Text style={styles.amountTotalNumber}>
+                  ${isNaN(totalAmount) || totalAmount === undefined ? '0.00' : totalAmount.toFixed(2)}
+                </Text>
               </View>
 
               {groupedSubcategories[category.id]?.map((subcat) => (
