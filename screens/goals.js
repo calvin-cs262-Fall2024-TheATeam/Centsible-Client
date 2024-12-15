@@ -1,80 +1,146 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
+import { Text, View, TouchableOpacity, ScrollView, Alert, TextInput } from 'react-native';
 
 const BudgetPlanner = () => {
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
   const [amounts, setAmounts] = useState({});
   const [transactions, setTransactions] = useState([]);
+  const [isBudgetExists, setIsBudgetExists] = useState(false); // State to track if budget exists
+
+  const appuserID = 1; // Replace with dynamic user ID
+  const month = 5;  // Current month
+  const year = 2024; // Current year
+
   const [editingAmount, setEditingAmount] = useState(null);
   const [editingSubcategory, setEditingSubcategory] = useState(null);
   const [newAmount, setNewAmount] = useState('');
   const [newSubcategoryName, setNewSubcategoryName] = useState('');
   const [isAddingSubcategory, setIsAddingSubcategory] = useState(false);
-  const [newSubcategoryAmount, setNewSubcategoryAmount] = useState('')
+  const [newSubcategoryAmount, setNewSubcategoryAmount] = useState('');
 
-  // Fetch initial data on component mount
-  useEffect(() => {
-    const fetchInitialData = async () => {
+    const fetchBudgetData = async () => {
       try {
         // Fetch categories
-        const categoriesResponse = await fetch('https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/monthBudget/1/12/2024');
+        const budgetResponse = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/monthBudget/${appuserID}/${month}/${year}`);
 
-        if (!categoriesResponse.ok) {
-          throw new Error('Failed to fetch categories.');
-        }
-        const categoriesData = await categoriesResponse.json();
-        // Extract category IDs from categoriesData
-        const categoryIDs = categoriesData.map(category => category.id);
+        if (budgetResponse.ok) {
+          const budgetData = await budgetResponse.json();
 
-        // Initialize an array to store subcategories
-        const subcategoriesData = [];
+          // Check if budgetData and budgetData.data are valid arrays
+          if (Array.isArray(budgetData.data)) {
+            setCategories(budgetData.data); // Set the categories
+            setIsBudgetExists(true);  // Mark that the budget exists
 
-        // Loop through each categoryId to fetch subcategories
-        for (let categoryId of categoryIDs) {
-          const subcatResponse = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/budgetSubcategory/${categoryId}`);
+            const categoryIDs = budgetData.data.map(category => category.id);
 
-          if (subcatResponse.ok) {
-            const subcatData = await subcatResponse.json();
-            subcategoriesData.push(...subcatData);  // Add the subcategory data to the array
+            // Initialize an array to store subcategories
+            const subcategoriesData = [];
+
+            // Fetch subcategories for each category
+            for (let categoryId of categoryIDs) {
+              try {
+                const subcatResponse = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/budgetSubcategory/${categoryId}`);
+
+                if (subcatResponse.ok) {
+                  const subcatData = await subcatResponse.json();
+
+                  // If there are subcategories, add them to the array
+                  if (Array.isArray(subcatData.data)) {
+                    subcategoriesData.push(...subcatData.data); // Add valid subcategories
+                  }
+                } else {
+                  // If no subcategories are found (404), you can skip that category or handle accordingly
+                  if (subcatResponse.status === 404) {
+                    console.log(`No subcategories found for category ${categoryId}`);
+                  }
+                }
+              } catch (error) {
+                console.error(`Error fetching subcategories for category ID ${categoryId}:`, error);
+              }
+            }
+
+            // After looping through all categories, update the state with subcategories
+            setSubcategories(subcategoriesData);
+
+            // Create amounts map for subcategories
+            const amountsMap = {};
+            subcategoriesData.forEach((subcat) => {
+              amountsMap[subcat.id] = parseFloat(subcat.monthlydollaramount).toFixed(2);
+            });
+            setAmounts(amountsMap);
+
+            console.log('Budget data and subcategory data fetched:', { budgetData, subcategoriesData });
           } else {
-            console.error(`Failed to fetch subcategories for category ID ${categoryId}`);
+            // If the response data is not in the expected format
+            console.error('Unexpected response format for budget data:', budgetData);
+          }
+        } else {
+          // If no data, handle accordingly
+          if (budgetResponse.status === 404) {
+            setIsBudgetExists(false); // Mark as no data
+            console.log('No budget data found, creating default budget');
           }
         }
 
         // Fetch transactions data
-        const transactionsResponse = await fetch('https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/transactions/1');
+        const transactionsResponse = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/transactions/1`);
 
-        if (!transactionsResponse.ok) {
-          throw new Error('Failed to fetch transactions.');
+        if (transactionsResponse.ok) {
+          const transactionsData = await transactionsResponse.json();
+          setTransactions(transactionsData);
+        } else {
+          throw new Error('Failed to fetch transactions');
         }
 
-        const transactionsData = await transactionsResponse.json();
-
-        // Set the data in state
-        setCategories(categoriesData);
-        setSubcategories(subcategoriesData);
-        setTransactions(transactionsData);
-
-        // Create amounts map for subcategories
-        const amountsMap = {};
-        subcategoriesData.forEach((subcat) => {
-          amountsMap[subcat.id] = parseFloat(subcat.monthlydollaramount).toFixed(2);
-        });
-        setAmounts(amountsMap);
-
-        // Optionally log the data
-        console.log('Categories:', categoriesData);
-        console.log('Subcategories:', subcategoriesData);
-        console.log('Transactions:', transactionsData);
       } catch (error) {
         console.error('Error initializing data:', error);
         Alert.alert('Error', error.message);
       }
     };
 
-    fetchInitialData();
-  }, []);
+    useEffect(() => {
+      fetchBudgetData(); // Call the fetch function on initial render
+    }, []);
+
+
+  // Integrating the Post API to create the default month budget
+  const createDefaultMonthBudget = async () => {
+    try {
+      const response = await fetch(
+        'https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/defaultMonthBudget', // Replace with your actual API endpoint
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            appuserID,   // User ID from your app (can be fetched from auth or state)
+            month,       // The month for the budget
+            year,        // The year for the budget
+          }),
+        }
+      );
+
+      if (response.ok) {
+        // Handle success - you can update the UI or notify the user
+        setIsBudgetExists(true); // Set budget as created successfully
+        fetchBudgetData(); // Re-fetch the budget data to display
+      } else {
+        const errorText = await response.text();
+        throw new Error('Failed to create default month budget: ' + errorText);
+      }
+    } catch (error) {
+      console.error('Error creating default month budget:', error);
+      Alert.alert('Error', error.message);
+    }
+  };
+
+  // // Example usage - assuming you have appuserID, month, and year to pass
+  // const handleCreateDefaultBudget = () =>
+  //   createDefaultMonthBudget(appuserID, month, year);
+  // };
+
 
   const updateSubcategoryAmount = async (subcategoryId, newAmount) => {
     try {
@@ -248,6 +314,12 @@ const BudgetPlanner = () => {
       <View style={styles.header}>
         <Text style={styles.headerText}>October 2024</Text>
       </View>
+
+      {!isBudgetExists && (
+        <TouchableOpacity onPress={createDefaultMonthBudget}>
+          <Text style={styles.addTemplateBudget}>Add Template Budget</Text>
+        </TouchableOpacity>
+      )}
 
       <ScrollView style={styles.scrollView}>
         {categories.map((category) => {
@@ -605,6 +677,16 @@ const styles = {
     color: 'red',
     fontSize: 18,
     alignSelf: 'center',
+  },
+  addTemplateBudget: {
+    padding: 7,
+    backgroundColor: 'purple',
+    borderRadius: 5,
+    color: 'white',
+    marginHorizontal: 47,
+    fontSize: 18,
+    marginTop: 15,
+    textAlign: 'center'
   },
 };
 
