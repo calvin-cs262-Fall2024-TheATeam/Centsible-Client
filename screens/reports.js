@@ -30,7 +30,7 @@ export default function ReportsScreen() {
       backgroundColor: isDarkMode ? '#333333' : '#ffffff', // Dark background for dark mode, light for light mode
     },
     pickerItem: {
-      color: isDarkMode ? '#ffffff' : '#000000', // Text color for items
+      color: isDarkMode ? '#ffffff' : '#000000', 
     },
   });
 
@@ -157,7 +157,6 @@ useEffect(() => {
     //console.log("Category Details: ", categoryDetails); // Log here
     //console.log("Filtered Transactions:", filteredTransactions);
 
-
     // Create data for Pie Chart
     setChartData(
       Object.keys(categoryTotals).map((category, index) => ({
@@ -217,7 +216,6 @@ useEffect(() => {
     population: item.population,
     color: item.color, 
   }));
-  
 
   const Triangle = ({ color, isSelected }) => {
     return (
@@ -526,7 +524,6 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
-
   },
   totalLabel: {
     textAlign: 'right',
@@ -569,7 +566,6 @@ const styles = StyleSheet.create({
   },
   legendText: {
     fontSize: 13,
-
     fontWeight: 'bold',
     fontWeight: '600',
     color: '#333',
@@ -627,7 +623,6 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     marginBottom: 10,
-
   },
   dropdownButton: {
     backgroundColor: '#231942',
@@ -637,7 +632,6 @@ const styles = StyleSheet.create({
     borderRadius: 0,
     width: '100%',
   },
-
   dropdownButtonText: {
     color: 'white',
     fontWeight: 'bold',
@@ -649,7 +643,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-
   modalContent: {
     backgroundColor: 'white',
     width: '80%',
