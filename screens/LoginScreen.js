@@ -10,10 +10,8 @@ export default function LoginScreen({ route, navigation }) {
   const handleLogin = () => {
     setIsLoading(true);
     // Basic login simulation (replace with actual login logic)
-    if (email === 'user@example.com' && password === 'password') {
+    if (email === '' && password === '') {
       setIsLoggedIn(true);
-      Alert.alert('Login Successful!');
-      navigation.replace('Home'); // Navigate to the Home screen
     } else {
       Alert.alert('Login Failed', 'Invalid email or password.');
     }
@@ -22,7 +20,7 @@ export default function LoginScreen({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
+      <Text style={styles.title}>Centsible</Text>
 
       <TextInput
         style={styles.input}
@@ -59,6 +57,8 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: 'bold',
+    fontStyle: 'italic',
+    color: 'purple',
     marginBottom: 24,
     textAlign: 'center',
   },
@@ -72,8 +72,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   createAccountText: {
-    color: 'blue',
+    color: 'purple',
     marginTop: 20,
+    fontWeight: 'bold',
     textAlign: 'center',
   },
 });
