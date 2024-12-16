@@ -3,8 +3,6 @@ import { Text, View, TouchableOpacity, TextInput, ScrollView, Alert, Modal, Styl
 import { Picker } from '@react-native-picker/picker';
 import { useColorScheme } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import React, { useState, useEffect } from 'react';
-import { Text, View, TouchableOpacity, ScrollView, Alert, TextInput } from 'react-native';
 
 const BudgetPlanner = () => {
 
@@ -32,106 +30,103 @@ const BudgetPlanner = () => {
   const [subcategories, setSubcategories] = useState([]);
   const [amounts, setAmounts] = useState({});
   const [transactions, setTransactions] = useState([]);
-  const [isBudgetExists, setIsBudgetExists] = useState(false); // State to track if budget exists
-
-  const appuserID = 1; // Replace with dynamic user ID
-  const month = 5;  // Current month
-  const year = 2024; // Current year
-
   const [editingAmount, setEditingAmount] = useState(null);
   const [editingSubcategory, setEditingSubcategory] = useState(null);
   const [newAmount, setNewAmount] = useState('');
   const [newSubcategoryName, setNewSubcategoryName] = useState('');
   const [isAddingSubcategory, setIsAddingSubcategory] = useState(false);
-  const [newSubcategoryAmount, setNewSubcategoryAmount] = useState('');
+  const [isBudgetExists, setIsBudgetExists] = useState(false); // State to track if budget exists
+  const [newSubcategoryAmount, setNewSubcategoryAmount] = useState('')
 
-    const fetchBudgetData = async () => {
-      try {
-        // Fetch categories
-        const budgetResponse = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/monthBudget/${appuserID}/${month}/${year}`);
 
-        if (budgetResponse.ok) {
-          const budgetData = await budgetResponse.json();
+  // Fetch initial data on component mount
+  const fetchBudgetData = async () => {
+    const { month, year } = selectedMonth;
+    try {
+      // Fetch categories
+      const budgetResponse = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/monthBudget/1/${month+1}/${year}`);
 
-          // Check if budgetData and budgetData.data are valid arrays
-          if (Array.isArray(budgetData.data)) {
-            setCategories(budgetData.data); // Set the categories
-            setIsBudgetExists(true);  // Mark that the budget exists
+      if (budgetResponse.ok) {
+        const budgetData = await budgetResponse.json();
 
-            const categoryIDs = budgetData.data.map(category => category.id);
+        // Check if budgetData and budgetData.data are valid arrays
+        if (Array.isArray(budgetData.data)) {
+          setCategories(budgetData.data); // Set the categories
+          setIsBudgetExists(true);  // Mark that the budget exists
 
-            // Initialize an array to store subcategories
-            const subcategoriesData = [];
+          const categoryIDs = budgetData.data.map(category => category.id);
 
-            // Fetch subcategories for each category
-            for (let categoryId of categoryIDs) {
-              try {
-                const subcatResponse = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/budgetSubcategory/${categoryId}`);
+          // Initialize an array to store subcategories
+          const subcategoriesData = [];
 
-                if (subcatResponse.ok) {
-                  const subcatData = await subcatResponse.json();
+          // Fetch subcategories for each category
+          for (let categoryId of categoryIDs) {
+            try {
+              const subcatResponse = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/budgetSubcategory/${categoryId}`);
 
-                  // If there are subcategories, add them to the array
-                  if (Array.isArray(subcatData.data)) {
-                    subcategoriesData.push(...subcatData.data); // Add valid subcategories
-                  }
-                } else {
-                  // If no subcategories are found (404), you can skip that category or handle accordingly
-                  if (subcatResponse.status === 404) {
-                    console.log(`No subcategories found for category ${categoryId}`);
-                  }
+              if (subcatResponse.ok) {
+                const subcatData = await subcatResponse.json();
+
+                // If there are subcategories, add them to the array
+                if (Array.isArray(subcatData.data)) {
+                  subcategoriesData.push(...subcatData.data); // Add valid subcategories
                 }
-              } catch (error) {
-                console.error(`Error fetching subcategories for category ID ${categoryId}:`, error);
+              } else {
+                // If no subcategories are found (404), you can skip that category or handle accordingly
+                if (subcatResponse.status === 404) {
+                  console.log(`No subcategories found for category ${categoryId}`);
+                }
               }
+            } catch (error) {
+              console.error(`Error fetching subcategories for category ID ${categoryId}:`, error);
             }
-
-            // After looping through all categories, update the state with subcategories
-            setSubcategories(subcategoriesData);
-
-            // Create amounts map for subcategories
-            const amountsMap = {};
-            subcategoriesData.forEach((subcat) => {
-              amountsMap[subcat.id] = parseFloat(subcat.monthlydollaramount).toFixed(2);
-            });
-            setAmounts(amountsMap);
-
-            console.log('Budget data and subcategory data fetched:', { budgetData, subcategoriesData });
-          } else {
-            // If the response data is not in the expected format
-            console.error('Unexpected response format for budget data:', budgetData);
           }
+
+          // After looping through all categories, update the state with subcategories
+          setSubcategories(subcategoriesData);
+
+          // Create amounts map for subcategories
+          const amountsMap = {};
+          subcategoriesData.forEach((subcat) => {
+            amountsMap[subcat.id] = parseFloat(subcat.monthlydollaramount).toFixed(2);
+          });
+          setAmounts(amountsMap);
+
+          console.log('Budget data and subcategory data fetched:', { budgetData, subcategoriesData });
         } else {
-          // If no data, handle accordingly
-          if (budgetResponse.status === 404) {
-            setIsBudgetExists(false); // Mark as no data
-            console.log('No budget data found, creating default budget');
-          }
+          // If the response data is not in the expected format
+          console.error('Unexpected response format for budget data:', budgetData);
         }
-
-        // Fetch transactions data
-        const transactionsResponse = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/transactions/1`);
-
-        if (transactionsResponse.ok) {
-          const transactionsData = await transactionsResponse.json();
-          setTransactions(transactionsData);
-        } else {
-          throw new Error('Failed to fetch transactions');
+      } else {
+        // If no data, handle accordingly
+        if (budgetResponse.status === 404) {
+          setIsBudgetExists(false); // Mark as no data
+          console.log('No budget data found, creating default budget');
         }
-
-      } catch (error) {
-        console.error('Error initializing data:', error);
-        Alert.alert('Error', error.message);
       }
-    };
 
-    useEffect(() => {
-      fetchBudgetData(); // Call the fetch function on initial render
-    }, []);
+      // Fetch transactions data
+      const transactionsResponse = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/transactions/1`);
 
+      if (transactionsResponse.ok) {
+        const transactionsData = await transactionsResponse.json();
+        setTransactions(transactionsData);
+      } else {
+        throw new Error('Failed to fetch transactions');
+      }
 
-  // Integrating the Post API to create the default month budget
-  const createDefaultMonthBudget = async () => {
+    } catch (error) {
+      console.error('Error initializing data:', error);
+      Alert.alert('Error', error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchBudgetData(); // Call the fetch function on initial render
+  }, [selectedMonth]);
+
+  const createDefaultMonthBudget = async (month, year) => {
+    appuserID = 1;
     try {
       const response = await fetch(
         'https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/defaultMonthBudget', // Replace with your actual API endpoint
@@ -162,17 +157,11 @@ const BudgetPlanner = () => {
     }
   };
 
-  // // Example usage - assuming you have appuserID, month, and year to pass
-  // const handleCreateDefaultBudget = () =>
-  //   createDefaultMonthBudget(appuserID, month, year);
-  // };
-
-
   const updateSubcategoryAmount = async (subcategoryId, newAmount) => {
     try {
       // Ensure the amount is valid and format it to 2 decimal places
       const formattedAmount = parseFloat(newAmount).toFixed(2);
-
+  
       // Call the backend API to update the subcategory amount
       const response = await fetch(
         'https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/budgetSubcategoryAmount',
@@ -187,18 +176,18 @@ const BudgetPlanner = () => {
           }),
         }
       );
-
+  
       // Check if the response is successful
       if (!response.ok) {
         throw new Error('Failed to update subcategory amount.');
       }
-
+  
       // Update the state with the new amount after backend confirms the update
       setAmounts((prevAmounts) => ({
         ...prevAmounts,
         [subcategoryId]: formattedAmount,
       }));
-
+  
       // Reset the editing state
       setEditingAmount(null);
       setNewAmount('');
@@ -207,13 +196,13 @@ const BudgetPlanner = () => {
       Alert.alert('Error', error.message); // Display error to the user
     }
   };
-
+  
   const updateSubcategoryName = async (subcategoryId, newSubcategoryName) => {
     if (!newSubcategoryName.trim()) {
       Alert.alert('Error', 'Subcategory name cannot be empty.');
       return;
     }
-
+  
     try {
       // Call the backend API to update the subcategory name
       const response = await fetch(
@@ -229,12 +218,12 @@ const BudgetPlanner = () => {
           }),
         }
       );
-
+  
       // Check if the response is successful
       if (!response.ok) {
         throw new Error('Failed to update subcategory name.');
       }
-
+  
       // Update the subcategories state with the new name
       setSubcategories((prevSubcategories) =>
         prevSubcategories.map((subcat) =>
@@ -243,7 +232,7 @@ const BudgetPlanner = () => {
             : subcat
         )
       );
-
+  
       // Reset the editing state
       setEditingSubcategory(null);
       setNewSubcategoryName('');
@@ -258,16 +247,27 @@ const BudgetPlanner = () => {
       Alert.alert('Error', 'Subcategory name and amount cannot be empty.');
       return;
     }
-
+  
     try {
-      // Ensure the amount is a valid number
-      const formattedAmount = parseFloat(monthlyAmount).toFixed(2);
-
-      const subcategory = {
-        budgetcategoryID: categoryId, // ID of the parent category
-        subcategoryname: subcategoryName, // Name of the new subcategory
-        monthlydollaramount: formattedAmount,
-      }
+      // Optimistically update the subcategories state before backend request
+      const newSubcategory = {
+        budgetcategoryID: categoryId,
+        subcategoryname: subcategoryName,
+        monthlydollaramount: parseFloat(monthlyAmount).toFixed(2),
+      };
+  
+      // Optimistically add the new subcategory to state
+      setSubcategories((prevSubcategories) => {
+        const updatedSubcategories = [...prevSubcategories];
+        const categoryIndex = updatedSubcategories.findIndex((subcat) => subcat.budgetcategoryID === categoryId);
+        if (categoryIndex === -1) {
+          updatedSubcategories.push(newSubcategory);
+        } else {
+          updatedSubcategories.splice(categoryIndex + 1, 0, newSubcategory);
+        }
+        return updatedSubcategories;
+      });
+  
       // Call the backend API to add the new subcategory
       const response = await fetch(
         'https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/budgetSubcategory',
@@ -276,49 +276,82 @@ const BudgetPlanner = () => {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(subcategory),
+          body: JSON.stringify(newSubcategory),
         }
       );
-
+  
       if (response.ok) {
-        const newSubcategory = await response.json();
-
-        console.log("newSubcategory: " + newSubcategory);
-        // Update the subcategories state to include the new subcategory
-        setSubcategories((prevSubcategories) => [...prevSubcategories, newSubcategory]);
-
-        // Update the amounts state for the new subcategory
-        setAmounts((prevAmounts) => ({
-          ...prevAmounts,
-          [newSubcategory.id]: formattedAmount, // Add the new subcategory amount
-        }));
-
-        // Clear the input fields or any UI state related to adding subcategories
-        setNewSubcategoryName('');
-        setNewAmount('');
+        const addedSubcategory = await response.json();
+        // Update the state with the actual data from the backend
+        setSubcategories((prevSubcategories) =>
+          prevSubcategories.map((subcat) => (subcat.id === addedSubcategory.id ? addedSubcategory : subcat))
+        );
+        setAmounts((prevAmounts) => ({ ...prevAmounts, [addedSubcategory.id]: monthlyAmount }));
+  
+        // Refresh the subcategories list for the specific category
+        const refreshSubcategories = async () => {
+          try {
+            const subcatResponse = await fetch(
+              `https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/budgetSubcategory/${categoryId}`
+            );
+            if (subcatResponse.ok) {
+              const subcatData = await subcatResponse.json();
+              // Update only the subcategories for the specific category
+              setSubcategories((prevSubcategories) =>
+                prevSubcategories.map((subcat) =>
+                  subcat.budgetcategoryID === categoryId ? subcatData.find((s) => s.id === subcat.id) || subcat : subcat
+                )
+              );
+            } else {
+              console.error(`Failed to refresh subcategories for category ID ${categoryId}`);
+            }
+          } catch (error) {
+            console.error('Error refreshing subcategories:', error);
+          }
+        };
+        refreshSubcategories();
       } else {
-        const responseText = await response.text();
-        console.error('Error response:', responseText);  // Log the error response for debugging
-        throw new Error('Failed to add transaction: ' + responseText);
+        // Handle backend error, and revert optimistic update if needed
+        console.error('Failed to add subcategory');
+        Alert.alert('Error', 'Failed to add subcategory');
+        setSubcategories((prevSubcategories) =>
+          prevSubcategories.filter((subcat) => subcat !== newSubcategory)
+        );
       }
     } catch (error) {
       console.error('Error adding subcategory:', error);
       Alert.alert('Error', error.message); // Display error to the user
+      // Revert the optimistic update if needed
+      setSubcategories((prevSubcategories) =>
+        prevSubcategories.filter((subcat) => subcat !== newSubcategory)
+      );
+    } finally {
+      setIsAddingSubcategory({ ...isAddingSubcategory, [categoryId]: false });
+      setNewSubcategoryName('');
+      setNewSubcategoryAmount('');
     }
   };
+  
+  
+  
 
-  const groupedSubcategories = categories.reduce((acc, category) => {
-    acc[category.id] = subcategories.filter((subcat) => subcat.budgetcategoryid === category.id);
-    return acc;
-  }, {});
+  const groupedSubcategories = useMemo(() => {
+    const grouped = {};
+    subcategories.forEach((subcategory) => {
+      if (!grouped[subcategory.budgetcategoryid]) {
+        grouped[subcategory.budgetcategoryid] = [];
+      }
+      grouped[subcategory.budgetcategoryid].push(subcategory);
+    });
+    return grouped;
+  }, [subcategories]); 
+  
 
-  //console.log(groupedSubcategories);
-
-
-  const calculateCategorySpent = (categoryName) => {
-    return transactions
-      .filter((transaction) => transaction.category === categoryName)
-      .reduce((total, transaction) => total + transaction.amount, 0);
+  const calculateCategorySpent = (categoryId) => {
+    const filteredTransactions = transactions.filter(
+      (txn) => txn.transactiontype === 'Expense' && txn.budgetcategoryid === categoryId
+    );
+    return filteredTransactions.reduce((sum, txn) => sum + parseFloat(txn.dollaramount), 0);
   };
 
  const getTotalForCategory = (categoryId) => {
@@ -374,13 +407,7 @@ const BudgetPlanner = () => {
     </TouchableOpacity>
 
       </View>
-
-      {!isBudgetExists && (
-        <TouchableOpacity onPress={createDefaultMonthBudget}>
-          <Text style={styles.addTemplateBudget}>Add Template Budget</Text>
-        </TouchableOpacity>
-      )}
-
+  
       <ScrollView style={styles.scrollView}>
         {categories.map((category) => {
           const categorySpent = calculateCategorySpent(category.id);
@@ -388,24 +415,9 @@ const BudgetPlanner = () => {
           const amountRemaining = totalAmount - categorySpent;
           const isOverBudget = amountRemaining < 0;
           const progress = totalAmount ? (categorySpent / totalAmount) * 100 : 0;
-
+          
           return (
             <View key={category.id} style={styles.categoryContainer}>
-              <View style={styles.percentageAndBar}>
-                <View style={styles.percentageContainer}>
-                  <Text style={styles.progressPercentage}>{progress.toFixed(0)}%</Text>
-                </View>
-                <View style={styles.progressBarContainer}>
-                  <View
-                    style={{
-                      ...styles.progressBar,
-                      width: `${Math.min(progress, 100)}%`,
-                      backgroundColor: getProgressBarColor(categorySpent, totalAmount),
-                    }}
-                  />
-                </View>
-              </View>
-
               <View style={styles.categoryHeader}>
                 <Text style={styles.categoryTitle}>{category.categoryname}</Text>
                 <View style={styles.spentRemaining}>
@@ -421,13 +433,27 @@ const BudgetPlanner = () => {
                 </View>
               </View>
 
+               {/* Move progress bar above category header */} 
+              <View style={styles.percentageAndBar}>
+                <View style={styles.percentageContainer}>
+                  <Text style={styles.progressPercentage}>{progress.toFixed(0)}%</Text>
+                </View>
+                <View style={styles.progressBarContainer}>
+                  <View
+                    style={{
+                      ...styles.progressBar,
+                      width: `${Math.min(progress, 100)}%`,
+                      backgroundColor: getProgressBarColor(categorySpent, totalAmount),
+                    }}
+                  />
+                </View>
+              </View>
+             
               <View style={styles.amountTotalContainer}>
                 <Text style={styles.amountTotal}>Total:</Text>
-                <Text style={styles.amountTotalNumber}>
-                  ${isNaN(totalAmount) || totalAmount === undefined ? '0.00' : totalAmount.toFixed(2)}
-                </Text>
+                <Text style={styles.amountTotalNumber}>${totalAmount.toFixed(2)}</Text>
               </View>
-
+  
               {groupedSubcategories[category.id]?.map((subcat) => (
                 <View key={subcat.id} style={styles.subCategoryItem}>
                   {editingSubcategory === subcat.id ? (
@@ -451,7 +477,7 @@ const BudgetPlanner = () => {
                       </Text>
                     </TouchableOpacity>
                   )}
-
+  
                   {editingAmount === subcat.id ? (
                     <TextInput
                       style={styles.individualAmountInput}
@@ -474,45 +500,45 @@ const BudgetPlanner = () => {
                   )}
                 </View>
               ))}
-
-              {!isAddingSubcategory[category.id] ? (
-                <TouchableOpacity onPress={() => setIsAddingSubcategory({ ...isAddingSubcategory, [category.id]: true })}>
-                  <Text style={styles.addSubcategoryText}>+ Add a subcategory</Text>
+  
+            {!isAddingSubcategory[category.id] ? (
+            <TouchableOpacity onPress={() => setIsAddingSubcategory({ ...isAddingSubcategory, [category.id]: true })}>
+              <Text style={styles.addSubcategoryText}>+ Add a subcategory</Text>
+            </TouchableOpacity>
+          ) : (
+            <View style={styles.addSubcategoryContainer}>
+              <View style={styles.addSubCat}>
+                <TextInput
+                  style={styles.input}
+                  value={newSubcategoryName}
+                  onChangeText={setNewSubcategoryName}
+                  placeholder="Enter subcategory name"
+                />
+                <TextInput
+                  style={styles.amountInput}
+                  value={newSubcategoryAmount}
+                  onChangeText={setNewSubcategoryAmount}
+                  placeholder="Enter amount"
+                  keyboardType="numeric"
+                />
+              </View>
+              <View style={styles.addSubcategoryActions}>
+                <TouchableOpacity
+                  style={styles.addButton}
+                  onPress={() => {
+                    addSubcategory(category.id, newSubcategoryName, newSubcategoryAmount); // Call addSubcategory
+                    setIsAddingSubcategory({ ...isAddingSubcategory, [category.id]: false }); // Reset the UI state for that category
+                  }}
+                >
+                  <Text style={styles.addButtonText}>Add</Text>
                 </TouchableOpacity>
-              ) : (
-                <View style={styles.addSubcategoryContainer}>
-                  <View style={styles.addSubCat}>
-                    <TextInput
-                      style={styles.input}
-                      value={newSubcategoryName}
-                      onChangeText={setNewSubcategoryName}
-                      placeholder="Enter subcategory name"
-                    />
-                    <TextInput
-                      style={styles.amountInput}
-                      value={newSubcategoryAmount}
-                      onChangeText={setNewSubcategoryAmount}
-                      placeholder="Enter amount"
-                      keyboardType="numeric"
-                    />
-                  </View>
-                  <View style={styles.addSubcategoryActions}>
-                    <TouchableOpacity
-                      style={styles.addButton}
-                      onPress={() => {
-                        addSubcategory(category.id, newSubcategoryName, newSubcategoryAmount); // Call addSubcategory
-                        setIsAddingSubcategory({ ...isAddingSubcategory, [category.id]: false }); // Reset the UI state for that category
-                      }}
-                    >
-                      <Text style={styles.addButtonText}>Add</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => setIsAddingSubcategory({ ...isAddingSubcategory, [category.id]: false })}>
-                      <Text style={styles.cancelButtonText}>Cancel</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              )}
+                <TouchableOpacity onPress={() => setIsAddingSubcategory({ ...isAddingSubcategory, [category.id]: false })}>
+                  <Text style={styles.cancelButtonText}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
             </View>
+          )}
+          </View>
           );
         })}
              <Modal
@@ -558,7 +584,7 @@ const BudgetPlanner = () => {
   );
 }
 
-const styles = {
+const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     backgroundColor: '#e8d0f4',
@@ -787,6 +813,120 @@ const styles = {
     marginTop: 15,
     textAlign: 'center'
   },
-};
+  container: {
+    flex: 1,
+    backgroundColor: '#e8d0f4',
+  },
+  header: {
+    padding: 10,
+    backgroundColor: 'purple',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  headerText: {
+    fontSize: 20,
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  monthNavigationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: 10,
+  },
+  arrowButton: {
+    width: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
+    backgroundColor: 'purple',
+    borderRadius: 0,
+    height: 42
+  },
+  dropdownButton: {
+    flex: 1,
+    backgroundColor: 'purple',
+    padding: 10,
+    borderRadius: 0,
+    marginHorizontal: 0,
+    height: 42
+  },
+  dropdownButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 18,
+    textAlign: 'center',
+  },
+  scrollView: {
+    flex: 1,
+    marginTop: -10,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    width: '80%',
+    alignItems: 'center',
+  },
+  monthNavigationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: 10,
+    
+  },
+  arrowButton: {
+    width: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
+    backgroundColor: 'purple',
+    borderRadius: 0,
+    height: 42
+    ,
+  },
+  dropdownButton: {
+
+    flex: 1,
+    backgroundColor: 'purple',
+    padding: 10,
+    borderRadius: 0,
+    marginHorizontal: 0,
+    height: 42
+  },
+  dropdownButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 18,
+    textAlign: 'center',
+  },
+  closeButton: {
+    marginTop: 10,
+    backgroundColor: 'red',
+    padding: 10,
+    borderRadius: 5,
+  },
+  closeButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  picker: {
+    width: '100%',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+
+});
 
 export default BudgetPlanner;
