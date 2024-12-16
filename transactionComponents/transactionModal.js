@@ -49,8 +49,6 @@ const TransactionModal = (
                 return;  // Skip fetching if categories for this month/year already exist
             }
 
-            const url = `https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/monthBudget/1/${selectedMonth}/${selectedYear}`;
-            console.log('URL:', url);  // Log URL to verify it's correct
             const response = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/monthBudget/1/${selectedMonth}/${selectedYear}`);
             if (response.ok) {
                 const responseData = await response.json();

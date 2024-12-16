@@ -483,7 +483,7 @@ const styles = {
     backgroundColor: '#DDD',
     flexDirection: 'row',
     marginBottom: 5,
-    borderRadius: 5,
+    borderRadius: 8,
     height: 50,
   },
   trashBtn: {
@@ -496,8 +496,8 @@ const styles = {
     paddingRight: 17,
     backgroundColor: 'red',
     right: 0,
-    borderTopRightRadius: 5,
-    borderBottomRightRadius: 5,
+    borderTopRightRadius: 8,
+    borderBottomRightRadius: 8,
     height: 50,
   },
   trash: {
