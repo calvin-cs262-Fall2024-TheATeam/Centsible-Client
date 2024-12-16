@@ -42,14 +42,13 @@ const BudgetPlanner = () => {
   // Fetch initial data on component mount
   const fetchBudgetData = async () => {
     const { month, year } = selectedMonth;
-
     try {
       // Fetch categories
       const budgetResponse = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/monthBudget/1/${month+1}/${year}`);
 
       if (budgetResponse.ok) {
         const budgetData = await budgetResponse.json();
-        
+
         // Check if budgetData and budgetData.data are valid arrays
         if (Array.isArray(budgetData.data)) {
           setCategories(budgetData.data); // Set the categories
@@ -362,12 +361,23 @@ const BudgetPlanner = () => {
 };
 
 
-  const getProgressBarColor = (spent, total) => {
-    const ratio = spent / total;
-    if (ratio > 1) return '#cc0000';
-    if (ratio > 0.75) return '#ff9933';
-    return '#006600';
-  };
+const getProgressBarColor = (spent, total) => {
+  console.log("Spent:", spent, "Total:", total);
+  if ((total === 0) && (spent === 0)) {
+    return 'f0f0f0';
+  }
+  if (total == 0) {
+    // If total is 0 (no allocated amount), show red (over budget)
+    return '#cc0000';
+  }
+
+  const ratio = spent / total;
+  console.log(ratio);
+  if ((ratio > 1) || (ratio === NaN) || (ratio === Infinity) ) return '#cc0000';  // Over budget
+  if (ratio > 0.75) return '#ff9933';  // 75% to 100% spent
+  return '#006600';  // Below 75%, green for safe budget
+};
+
 
   return (
     <View style= {styles.container}>
@@ -415,7 +425,7 @@ const BudgetPlanner = () => {
           const totalAmount = getTotalForCategory(category.id);
           const amountRemaining = totalAmount - categorySpent;
           const isOverBudget = amountRemaining < 0;
-          const progress = totalAmount ? (categorySpent / totalAmount) * 100 : 0;
+          const progress = totalAmount ? (categorySpent / totalAmount) * 100 : 100;
           
           return (
             <View key={category.id} style={styles.categoryContainer}>
@@ -588,12 +598,12 @@ const BudgetPlanner = () => {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: '#e8d0f4',
+    backgroundColor: 'white',
+    flex: 1,
   },
-  // header and headerText are purple bar at the top
   header: {
     padding: 10,
-    backgroundColor: 'purple',
+    backgroundColor: '#231942',
     justifyContent: 'center',
     width: '100%',
     flexDirection: 'row',
@@ -621,13 +631,14 @@ const styles = StyleSheet.create({
   },
   categoryContainer: {
     marginTop: 10,
+    marginBottom: 10,
     marginRight: 10,
     marginLeft: 10,
-    padding: 10,
+    padding: 15,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#231942',
     borderRadius: 8,
-    backgroundColor: '#fff',
+    backgroundColor: '#f5f5f5',
     marginHorizontal: 5,
     flexGrow: 1,
   },
@@ -645,7 +656,7 @@ const styles = StyleSheet.create({
   },
 
   spentRemaining: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#dcdcdc',
     color: '#666',
     padding: 3,
     borderRadius: 5,
@@ -775,7 +786,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
 
-
   addSubcategoryText: {
     color: 'purple',
     fontSize: 16,
@@ -804,6 +814,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     alignSelf: 'center',
   },
+
   addTemplateBudget: {
     padding: 7,
     backgroundColor: 'purple',
@@ -814,21 +825,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
     textAlign: 'center'
   },
-  container: {
-    flex: 1,
-    backgroundColor: '#e8d0f4',
-  },
-  header: {
-    padding: 10,
-    backgroundColor: 'purple',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  headerText: {
-    fontSize: 20,
-    color: 'white',
-    fontWeight: 'bold',
-  },
+  
   monthNavigationContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -841,13 +838,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 10,
-    backgroundColor: 'purple',
+    backgroundColor: '#231942',
     borderRadius: 0,
     height: 42
   },
   dropdownButton: {
     flex: 1,
-    backgroundColor: 'purple',
+    backgroundColor: '#231942',
     padding: 10,
     borderRadius: 0,
     marginHorizontal: 0,
@@ -859,10 +856,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'center',
   },
-  scrollView: {
-    flex: 1,
-    marginTop: -10,
-  },
+
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -876,39 +870,7 @@ const styles = StyleSheet.create({
     width: '80%',
     alignItems: 'center',
   },
-  monthNavigationContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '100%',
-    marginBottom: 10,
-    
-  },
-  arrowButton: {
-    width: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 10,
-    backgroundColor: 'purple',
-    borderRadius: 0,
-    height: 42
-    ,
-  },
-  dropdownButton: {
-
-    flex: 1,
-    backgroundColor: 'purple',
-    padding: 10,
-    borderRadius: 0,
-    marginHorizontal: 0,
-    height: 42
-  },
-  dropdownButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 18,
-    textAlign: 'center',
-  },
+  
   closeButton: {
     marginTop: 10,
     backgroundColor: 'red',
@@ -927,7 +889,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 10,
   },
-
 });
 
 export default BudgetPlanner;

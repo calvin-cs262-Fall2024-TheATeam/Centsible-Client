@@ -401,7 +401,7 @@ useEffect(() => {
             </Text>
 
             {/*<View contentContainerStyle={styles.scrollableContent}>*/}
-              <View
+              <FlatList
                 data={details[selectedCategory]}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={({ item }) => (
@@ -475,7 +475,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     borderColor: '#231942',
     marginHorizontal: 10,
-    marginTop: 5,
+    marginTop: 10,
   },
   detailBox: {
     backgroundColor: '#fff',
@@ -508,7 +508,7 @@ const styles = StyleSheet.create({
   totalExpenseText: {
     position: 'absolute',
     top: '44%',
-    left: '11%',
+    left: '12%',
     fontSize: 24,
     fontWeight: 'bold',
     color: 'red',

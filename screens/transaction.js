@@ -434,12 +434,12 @@ const styles = {
   transactionTableContainer: {
     paddingHorizontal: 10,
     flex: 1,
-    marginTop: 15,
+    marginTop: 20,
     marginBottom: 12, // Add some bottom margin
   },
   rowFrontVisible: {
     backgroundColor: '#f5f5f5',
-    borderRadius: 5,
+    borderRadius: 8,
     marginBottom: 10,
     padding: 15,
     width: '100%', // Full width for the item
