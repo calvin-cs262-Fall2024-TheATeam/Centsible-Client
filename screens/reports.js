@@ -57,7 +57,7 @@ export default function ReportsScreen() {
   
       if (response.ok) {
         const data = await response.json();
-        console.log("Fetched Transactions: ", data);
+        //console.log("Fetched Transactions: ", data);
   
         const updatedTransactions = await Promise.all(data.map(async (transaction, index) => {
           try {
@@ -153,9 +153,9 @@ useEffect(() => {
       categoryDetails[category].push({ optionaldescription, amount, date: new Date(transactiondate) });
     });
     
-    console.log("Category Totals: ", categoryTotals); // Log here
-    console.log("Category Details: ", categoryDetails); // Log here
-    console.log("Filtered Transactions:", filteredTransactions);
+    //console.log("Category Totals: ", categoryTotals); // Log here
+    //console.log("Category Details: ", categoryDetails); // Log here
+    //console.log("Filtered Transactions:", filteredTransactions);
 
 
     // Create data for Pie Chart
@@ -311,7 +311,6 @@ useEffect(() => {
             </View>
   
               <View style={styles.progressBarBackground}>
-
                 {/* Income section */}
                 <View
                   style={[
@@ -387,7 +386,34 @@ useEffect(() => {
         </View>
   
         {/* Box for Category Details (if selected) */}
-        {selectedCategory && expenseDetails()}
+        {selectedCategory && (
+          <View style={styles.box}>
+            <Text style={[
+              styles.detailsTitle,
+              { color: categoryColors[selectedCategory] || "#000000" } 
+            ]}> {selectedCategory} Expenses
+            </Text>
+
+            <Text style={styles.totalCategoryExpense && totalPercentage}> 
+              <Text style={styles.totalLabel}>Total: </Text>
+              <Text style={styles.totalAmount}>${calculateCategoryTotal(selectedCategory).toLocaleString()}
+              </Text>
+            </Text>
+
+            {/*<View contentContainerStyle={styles.scrollableContent}>*/}
+              <View
+                data={details[selectedCategory]}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item }) => (
+                  <View style={styles.detailItem}>
+                    <Text style={styles.date}>{item.date.toLocaleDateString()}</Text>
+                    <Text style={styles.description}>{item.description}</Text>
+                    <Text style={styles.amount}>${item.amount.toFixed()}</Text>
+                  </View>
+                )}
+              />
+            </View>
+        )}
   
         {/* Switch months button */}
         <Modal
@@ -482,7 +508,7 @@ const styles = StyleSheet.create({
   totalExpenseText: {
     position: 'absolute',
     top: '44%',
-    left: '10%',
+    left: '11%',
     fontSize: 24,
     fontWeight: 'bold',
     color: 'red',
@@ -595,7 +621,7 @@ const styles = StyleSheet.create({
     color: '#d0d0d0',
   },
   scrollableContent: {
-    maxHeight: 200,
+    maxHeight: 100,
   },
   dropdownButtonContainer: {
     width: '100%',
@@ -710,5 +736,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 18,
     textAlign: 'center',
+  },
+  ScrollView:
+  {
+    flex: 1,
   },
 });
