@@ -42,13 +42,14 @@ const BudgetPlanner = () => {
   // Fetch initial data on component mount
   const fetchBudgetData = async () => {
     const { month, year } = selectedMonth;
+
     try {
       // Fetch categories
       const budgetResponse = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/monthBudget/1/${month+1}/${year}`);
 
       if (budgetResponse.ok) {
         const budgetData = await budgetResponse.json();
-
+        
         // Check if budgetData and budgetData.data are valid arrays
         if (Array.isArray(budgetData.data)) {
           setCategories(budgetData.data); // Set the categories

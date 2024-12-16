@@ -49,20 +49,28 @@ const TransactionModal = (
                 return;  // Skip fetching if categories for this month/year already exist
             }
 
+            const url = `https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/monthBudget/1/${selectedMonth}/${selectedYear}`;
+            console.log('URL:', url);  // Log URL to verify it's correct
             const response = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/monthBudget/1/${selectedMonth}/${selectedYear}`);
             if (response.ok) {
-                const data = await response.json();
-                console.log(data);
+                const responseData = await response.json();
+                console.log('Response data:', responseData);  // Log the full response for inspection
 
-                setCategories(data.map(item => ({
-                    id: item.id, // ID for the category
-                    name: item.categoryname // Name for the category
-                })));
-                setLastFetchedMonth(selectedMonth);
-                setLastFetchedYear(selectedYear);
+                if (Array.isArray(responseData.data)) {
+                    // Access the categories and map over them
+                    setCategories(responseData.data.map(item => ({
+                        id: item.id,
+                        name: item.categoryname
+                    })));
+                    setLastFetchedMonth(selectedMonth);
+                    setLastFetchedYear(selectedYear);
+                } else {
+                    console.error('Error: `data` is not an array', responseData);
+                }
             } else {
-                console.error('Failed to fetch categories:', response.status);
-                // Handle failure here (maybe show an error message to the user)
+                console.error("API call failed with status:", response.status);
+                const errorText = await response.text();
+                console.error("Error message:", errorText);
             }
         } catch (error) {
             console.error('Error fetching categories:', error);
