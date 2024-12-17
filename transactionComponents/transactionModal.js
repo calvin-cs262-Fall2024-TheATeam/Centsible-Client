@@ -104,7 +104,6 @@ const TransactionModal = (
                                 resetForm();  // Reset the form
                             }}
                             color="red"
-                            style={globalStyles.cancelTransaction}
                         />
                         <Text style={globalStyles.transactionHeaderText}>Add a transaction</Text>
 
@@ -125,7 +124,7 @@ const TransactionModal = (
                                     onClose(); // Close the modal after adding the transaction
                                 }
                             }}
-                            color="purple"
+                            color="#231942"
                         />
 
                         {/* TO FIX: Add button but as touchable opacity. 
