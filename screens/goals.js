@@ -730,7 +730,7 @@ const styles = StyleSheet.create({
   },
 
   subAmountText: {
-    color: 'purple',
+    color: '#402e79',
     fontSize: 18,
   },
   subCategoryContainer: {
@@ -793,7 +793,7 @@ const styles = StyleSheet.create({
   },
 
   addSubcategoryText: {
-    color: 'purple',
+    color: '#4e3a72',
     fontSize: 16,
     textDecorationLine: 'underline',
     marginTop: 10,
@@ -811,7 +811,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   addButtonText: {
-    color: 'purple',
+    color: '#4e3a72',
     fontWeight: 'bold',
     fontSize: 18,
   },
