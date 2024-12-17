@@ -13,7 +13,7 @@ export default function LoginScreen({ route, navigation }) {
   const handleLogin = () => {
     setIsLoading(true);
     // Basic login simulation (replace with actual login logic)
-    if (email === '' && password === '') {
+    if (email === 'user@example.com' && password === 'password') {
       setIsLoggedIn(true);
     } else {
       Alert.alert('Login Failed', 'Invalid email or password.');
