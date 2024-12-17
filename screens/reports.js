@@ -16,10 +16,10 @@ export default function ReportsScreen() {
   const [totalExpense, setTotalExpense] = useState(0);
   const [isPickerVisible, setPickerVisible] = useState(false);
 
-  const currentDate = new Date(); 
+  const currentDate = new Date();
   const [selectedMonth, setSelectedMonth] = useState({
-    month: currentDate.getMonth(), 
-    year: currentDate.getFullYear(), 
+    month: currentDate.getMonth(),
+    year: currentDate.getFullYear(),
   });
 
   const isDarkMode = useColorScheme() === 'dark';
@@ -30,7 +30,7 @@ export default function ReportsScreen() {
       backgroundColor: isDarkMode ? '#333333' : '#ffffff', // Dark background for dark mode, light for light mode
     },
     pickerItem: {
-      color: isDarkMode ? '#ffffff' : '#000000', 
+      color: isDarkMode ? '#ffffff' : '#000000',
     },
   });
 
@@ -40,7 +40,7 @@ export default function ReportsScreen() {
     const newYear = selectedMonth.month === 0 ? selectedMonth.year - 1 : selectedMonth.year;
     setSelectedMonth({ month: newMonth, year: newYear });
   };
-  
+
   const handleNextMonth = () => {
     const newMonth = selectedMonth.month === 11 ? 0 : selectedMonth.month + 1;
     const newYear = selectedMonth.month === 11 ? selectedMonth.year + 1 : selectedMonth.year;
@@ -52,13 +52,13 @@ export default function ReportsScreen() {
 
   const fetchTransactions = async () => {
     try {
-      const userId = 1; 
-      const response = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/transactions/${userId}`); 
-  
+      const userId = 1;
+      const response = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/transactions/${userId}`);
+
       if (response.ok) {
         const data = await response.json();
         //console.log("Fetched Transactions: ", data);
-  
+
         const updatedTransactions = await Promise.all(data.map(async (transaction, index) => {
           try {
             if (transaction.transactiontype === 'Income') {
@@ -81,13 +81,13 @@ export default function ReportsScreen() {
                   };
                 }
               }
-            
-                return {
-                  ...transaction,
-                  category: 'Unknown Category',  // Default category if failed
-                  key: transaction.id || index.toString(),
-                  amount: parseFloat(transaction.dollaramount),
-                };
+
+              return {
+                ...transaction,
+                category: 'Unknown Category',  // Default category if failed
+                key: transaction.id || index.toString(),
+                amount: parseFloat(transaction.dollaramount),
+              };
             } else {
               return {
                 ...transaction,
@@ -118,60 +118,60 @@ export default function ReportsScreen() {
     }
   };
 
-useEffect(() => {
-  fetchTransactions(); 
-}, []);
+  useEffect(() => {
+    fetchTransactions();
+  }, []);
 
-useEffect(() => {
-  if (transactions.length > 0) {
-    const filteredTransactions = transactions.filter((transaction) => {
-      const transactionDate = new Date(transaction.transactiondate);
-      return (
-        transactionDate.getMonth() === selectedMonth.month &&
-        transactionDate.getFullYear() === selectedMonth.year
+  useEffect(() => {
+    if (transactions.length > 0) {
+      const filteredTransactions = transactions.filter((transaction) => {
+        const transactionDate = new Date(transaction.transactiondate);
+        return (
+          transactionDate.getMonth() === selectedMonth.month &&
+          transactionDate.getFullYear() === selectedMonth.year
+        );
+      });
+
+      const categoryTotals = {};
+      const categoryDetails = {};
+      let income = 0;
+      let expense = 0;
+
+      // Categorize and sum expenses and income
+      filteredTransactions.forEach((transaction) => {
+        const { category, amount, transactiontype, optionaldescription = "No description", transactiondate = new Date() } = transaction;
+        if (transactiontype === 'Expense') {
+          categoryTotals[category] = (categoryTotals[category] || 0) + Math.abs(amount);
+          expense += Math.abs(amount);
+        } else {
+          income += amount;
+        }
+
+        if (!categoryDetails[category]) {
+          categoryDetails[category] = [];
+        }
+        categoryDetails[category].push({ optionaldescription, amount, date: new Date(transactiondate) });
+      });
+
+      //console.log("Category Totals: ", categoryTotals); // Log here
+      //console.log("Category Details: ", categoryDetails); // Log here
+      //console.log("Filtered Transactions:", filteredTransactions);
+
+      // Create data for Pie Chart
+      setChartData(
+        Object.keys(categoryTotals).map((category, index) => ({
+          name: category,
+          population: categoryTotals[category],
+          color: getColor(index),
+        }))
       );
-    });
 
-    const categoryTotals = {};
-    const categoryDetails = {};
-    let income = 0;
-    let expense = 0;
+      setDetails(categoryDetails);
+      setTotalIncome(income);
+      setTotalExpense(expense);
 
-    // Categorize and sum expenses and income
-    filteredTransactions.forEach((transaction) => {
-      const { category, amount, transactiontype, optionaldescription = "No description", transactiondate = new Date() } = transaction;
-      if (transactiontype === 'Expense') {
-        categoryTotals[category] = (categoryTotals[category] || 0) + Math.abs(amount);
-        expense += Math.abs(amount);
-      } else {
-        income += amount;
-      }
-
-      if (!categoryDetails[category]) {
-        categoryDetails[category] = [];
-      }
-      categoryDetails[category].push({ optionaldescription, amount, date: new Date(transactiondate) });
-    });
-    
-    //console.log("Category Totals: ", categoryTotals); // Log here
-    //console.log("Category Details: ", categoryDetails); // Log here
-    //console.log("Filtered Transactions:", filteredTransactions);
-
-    // Create data for Pie Chart
-    setChartData(
-      Object.keys(categoryTotals).map((category, index) => ({
-        name: category,
-        population: categoryTotals[category],
-        color: getColor(index),
-    }))
-  );
-
-    setDetails(categoryDetails);
-    setTotalIncome(income);
-    setTotalExpense(expense);
-
-  }
-}, [transactions, selectedMonth]);
+    }
+  }, [transactions, selectedMonth]);
 
   const calculateCategoryTotal = (category) => {
     return details[category]?.reduce((total, item) => total + item.amount, 0) || 0;
@@ -208,13 +208,13 @@ useEffect(() => {
 
   const dataWithFixedColors = sortedChartData.map(item => ({
     ...item,
-    color: categoryColors[item.name] || "#000000", 
+    color: categoryColors[item.name] || "#000000",
   }));
 
   const dataForPieChart = dataWithFixedColors.map(item => ({
     name: item.name,
     population: item.population,
-    color: item.color, 
+    color: item.color,
   }));
 
   const Triangle = ({ color, isSelected }) => {
@@ -228,7 +228,7 @@ useEffect(() => {
       />
     );
   };
-  
+
   const expenseDetails = () => {
     return (
       <View style={styles.detailBox}>
@@ -258,7 +258,7 @@ useEffect(() => {
       </View>
     );
   };
-  
+
   return (
     <View style={styles.container}>
       <View style={styles.monthNavigationContainer}>
@@ -273,7 +273,7 @@ useEffect(() => {
         >
           <FontAwesome name="chevron-left" size={20} color="white" />
         </TouchableOpacity>
-  
+
         {/* Dropdown Button */}
         <TouchableOpacity
           style={styles.dropdownButton}
@@ -283,7 +283,7 @@ useEffect(() => {
             {new Date(selectedMonth.year, selectedMonth.month).toLocaleString('default', { month: 'long' })} {selectedMonth.year}
           </Text>
         </TouchableOpacity>
-  
+
         {/* Next Month Arrow */}
         <TouchableOpacity
           style={styles.arrowButton}
@@ -297,13 +297,13 @@ useEffect(() => {
         </TouchableOpacity>
       </View>
 
-    <ScrollView>
-      {/* ScrollView Container */}
+      <ScrollView>
+        {/* ScrollView Container */}
         <View style={styles.box}>
           <View style={styles.chartContainer}>
             <Text style={styles.boxText}>Income vs. Expense</Text>
 
-             <View style={styles.progressBarContainer}>
+            <View style={styles.progressBarContainer}>
               <Text style={styles.progressBarLabel}>Total Income</Text>
               <View style={styles.progressBarBackground}>
                 <View
@@ -346,7 +346,7 @@ useEffect(() => {
         <View style={styles.box}>
           <View style={styles.chartContainer}>
             <Text style={styles.boxText}>Total Expenses</Text>
-  
+
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
               <View style={{ position: 'relative', alignItems: 'center', width: '50%' }}>
                 <PieChart
@@ -369,7 +369,7 @@ useEffect(() => {
                 <View style={styles.donutCenter} />
                 <Text style={styles.totalExpenseText}>${Math.round(totalExpense).toLocaleString()}</Text>
               </View>
-    
+
               {/* Legend for the Pie Chart */}
               <View style={styles.legendContainer}>
                 {sortedDataWithPercentage.map((item, index) => (
@@ -379,78 +379,82 @@ useEffect(() => {
                       <Text style={[styles.legendText, selectedCategory === item.name && { color: categoryColors[item.name] }]}>
                         {item.name}</Text>
 
-                  </View>
-                </TouchableOpacity>
-              ))}
+                    </View>
+                  </TouchableOpacity>
+                ))}
               </View>
             </View>
           </View>
         </View>
-        
 
-  
+
+
         {/* Box for Category Details (if selected) */}
         {selectedCategory && (
           <View style={styles.box}>
             <Text style={[
               styles.detailsTitle,
-              { color: categoryColors[selectedCategory] || "#000000" } 
+              { color: categoryColors[selectedCategory] || "#000000" }
             ]}> {selectedCategory} Expenses
             </Text>
 
-            <Text style={styles.totalCategoryExpense && totalPercentage}> 
+            <Text style={styles.totalCategoryExpense && totalPercentage}>
               <Text style={styles.totalLabel}>Total: </Text>
               <Text style={styles.totalAmount}>${calculateCategoryTotal(selectedCategory).toLocaleString()}
               </Text>
             </Text>
 
             {/*<View contentContainerStyle={styles.scrollableContent}>*/}
-              <FlatList
-                data={details[selectedCategory]}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={({ item }) => (
-                  <View style={styles.detailItem}>
-                    <Text style={styles.date}>{item.date.toLocaleDateString()}</Text>
-                    <Text style={styles.description}>{item.description}</Text>
-                    <Text style={styles.amount}>${item.amount.toFixed()}</Text>
-                  </View>
-                )}
-              />
+            <View style={styles.detailsContainer}>
+              {details[selectedCategory]?.map((item, index) => (
+                <View
+                  style={[
+                    styles.detailItem,
+                    index === details[selectedCategory].length - 1 && { borderBottomWidth: 0 },
+                  ]}
+                  key={index}
+                >
+                  <Text style={styles.date}>{item.date.toLocaleDateString()}</Text>
+                  <Text style={styles.description}>{item.description}</Text>
+                  <Text style={styles.amount}>${item.amount.toFixed()}</Text>
+                </View>
+              ))}
             </View>
+          </View>
         )}
-  
+
         {/* Switch months button */}
         <Modal
-        visible={isPickerVisible} // Show/hide modal
-        transparent={true} // Makes the modal overlay transparent
-        animationType="slide" // Slide-in effect
-        onRequestClose={() => setPickerVisible(false)} // Close modal on back press
+          visible={isPickerVisible} // Show/hide modal
+          transparent={true} // Makes the modal overlay transparent
+          animationType="slide" // Slide-in effect
+          onRequestClose={() => setPickerVisible(false)} // Close modal on back press
         >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Select Month</Text>
-            <Picker
-              selectedValue={`${selectedMonth.month}-${selectedMonth.year}`} // Use a string as value
-              onValueChange={(itemValue) => {
-                const [month, year] = itemValue.split('-').map(Number); // Parse the selected value
-                setSelectedMonth({ month, year }); // Update state with parsed values
-                setPickerVisible(false); // Close modal after selection
-              }}
-              style={styles.picker}
-              itemStyle={pickerStyles.pickerItem}
-            >
-              {Array.from({ length: currentDate.getMonth() + 1 }, (_, i) => (
-                <Picker.Item
-                  key={i}
-                  label={`${new Date(currentDate.getFullYear(), i).toLocaleString('default', { month: 'long' })} ${currentDate.getFullYear()}`}
-                  value={`${i}-${currentDate.getFullYear()}`} // Use a string representation
-                />
-              ))}
-            </Picker>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setPickerVisible(false)} // Close modal without selection
-            >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Select Month</Text>
+              <Picker
+                selectedValue={`${selectedMonth.month}-${selectedMonth.year}`} // Use a string as value
+                onValueChange={(itemValue) => {
+                  const [month, year] = itemValue.split('-').map(Number); // Parse the selected value
+                  setSelectedMonth({ month, year }); // Update state with parsed values
+                  setPickerVisible(false); // Close modal after selection
+                }}
+                style={styles.picker}
+                itemStyle={pickerStyles.pickerItem}
+              >
+                {Array.from({ length: currentDate.getMonth() + 1 }, (_, i) => (
+                  <Picker.Item
+                    key={i}
+                    label={`${new Date(currentDate.getFullYear(), i).toLocaleString('default', { month: 'long' })} ${currentDate.getFullYear()}`}
+                    value={`${i}-${currentDate.getFullYear()}`} // Use a string representation
+                  />
+                ))}
+              </Picker>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setPickerVisible(false)} // Close modal without selection
+              >
                 <Text style={styles.closeButtonText}>Close</Text>
               </TouchableOpacity>
             </View>
@@ -459,19 +463,8 @@ useEffect(() => {
       </ScrollView>
     </View>
   );
-  return (
-    <FlatList
-      ref={flatListRef}
-      data={selectedCategory ? [selectedCategory] : []}
-      keyExtractor={(item, index) => index.toString()}
-      ListHeaderComponent={renderHeader}
-      ListFooterComponent={renderFooter}
-      renderItem={null}
-    />
-  );
-
 }
-  
+
 
 const styles = StyleSheet.create({
   container: {
