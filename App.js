@@ -14,7 +14,8 @@ import LoginScreen from './screens/LoginScreen';
 import CreateAccountScreen from './screens/CreateAccountScreen';
 import ImageViewer from './components/ImageViewer';
 
-const PlaceholderImage = require('./assets/background-img.png');
+// const PlaceholderImage = require('./assets/background-img.png');
+const Logo = require('./assets/centsible-text.png')
 
 // Tab and Stack navigators
 const Tab = createBottomTabNavigator();
@@ -37,12 +38,13 @@ export default function App() {
   if (isLoading) {
     return (
       <View style={globalStyles.splashContainer}>
-        <View style={globalStyles.imageContainer}>
+        {/* <View style={globalStyles.imageContainer}>
           <ImageViewer placeholderImageSource={PlaceholderImage} />
         </View>
         <View style={globalStyles.textContainer}>
           <Text style={globalStyles.welcomeText}>Welcome to Centsible!</Text>
-        </View>
+        </View> */}
+        <ImageViewer placeholderImageSource={Logo}/>
       </View>
     );
   }

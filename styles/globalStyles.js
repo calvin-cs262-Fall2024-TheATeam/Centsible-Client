@@ -3,9 +3,9 @@ import { StyleSheet } from 'react-native';
 export const globalStyles = StyleSheet.create({
   splashContainer: {
     flex: 1,
-    backgroundColor: '#231942',
+    backgroundColor: 'white',
     alignItems: 'center',
-    justifyContent: 'flex-start', // Align items at the start
+    justifyContent: 'center', // Align items at the start
   },
   imageContainer: {
     flex: 0.8, // Adjust this to control image height
