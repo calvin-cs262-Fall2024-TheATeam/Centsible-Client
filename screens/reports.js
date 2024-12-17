@@ -258,6 +258,11 @@ export default function ReportsScreen() {
       </View>
     );
   };
+  
+  const total = totalIncome + totalExpense;
+  const incomePercentage = totalIncome > 0 ? (totalIncome / total) * 100 : 0;
+  const expensePercentage = totalExpense > 0 ? (totalExpense / total) * 100 : 0;
+  const maxPercentage = Math.max(incomePercentage, expensePercentage);
 
   return (
     <View style={styles.container}>
@@ -310,7 +315,7 @@ export default function ReportsScreen() {
                   style={[
                     styles.progressBarFill,
                     {
-                      width: totalIncome > 0 ? `${(totalIncome / (totalIncome + totalExpense)) * 100}%` : '0%',
+                      width: totalIncome > 0 ? `${(incomePercentage / maxPercentage) * 100}%` : '0%',
                       backgroundColor: 'rgba(0, 123, 255, 1)',
                     },
                   ]}
@@ -329,7 +334,7 @@ export default function ReportsScreen() {
                   style={[
                     styles.progressBarFill,
                     {
-                      width: totalExpense > 0 ? `${(totalExpense / (totalIncome + totalExpense)) * 100}%` : '0%',
+                      width: totalExpense > 0 ? `${(expensePercentage / maxPercentage) * 100}%` : '0%',
                       backgroundColor: 'rgba(255, 69, 58, 1)',
                     },
                   ]}
@@ -506,7 +511,7 @@ const styles = StyleSheet.create({
   donutCenter: {
     position: 'absolute',
     top: '50%',
-    left: '28%',
+    left: '29%',
     width: 120,
     height: 120,
     backgroundColor: '#F5F5F5',
