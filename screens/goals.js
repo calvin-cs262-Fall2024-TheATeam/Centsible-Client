@@ -1,8 +1,12 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useLayoutEffect } from 'react';
 import { Text, View, TouchableOpacity, TextInput, ScrollView, Alert, Modal, StyleSheet } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useColorScheme } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+import BudgetHelpModal from '../helpModals/budgetHelpModal'
+import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/FontAwesome';
+
 
 const BudgetPlanner = () => {
 
@@ -339,9 +343,6 @@ const BudgetPlanner = () => {
     }
   };
 
-
-
-
   const groupedSubcategories = useMemo(() => {
     const grouped = {};
     subcategories.forEach((subcategory) => {
@@ -385,9 +386,38 @@ const BudgetPlanner = () => {
     return '#006600';  // Below 75%, green for safe budget
   };
 
+  const [budgetHelpModalVisible, setBudgetHelpModalVisible] = useState(false);
+  const navigation = useNavigation(); // Get navigation via hook
+
+  const toggleBudgetHelpModal = () => {
+    setBudgetHelpModalVisible(!budgetHelpModalVisible);
+  };
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => (
+        <View><TouchableOpacity>
+          <Icon name="question" 
+            size={25} 
+            color={'purple'} 
+            paddingLeft={20}
+            onPress={toggleBudgetHelpModal}/>
+        </TouchableOpacity></View>
+      ),
+    });
+  }, [navigation, toggleBudgetHelpModal]);
+
 
   return (
     <View style={styles.container}>
+
+      {/* Modal for budget help */}
+      <BudgetHelpModal
+        visible={budgetHelpModalVisible}
+        onClose={toggleBudgetHelpModal}
+        content="This is the Screen 1 Modal!"
+      />
+      
       <View style={styles.monthNavigationContainer}>
         <TouchableOpacity
           style={styles.arrowButton}

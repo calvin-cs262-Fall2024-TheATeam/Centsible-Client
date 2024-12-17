@@ -1,10 +1,14 @@
 import { color } from 'chart.js/helpers';
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, FlatList, ScrollView, Modal, VirtualizedScrollView } from 'react-native';
-import { BarChart, PieChart } from 'react-native-chart-kit';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, FlatList, ScrollView, Modal } from 'react-native';
+import { PieChart } from 'react-native-chart-kit';
 import { Picker } from '@react-native-picker/picker';
+import BudgetHelpModal from '../helpModals/budgetHelpModal'
+import { useNavigation } from '@react-navigation/native';
 import { FontAwesome } from '@expo/vector-icons';
 import { useColorScheme } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome';
+
 
 export default function ReportsScreen() {
   const screenWidth = Dimensions.get('window').width;
@@ -49,6 +53,14 @@ export default function ReportsScreen() {
 
   const colors = ['#f95d6a', '#ff9909', '#fbd309', '#7cb6dc', '#1c43da', '#2e3884'];
   const getColor = (index) => colors[index % colors.length];
+
+  // For help modal
+  const [helpModalVisible, setHelpModalVisible] = useState(false);
+  const navigation = useNavigation(); // Get navigation via hook
+
+  const toggleHelpModal = () => {
+    setHelpModalVisible(!helpModalVisible);
+  };
 
   const fetchTransactions = async () => {
     try {
@@ -121,6 +133,18 @@ export default function ReportsScreen() {
   useEffect(() => {
     fetchTransactions();
   }, []);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => (
+        <View>
+          <TouchableOpacity onPress={toggleHelpModal}>
+            <Icon name="question" size={25} color="purple" paddingLeft={20} />
+          </TouchableOpacity>
+        </View>
+      ),
+    });
+  }, [navigation, helpModalVisible]); 
 
   useEffect(() => {
     if (transactions.length > 0) {
@@ -316,7 +340,7 @@ export default function ReportsScreen() {
                     styles.progressBarFill,
                     {
                       width: totalIncome > 0 ? `${(incomePercentage / maxPercentage) * 100}%` : '0%',
-                      backgroundColor: 'rgba(0, 123, 255, 1)',
+                      backgroundColor: 'rgba(35, 150, 84, 1)',
                     },
                   ]}
                 />
@@ -335,7 +359,7 @@ export default function ReportsScreen() {
                     styles.progressBarFill,
                     {
                       width: totalExpense > 0 ? `${(expensePercentage / maxPercentage) * 100}%` : '0%',
-                      backgroundColor: 'rgba(255, 69, 58, 1)',
+                      backgroundColor: 'rgba(0, 123, 255, 1)',
                     },
                   ]}
                 />
@@ -466,10 +490,16 @@ export default function ReportsScreen() {
           </View>
         </Modal>
       </ScrollView>
+
+      {/* Modal for budget help */}
+      <BudgetHelpModal
+        visible={helpModalVisible}
+        onClose={toggleHelpModal}
+      />
+
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
