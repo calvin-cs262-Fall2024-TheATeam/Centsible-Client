@@ -1,7 +1,7 @@
 import { color } from 'chart.js/helpers';
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, FlatList, ScrollView, Modal, VirtualizedScrollView } from 'react-native';
-import { BarChart, PieChart } from 'react-native-chart-kit';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, ScrollView, Modal } from 'react-native';
+import { PieChart } from 'react-native-chart-kit';
 import { Picker } from '@react-native-picker/picker';
 import { FontAwesome } from '@expo/vector-icons';
 import { useColorScheme } from 'react-native';
@@ -228,36 +228,6 @@ export default function ReportsScreen() {
       />
     );
   };
-
-  const expenseDetails = () => {
-    return (
-      <View style={styles.detailBox}>
-        <Text style={[
-          styles.detailsTitle,
-          { color: categoryColors[selectedCategory] || "#000000" }
-        ]}> {selectedCategory} Expenses</Text>
-        <Text style={styles.totalCategoryExpense && totalPercentage}>
-          <Text style={styles.totalLabel}>Total: </Text>
-          <Text style={styles.totalAmount}>${calculateCategoryTotal(selectedCategory).toLocaleString()}</Text>
-        </Text>
-        <View style={styles.detailsContainer}>
-          {details[selectedCategory]?.map((item, index) => (
-            <View
-              style={[
-                styles.detailItem,
-                index === details[selectedCategory].length - 1 && { borderBottomWidth: 0 },
-              ]}
-              key={index}
-            >
-              <Text style={styles.date}>{item.date.toLocaleDateString()}</Text>
-              <Text style={styles.description}>{item.description}</Text>
-              <Text style={styles.amount}>${item.amount.toFixed()}</Text>
-            </View>
-          ))}
-        </View>
-      </View>
-    );
-  };
   
   const total = totalIncome + totalExpense;
   const incomePercentage = totalIncome > 0 ? (totalIncome / total) * 100 : 0;
@@ -470,10 +440,9 @@ export default function ReportsScreen() {
   );
 }
 
-
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'flex-start',
     backgroundColor: 'white',
