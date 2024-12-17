@@ -19,6 +19,7 @@ export default function ReportsScreen() {
   const [totalIncome, setTotalIncome] = useState(0);
   const [totalExpense, setTotalExpense] = useState(0);
   const [isPickerVisible, setPickerVisible] = useState(false);
+  const [subcategories, setSubcategories] = useState([]);
 
   const currentDate = new Date();
   const [selectedMonth, setSelectedMonth] = useState({
@@ -58,6 +59,11 @@ export default function ReportsScreen() {
   const [helpModalVisible, setHelpModalVisible] = useState(false);
   const navigation = useNavigation(); // Get navigation via hook
 
+  const [categoryBudget, setCategoryBudget] = useState({
+    totalAmount: 0,
+    progress: 0,
+  });
+
   const toggleHelpModal = () => {
     setHelpModalVisible(!helpModalVisible);
   };
@@ -73,6 +79,7 @@ export default function ReportsScreen() {
 
         const updatedTransactions = await Promise.all(data.map(async (transaction, index) => {
           try {
+          
             if (transaction.transactiontype === 'Income') {
               return {
                 ...transaction,
@@ -127,6 +134,21 @@ export default function ReportsScreen() {
     } catch (error) {
       console.error("Error fetching transactions:", error);
       Alert.alert("Error", "Something went wrong.");
+    }
+  };
+
+  const fetchCategoryData = async (categoryId) => {
+    try {
+      const response = await fetch(`'https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/budgetSubcategoryName/${categoryId}`);
+      if (response.ok) {
+        const data = await response.json();
+        // Update state with the fetched data
+        setCategoryData(data);
+      } else {
+        console.error('Failed to fetch category data');
+      }
+    } catch (error) {
+      console.error('Error fetching category data:', error);
     }
   };
 
@@ -201,9 +223,25 @@ export default function ReportsScreen() {
     return details[category]?.reduce((total, item) => total + item.amount, 0) || 0;
   };
 
+  const getTotalForCategory = (categoryId) => {
+    return subcategories
+      .filter((subcategory) => subcategory.budgetcategoryid === categoryId)
+      .reduce((sum, subcategory) => sum + parseFloat(amounts[subcategory.id] || 0), 0);
+  };
+  
+
   const handleCategoryPress = (category) => {
     if (category !== 'Income') {
       setSelectedCategory(category === selectedCategory ? null : category);
+      if (category !== selectedCategory) {
+        const totalAmount = getTotalForCategory(category);
+
+        const categorySpent = transactions .filter((transaction) => transaction.categoryId === category.id)
+        .reduce((spent, transaction) => spent + parseFloat(transaction.amount), 0);
+
+        const progress = totalAmount ? (categorySpent / totalAmount) * 100 : 100;
+        setCategoryBudget({ totalAmount, categorySpent, progress });
+      }
     }
   };
 
@@ -257,6 +295,8 @@ export default function ReportsScreen() {
   const incomePercentage = totalIncome > 0 ? (totalIncome / total) * 100 : 0;
   const expensePercentage = totalExpense > 0 ? (totalExpense / total) * 100 : 0;
   const maxPercentage = Math.max(incomePercentage, expensePercentage);
+
+  
 
   return (
     <View style={styles.container}>
@@ -386,8 +426,6 @@ export default function ReportsScreen() {
           </View>
         </View>
 
-
-
         {/* Box for Category Details (if selected) */}
         {selectedCategory && (
           <View style={styles.box}>
@@ -397,11 +435,20 @@ export default function ReportsScreen() {
             ]}> {selectedCategory} Expenses
             </Text>
 
+            <Text>
+              <Text style={styles.totalLabel}>Budget Total: </Text>
+              <Text style={[styles.totalAmount, styles.totalCategoryExpense]}>
+                ${categoryBudget.totalAmount.toLocaleString()}
+                </Text>
+            </Text>
+
             <Text style={styles.totalCategoryExpense && totalPercentage}>
-              <Text style={styles.totalLabel}>Total: </Text>
+              <Text style={styles.totalLabel}>Total Spent: </Text>
               <Text style={styles.totalAmount}>${calculateCategoryTotal(selectedCategory).toLocaleString()}
               </Text>
             </Text>
+
+  
 
             {/*<View contentContainerStyle={styles.scrollableContent}>*/}
             <View style={styles.detailsContainer}>
@@ -414,7 +461,7 @@ export default function ReportsScreen() {
                   key={index}
                 >
                   <Text style={styles.date}>{item.date.toLocaleDateString()}</Text>
-                  <Text style={styles.description}>{item.description}</Text>
+                  <Text style={styles.optionaldescription1}>{item.optionaldescription}</Text>
                   <Text style={styles.amount}>${item.amount.toFixed()}</Text>
                 </View>
               ))}
@@ -550,7 +597,7 @@ const styles = StyleSheet.create({
   totalAmount: {
     fontSize: 18,
     flex: 1,
-    fontWeight: 'bold',
+
     marginBottom: 10,
     color: 'red',
   },
