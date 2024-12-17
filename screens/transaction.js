@@ -500,7 +500,6 @@ const styles = {
     borderBottomRightRadius: 8,
     height: 50,
   },
-
   trash: {
     height: 35,
     width: 35,

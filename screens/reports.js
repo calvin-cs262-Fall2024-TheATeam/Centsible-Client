@@ -356,7 +356,7 @@ export default function ReportsScreen() {
               <View style={{ position: 'relative', alignItems: 'center', width: '50%' }}>
                 <PieChart
                   data={dataForPieChart}
-                  width={screenWidth * 0.8}
+                  width={screenWidth * 0.7}
                   height={220}
                   chartConfig={{
                     backgroundColor: '#1cc910',
@@ -482,11 +482,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
     borderRadius: 8,
     borderWidth: 1,
-    width: '100%',
     padding: 15,
     marginBottom: 10,
     flexGrow: 1,
     borderColor: '#231942',
+    marginLeft: 20,
+    marginRight: 20,
     marginTop: 10,
   },
   detailBox: {
@@ -511,7 +512,7 @@ const styles = StyleSheet.create({
   donutCenter: {
     position: 'absolute',
     top: '50%',
-    left: '29%',
+    left: '35%',
     width: 120,
     height: 120,
     backgroundColor: '#F5F5F5',
@@ -521,7 +522,7 @@ const styles = StyleSheet.create({
   totalExpenseText: {
     position: 'absolute',
     top: '44%',
-    left: '9%',
+    left: '15%',
     fontSize: 24,
     fontWeight: 'bold',
     color: 'red',
