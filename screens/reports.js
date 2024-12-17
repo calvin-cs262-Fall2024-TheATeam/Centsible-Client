@@ -4,6 +4,7 @@ import { View, Text, StyleSheet, Dimensions, TouchableOpacity, FlatList, ScrollV
 import { PieChart } from 'react-native-chart-kit';
 import { Picker } from '@react-native-picker/picker';
 import BudgetHelpModal from '../helpModals/budgetHelpModal'
+import BudgetPlanner from './goals';
 import { useNavigation } from '@react-navigation/native';
 import { FontAwesome } from '@expo/vector-icons';
 import { useColorScheme } from 'react-native';
@@ -223,18 +224,12 @@ export default function ReportsScreen() {
     return details[category]?.reduce((total, item) => total + item.amount, 0) || 0;
   };
 
-  const getTotalForCategory = (categoryId) => {
-    return subcategories
-      .filter((subcategory) => subcategory.budgetcategoryid === categoryId)
-      .reduce((sum, subcategory) => sum + parseFloat(amounts[subcategory.id] || 0), 0);
-  };
-  
 
   const handleCategoryPress = (category) => {
     if (category !== 'Income') {
       setSelectedCategory(category === selectedCategory ? null : category);
       if (category !== selectedCategory) {
-        const totalAmount = getTotalForCategory(category);
+        const totalAmount = getTotalAmount(category);
 
         const categorySpent = transactions .filter((transaction) => transaction.categoryId === category.id)
         .reduce((spent, transaction) => spent + parseFloat(transaction.amount), 0);
@@ -296,7 +291,11 @@ export default function ReportsScreen() {
   const expensePercentage = totalExpense > 0 ? (totalExpense / total) * 100 : 0;
   const maxPercentage = Math.max(incomePercentage, expensePercentage);
 
-  
+  const getTotalAmount = (categoryId) => {
+    return subcategories.reduce((total, subcategory) => {
+      return sum + parseFloat(subcategory.monthlydollaramount || 0); // Assuming category has a 'monthlydollaramount' field
+    }, 0);
+  };
 
   return (
     <View style={styles.container}>
@@ -438,7 +437,7 @@ export default function ReportsScreen() {
             <Text>
               <Text style={styles.totalLabel}>Budget Total: </Text>
               <Text style={[styles.totalAmount, styles.totalCategoryExpense]}>
-                ${categoryBudget.totalAmount.toLocaleString()}
+                ${getTotalAmount().toLocaleString()}
                 </Text>
             </Text>
 
