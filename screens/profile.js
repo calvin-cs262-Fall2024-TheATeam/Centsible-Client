@@ -100,7 +100,7 @@ export default function ProfileScreen({ setIsLoggedIn }) {
           <Switch
             value={isNotificationsEnabled}
             onValueChange={toggleNotifications}
-            trackColor={{ false: '#767577', true: '#9b59b6' }}
+            trackColor={{ false: '#767577', true: '#231942' }}
             thumbColor={isNotificationsEnabled ? '#ffffff' : '#ffffff'}
             style={styles.switch}
           />
@@ -115,7 +115,7 @@ export default function ProfileScreen({ setIsLoggedIn }) {
               <Switch
                 value={reminderNotification}
                 onValueChange={toggleReminderNotification}
-                trackColor={{ false: '#767577', true: '#9b59b6' }}
+                trackColor={{ false: '#767577', true: '#231942' }}
               />
             </View>
 
@@ -125,7 +125,7 @@ export default function ProfileScreen({ setIsLoggedIn }) {
               <Switch
                 value={budgetWarningNotification}
                 onValueChange={toggleBudgetWarningNotification}
-                trackColor={{ false: '#767577', true: '#9b59b6' }}
+                trackColor={{ false: '#767577', true: '#231942' }}
               />
             </View>
           </>
