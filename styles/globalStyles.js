@@ -170,7 +170,7 @@ export const globalStyles = StyleSheet.create({
   closeCategoryModal: {
     marginTop: 10,
     padding: 10,
-    backgroundColor: 'purple',
+    backgroundColor: '#231942',
     borderRadius: 5,
     alignItems: 'center',
   },

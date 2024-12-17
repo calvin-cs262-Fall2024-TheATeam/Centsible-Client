@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: 'bold',
     fontStyle: 'italic',
-    color: 'purple',
+    color: '#231942',
     marginBottom: 24,
     textAlign: 'center',
   },
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   createAccountText: {
-    color: 'purple',
+    color: '#231942',
     marginTop: 20,
     fontWeight: 'bold',
     textAlign: 'center',
