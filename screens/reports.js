@@ -1,8 +1,11 @@
 import { color } from 'chart.js/helpers';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Dimensions, TouchableOpacity, FlatList, ScrollView, Modal, VirtualizedScrollView } from 'react-native';
 import { BarChart, PieChart } from 'react-native-chart-kit';
 import { Picker } from '@react-native-picker/picker';
+import BudgetHelpModal from '../helpModals/budgetHelpModal'
+import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 export default function ReportsScreen() {
   const screenWidth = Dimensions.get('window').width;
@@ -225,139 +228,171 @@ export default function ReportsScreen() {
     )
   }
 
+  // For help modal
+  const [helpModalVisible, setHelpModalVisible] = useState(false);
+  const navigation = useNavigation(); // Get navigation via hook
+
+  const toggleHelpModal = () => {
+    setHelpModalVisible(!helpModalVisible);
+  };
+
+  // Icon for help modal
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => (
+        <View><TouchableOpacity>
+          <Icon name="question" 
+            size={25} 
+            color={'purple'} 
+            paddingLeft={20}
+            onPress={toggleHelpModal}/>
+        </TouchableOpacity></View>
+      ),
+    });
+  }, [navigation, toggleHelpModal]);
+
   return (
-
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.dropdownButtonContainer}>
-        <TouchableOpacity
-          style={styles.dropdownButton}
-          onPress={() => setPickerVisible(true)}
-        >
-          <Text style={styles.dropdownButtonText}>
-            {new Date(selectedMonth.year, selectedMonth.month).toLocaleString('default', { month: 'long' })} {selectedMonth.year}
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.box}>
-        <View style={styles.chartContainer}>
-          <Text style={styles.boxText}>Income vs. Expense</Text>
-          <View style={styles.progressBarContainer}>
-            <View style={styles.progressBarLabels}>
-              <Text style={styles.progressBarLabel}>Income</Text>
-              <Text style={styles.progressBarLabel}>Expenses</Text>
-            </View>
-            {/* Progress is measured percentage of income over total income and expenses.
-                Value is found in prop width. tbh, not sure if it's going to work perfectly
-                in all edge cases */}
-            <View style={styles.progressBarBackground}>
-              <View
-                style={[
-                  styles.progressBarFill,
-                  {
-                    width: totalIncome > 0 ? `${(totalIncome / (totalIncome + totalExpense)) * 100}%` : '0%',
-                    backgroundColor: 'rgba(0, 123, 255, 1)',
-                  },
-                ]}
-              />
-            </View>
-            <View style={styles.progressBarLabels}>
-              <Text style={styles.progressBarLabel}>${totalIncome}</Text>
-              <Text style={styles.progressBarLabel}>${totalExpense}</Text>
-            </View>
-          </View>
+    
+    <View>
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.dropdownButtonContainer}>
+          <TouchableOpacity
+            style={styles.dropdownButton}
+            onPress={() => setPickerVisible(true)}
+          >
+            <Text style={styles.dropdownButtonText}>
+              {new Date(selectedMonth.year, selectedMonth.month).toLocaleString('default', { month: 'long' })} {selectedMonth.year}
+            </Text>
+          </TouchableOpacity>
         </View>
-      </View>
 
-
-      {/* Box for Pie Chart */}
-      <View style={styles.box}>
-        <View style={styles.chartContainer}>
-          <Text style={styles.boxText}>Total Expenses</Text>
-
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-            <View style={{ position: 'relative', alignItems: 'center', width: '50%' }}>
-              <PieChart
-                data={sortedChartData && filteredChartData && dataWithPercentage}
-                width={screenWidth * 0.8}
-                height={220}
-                chartConfig={{
-                  backgroundColor: '#1cc910',
-                  backgroundGradientFrom: '#eff3ff',
-                  backgroundGradientTo: '#efefef',
-                  color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                  labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                }}
-                accessor="population"
-                backgroundColor="transparent"
-                paddingLeft="45"
-                // hid the freakin labels that come with pie chart :) yay
-                hasLegend={false}
-                absolute={false}
-              />
-              <View style={styles.donutCenter} />
-              <Text style={styles.totalExpenseText}>${Math.round(totalExpense).toLocaleString()}</Text>
-
-            </View>
-
-            {/* Legend for the Pie Chart */}
-            <View style={styles.legendContainer}>
-              {sortedDataWithPercentage.map((item, index) => (
-                <TouchableOpacity key={index} onPress={() => handleCategoryPress(item.name)}>
-                  <View style={styles.legendItem}>
-                    <Triangle color={item.color} isSelected={selectedCategory === item.name} />
-                    <Text style={[styles.legendText, selectedCategory === item.name && { color: item.color }]}>{item.name}</Text>
-
-                  </View>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-        </View>
-      </View>
-
-
-
-      {/* Box for Category Details (if selected) */}
-      {selectedCategory && expenseDetails()}
-
-      {/* Switch months button */}
-      <Modal
-        visible={isPickerVisible} // Show/hide modal
-        transparent={true} // Makes the modal overlay transparent
-        animationType="slide" // Slide-in effect
-        onRequestClose={() => setPickerVisible(false)} // Close modal on back press
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Select Month</Text>
-            <Picker
-              selectedValue={`${selectedMonth.month}-${selectedMonth.year}`} // Use a string as value
-              onValueChange={(itemValue) => {
-                const [month, year] = itemValue.split('-').map(Number); // Parse the selected value
-                setSelectedMonth({ month, year }); // Update state with parsed values
-                setPickerVisible(false); // Close modal after selection
-              }}
-              style={styles.picker}
-            >
-              {Array.from({ length: currentDate.getMonth() + 1 }, (_, i) => (
-                <Picker.Item
-                  key={i}
-                  label={`${new Date(currentDate.getFullYear(), i).toLocaleString('default', { month: 'long' })} ${currentDate.getFullYear()}`}
-                  value={`${i}-${currentDate.getFullYear()}`} // Use a string representation
+        <View style={styles.box}>
+          <View style={styles.chartContainer}>
+            <Text style={styles.boxText}>Income vs. Expense</Text>
+            <View style={styles.progressBarContainer}>
+              <View style={styles.progressBarLabels}>
+                <Text style={styles.progressBarLabel}>Income</Text>
+                <Text style={styles.progressBarLabel}>Expenses</Text>
+              </View>
+              {/* Progress is measured percentage of income over total income and expenses.
+                  Value is found in prop width. tbh, not sure if it's going to work perfectly
+                  in all edge cases */}
+              <View style={styles.progressBarBackground}>
+                <View
+                  style={[
+                    styles.progressBarFill,
+                    {
+                      width: totalIncome > 0 ? `${(totalIncome / (totalIncome + totalExpense)) * 100}%` : '0%',
+                      backgroundColor: '#7cb6dc',
+                    },
+                  ]}
                 />
-              ))}
-            </Picker>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setPickerVisible(false)} // Close modal without selection
-            >
-              <Text style={styles.closeButtonText}>Close</Text>
-            </TouchableOpacity>
+              </View>
+              <View style={styles.progressBarLabels}>
+                <Text style={styles.progressBarLabel}>${totalIncome}</Text>
+                <Text style={styles.progressBarLabel}>${totalExpense}</Text>
+              </View>
+            </View>
           </View>
         </View>
-      </Modal>
-    </ScrollView >
+
+
+        {/* Box for Pie Chart */}
+        <View style={styles.box}>
+          <View style={styles.chartContainer}>
+            <Text style={styles.boxText}>Total Expenses</Text>
+
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ position: 'relative', alignItems: 'center', width: '50%' }}>
+                <PieChart
+                  data={sortedChartData && filteredChartData && dataWithPercentage}
+                  width={screenWidth * 0.8}
+                  height={220}
+                  chartConfig={{
+                    backgroundColor: '#1cc910',
+                    backgroundGradientFrom: '#eff3ff',
+                    backgroundGradientTo: '#efefef',
+                    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                  }}
+                  accessor="population"
+                  backgroundColor="transparent"
+                  paddingLeft="45"
+                  // hid the freakin labels that come with pie chart :) yay
+                  hasLegend={false}
+                  absolute={false}
+                />
+                <View style={styles.donutCenter} />
+                <Text style={styles.totalExpenseText}>${Math.round(totalExpense).toLocaleString()}</Text>
+
+              </View>
+
+              {/* Legend for the Pie Chart */}
+              <View style={styles.legendContainer}>
+                {sortedDataWithPercentage.map((item, index) => (
+                  <TouchableOpacity key={index} onPress={() => handleCategoryPress(item.name)}>
+                    <View style={styles.legendItem}>
+                      <Triangle color={item.color} isSelected={selectedCategory === item.name} />
+                      <Text style={[styles.legendText, selectedCategory === item.name && { color: item.color }]}>{item.name}</Text>
+
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          </View>
+        </View>
+
+
+
+        {/* Box for Category Details (if selected) */}
+        {selectedCategory && expenseDetails()}
+
+        {/* Switch months button */}
+        <Modal
+          visible={isPickerVisible} // Show/hide modal
+          transparent={true} // Makes the modal overlay transparent
+          animationType="slide" // Slide-in effect
+          onRequestClose={() => setPickerVisible(false)} // Close modal on back press
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Select Month</Text>
+              <Picker
+                selectedValue={`${selectedMonth.month}-${selectedMonth.year}`} // Use a string as value
+                onValueChange={(itemValue) => {
+                  const [month, year] = itemValue.split('-').map(Number); // Parse the selected value
+                  setSelectedMonth({ month, year }); // Update state with parsed values
+                  setPickerVisible(false); // Close modal after selection
+                }}
+                style={styles.picker}
+              >
+                {Array.from({ length: currentDate.getMonth() + 1 }, (_, i) => (
+                  <Picker.Item
+                    key={i}
+                    label={`${new Date(currentDate.getFullYear(), i).toLocaleString('default', { month: 'long' })} ${currentDate.getFullYear()}`}
+                    value={`${i}-${currentDate.getFullYear()}`} // Use a string representation
+                  />
+                ))}
+              </Picker>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setPickerVisible(false)} // Close modal without selection
+              >
+                <Text style={styles.closeButtonText}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      </ScrollView >
+
+      {/* Modal for budget help */}
+      <BudgetHelpModal
+        visible={helpModalVisible}
+        onClose={toggleHelpModal}
+      />
+
+    </View>
   );
 }
 
@@ -567,7 +602,7 @@ const styles = StyleSheet.create({
   progressBarBackground: {
     width: '100%',
     height: 10,
-    backgroundColor: 'red',
+    backgroundColor: '#f95d6a',
     overflow: 'hidden',
     borderRadius: 5,
     marginVertical: 5,

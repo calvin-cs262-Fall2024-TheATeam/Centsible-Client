@@ -3,9 +3,13 @@ import { StyleSheet } from 'react-native';
 export const globalStyles = StyleSheet.create({
   splashContainer: {
     flex: 1,
-    backgroundColor: 'purple',
+    backgroundColor: '#fff',
     alignItems: 'center',
-    justifyContent: 'flex-start', // Align items at the start
+    height: '100vw',
+    justifyContent: 'center',
+  },
+  spashImage: {
+    width: 100,
   },
   imageContainer: {
     flex: 0.8, // Adjust this to control image height
@@ -178,4 +182,12 @@ export const globalStyles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
   },
+
+  // About Modal button
+  aboutButton: {
+    fontWeight: 'bold',
+    marginLeft: 20,
+    color: 'purple',
+    fontSize: 24,
+  }
 });

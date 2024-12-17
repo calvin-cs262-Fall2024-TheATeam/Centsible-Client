@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useLayoutEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Switch } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import ChangePassword from './changePassword';
+import BudgetHelpModal from '../helpModals/budgetHelpModal'
+import { useNavigation } from '@react-navigation/native';
+import Icon2 from 'react-native-vector-icons/FontAwesome'; // Aliasing as Icon2 because Icon already exits
 
 export default function ProfileScreen({ setIsLoggedIn }) {
   const [isNotificationsEnabled, setIsNotificationsEnabled] = useState(false);
@@ -53,8 +56,39 @@ export default function ProfileScreen({ setIsLoggedIn }) {
     setIsPasswordVisible(prevState => !prevState);
   };
 
+  // For help modal
+  const [helpModalVisible, setHelpModalVisible] = useState(false);
+  const navigation = useNavigation(); // Get navigation via hook
+
+  const toggleHelpModal = () => {
+    setHelpModalVisible(!helpModalVisible);
+  };
+
+  // Icon for help modal
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => (
+        <View><TouchableOpacity>
+          <Icon2 name="question" 
+            size={25} 
+            color={'purple'} 
+            paddingLeft={20}
+            onPress={toggleHelpModal}/>
+          {/* <Text onPress={toggleHelpModal}>Info</Text> */}
+        </TouchableOpacity></View>
+      ),
+    });
+  }, [navigation, toggleHelpModal]);
+
   return (
     <View style={styles.container}>
+      
+      {/* Modal for budget help */}
+      <BudgetHelpModal
+        visible={helpModalVisible}
+        onClose={toggleHelpModal}
+      />
+      
       <View style={styles.infoBox}>
         {/* First Name Box */}
         <View style={[styles.rowDisplay, styles.rowWithBorder]}>

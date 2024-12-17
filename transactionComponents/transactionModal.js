@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Modal, TextInput, Text, View, Button, TouchableOpacity, FlatList, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { globalStyles } from '../styles/globalStyles';
-import SegmentedControlTab from "react-native-segmented-control-tab"; // me
+import SegmentedControlTab from "react-native-segmented-control-tab";
 // may need to use command "npm install react-native-segmented-control-tab"
 
 const expenseCategories = [

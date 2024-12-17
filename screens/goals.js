@@ -1,6 +1,10 @@
-import React, { useState } from 'react'; 
+import React, { useState, useLayoutEffect } from 'react'; 
 import { Text, View, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
+import BudgetHelpModal from '../helpModals/budgetHelpModal'
+import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/FontAwesome';
+
 
 // Initial transactions and amounts
 const initialTransactions = [
@@ -194,6 +198,12 @@ const BudgetPlanner = () => {
     Entertainment: ["Spotify subscription", "Streaming services", "Fun things"],
   });
   const [amounts, setAmounts] = useState(initialAmounts); // Track budget goals for subcategories
+  const [budgetHelpModalVisible, setBudgetHelpModalVisible] = useState(false);
+  const navigation = useNavigation(); // Get navigation via hook
+
+  const toggleBudgetHelpModal = () => {
+    setBudgetHelpModalVisible(!budgetHelpModalVisible);
+  };
 
   const onAmountUpdate = (subcategory, newAmount) => {
     setAmounts((prev) => ({
@@ -216,34 +226,30 @@ const BudgetPlanner = () => {
     return '#006600';
   };
 
-  // const HiddenItemWithActions = ({ onDelete, data, rowMap }) => {
-  //   const isExpanded = expandedTransaction === data.item.key;
-  
-  //   return (
-  //     <View style={[styles.rowBack, { height: isExpanded ? 70 : 60 }]}>
-  //       <TouchableOpacity
-  //         style={[styles.trashBtn, { height: isExpanded ? 70 : 60 }]}
-  //         // onPress={() => onDelete(rowMap, data.item.key)} // Use the passed onDelete handler
-  //       >
-  //         <MaterialCommunityIcons name="trash-can-outline" size={25} color="#fff" />
-  //       </TouchableOpacity>
-  //     </View>
-  //   );
-  // };
-
-  // Render the hidden item when swiped
-  // const renderHiddenItem = (data, rowMap) => {
-  //   return (
-  //     <HiddenItemWithActions
-  //       data={data}
-  //       rowMap={rowMap}
-  //       // onDelete={deleteTransaction}
-  //     />
-  //   );
-  // };
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => (
+        <View><TouchableOpacity>
+          <Icon name="question" 
+            size={25} 
+            color={'purple'} 
+            paddingLeft={20}
+            onPress={toggleBudgetHelpModal}/>
+        </TouchableOpacity></View>
+      ),
+    });
+  }, [navigation, toggleBudgetHelpModal]);
 
   return (
     <View style={styles.container}>
+
+      {/* Modal for budget help */}
+      <BudgetHelpModal
+        visible={budgetHelpModalVisible}
+        onClose={toggleBudgetHelpModal}
+        content="This is the Screen 1 Modal!"
+      />
+
       <View style={styles.header}>
         <Text style={styles.headerText}>October 2024</Text>
       </View>

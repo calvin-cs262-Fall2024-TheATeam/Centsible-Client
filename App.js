@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, Image, LogBox } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -14,7 +14,7 @@ import LoginScreen from './screens/LoginScreen';
 import CreateAccountScreen from './screens/CreateAccountScreen';
 import ImageViewer from './components/ImageViewer';
 
-const PlaceholderImage = require('./assets/background-img.png');
+const Logo = require('./assets/centsible-text.png')
 
 // Tab and Stack navigators
 const Tab = createBottomTabNavigator();
@@ -37,12 +37,13 @@ export default function App() {
   if (isLoading) {
     return (
       <View style={globalStyles.splashContainer}>
-        <View style={globalStyles.imageContainer}>
+        {/* <View style={globalStyles.imageContainer}>
           <ImageViewer placeholderImageSource={PlaceholderImage} />
         </View>
         <View style={globalStyles.textContainer}>
           <Text style={globalStyles.welcomeText}>Welcome to Centsible!</Text>
-        </View>
+        </View> */}
+        <ImageViewer placeholderImageSource={Logo}/>
       </View>
     );
   }

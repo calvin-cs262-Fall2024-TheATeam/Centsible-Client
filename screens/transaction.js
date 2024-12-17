@@ -1,10 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useLayoutEffect } from 'react';
 import {
   View, Text, Animated, TouchableHighlight, TouchableOpacity, Alert
 } from 'react-native';
 import TransactionModal from '../transactionComponents/transactionModal'; // Import the modal component
 import { SwipeListView } from 'react-native-swipe-list-view';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import BudgetHelpModal from '../helpModals/budgetHelpModal'
+// import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 export default function TransactionScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
@@ -219,8 +222,38 @@ export default function TransactionScreen({ navigation }) {
     });
   }, [navigation]);
 
+  // For help modal
+  const [helpModalVisible, setHelpModalVisible] = useState(false);
+  // const navigation = useNavigation(); // Get navigation via hook
+
+  const toggleHelpModal = () => {
+    setHelpModalVisible(!helpModalVisible);
+  };
+
+  // Icon for help modal
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => (
+        <View><TouchableOpacity>
+          <Icon name="question" 
+            size={25} 
+            color={'purple'} 
+            paddingLeft={20}
+            onPress={toggleHelpModal}/>
+        </TouchableOpacity></View>
+      ),
+    });
+  }, [navigation, toggleHelpModal]);
+
   return (
     <View style={styles.container}>
+      
+      {/* Modal for budget help */}
+      <BudgetHelpModal
+        visible={helpModalVisible}
+        onClose={toggleHelpModal}
+      />
+      
       {/* Balance Section */}
       <View style={styles.balanceContainer}>
         <Text style={styles.balanceText}>Current Balance:</Text>
