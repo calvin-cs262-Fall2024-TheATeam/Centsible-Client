@@ -496,15 +496,15 @@ const BudgetPlanner = () => {
                     </TouchableOpacity>
                   )}
 
-                  {editingAmount === subcat.id ? (
-                    <TextInput
-                      style={styles.individualAmountInput}
-                      value={newAmount}
-                      onChangeText={setNewAmount}
-                      keyboardType="numeric"
-                      onBlur={() => updateSubcategoryAmount(subcat.id, newAmount)}
+                {editingAmount === subcat.id ? (
+                <TextInput
+                  style={[styles.individualAmountInput, { textAlign: 'right' }]}
+                  value={newAmount}
+                    onChangeText={setNewAmount}
+                    keyboardType="numeric"
+                    onBlur={() => updateSubcategoryAmount(subcat.id, newAmount)}
                     />
-                  ) : (
+                    ) : (
                     <TouchableOpacity
                       onPress={() => {
                         setEditingAmount(subcat.id);
@@ -637,17 +637,16 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   categoryContainer: {
-    marginTop: 10,
-    marginBottom: 10,
-    marginRight: 10,
-    marginLeft: 10,
-    padding: 15,
-    borderWidth: 1,
-    borderColor: '#231942',
+    backgroundColor: '#F5F5F5',
     borderRadius: 8,
-    backgroundColor: '#f5f5f5',
-    marginHorizontal: 5,
+    borderWidth: 1,
+    width: '90%', 
+    padding: 15,
+    marginBottom: 10,
     flexGrow: 1,
+    borderColor: '#231942',
+    marginLeft: 20,
+    marginTop: 10,
   },
   categoryHeader: {
     flexDirection: 'row',
@@ -784,7 +783,7 @@ const styles = StyleSheet.create({
   },
 
   individualAmountInput: {
-    width: '100%',
+    width: '25%',
     height: 40,
     backgroundColor: '#f0f0f0',
     padding: 8,

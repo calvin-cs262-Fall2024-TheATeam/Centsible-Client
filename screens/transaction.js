@@ -435,7 +435,8 @@ const styles = {
     paddingHorizontal: 10,
     flex: 1,
     marginTop: 20,
-    marginBottom: 12, // Add some bottom margin
+    marginBottom: 12, 
+    width: '95%',
   },
   rowFrontVisible: {
     backgroundColor: '#f5f5f5',
@@ -476,7 +477,6 @@ const styles = {
     textAlign: 'right',
     fontSize: 16,
   },
-
   //styles for when you swipe on a transaction
   rowBack: {
     alignItems: 'center',
@@ -500,6 +500,7 @@ const styles = {
     borderBottomRightRadius: 8,
     height: 50,
   },
+
   trash: {
     height: 35,
     width: 35,

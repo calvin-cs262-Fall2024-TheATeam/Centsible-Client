@@ -386,6 +386,8 @@ useEffect(() => {
             </View>
           </View>
         </View>
+        
+
   
         {/* Box for Category Details (if selected) */}
         {selectedCategory && (
@@ -457,6 +459,17 @@ useEffect(() => {
       </ScrollView>
     </View>
   );
+  return (
+    <FlatList
+      ref={flatListRef}
+      data={selectedCategory ? [selectedCategory] : []}
+      keyExtractor={(item, index) => index.toString()}
+      ListHeaderComponent={renderHeader}
+      ListFooterComponent={renderFooter}
+      renderItem={null}
+    />
+  );
+
 }
   
 
@@ -464,22 +477,19 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     backgroundColor: 'white',
   },
   box: {
     backgroundColor: '#F5F5F5',
     borderRadius: 8,
     borderWidth: 1,
-    width: '95%',
+    width: '100%',
     padding: 15,
     marginBottom: 10,
     flexGrow: 1,
     borderColor: '#231942',
-    marginHorizontal: 10,
     marginTop: 10,
-    marginRight: 10,
-    marginLeft: 10,
   },
   detailBox: {
     backgroundColor: '#fff',
@@ -503,7 +513,7 @@ const styles = StyleSheet.create({
   donutCenter: {
     position: 'absolute',
     top: '50%',
-    left: '30%',
+    left: '28%',
     width: 120,
     height: 120,
     backgroundColor: '#F5F5F5',
@@ -513,7 +523,7 @@ const styles = StyleSheet.create({
   totalExpenseText: {
     position: 'absolute',
     top: '44%',
-    left: '12%',
+    left: '9%',
     fontSize: 24,
     fontWeight: 'bold',
     color: 'red',
