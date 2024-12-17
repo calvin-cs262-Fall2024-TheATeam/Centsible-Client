@@ -139,7 +139,7 @@ export default function ReportsScreen() {
       headerLeft: () => (
         <View>
           <TouchableOpacity onPress={toggleHelpModal}>
-            <Icon name="question" size={25} color="purple" paddingLeft={20} />
+            <Icon name="question" size={25} color="#3A4D72" paddingLeft={20} />
           </TouchableOpacity>
         </View>
       ),

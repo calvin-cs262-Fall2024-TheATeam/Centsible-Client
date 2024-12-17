@@ -399,7 +399,7 @@ const BudgetPlanner = () => {
         <View><TouchableOpacity>
           <Icon name="question" 
             size={25} 
-            color={'purple'} 
+            color={'#3A4D72'} 
             paddingLeft={20}
             onPress={toggleBudgetHelpModal}/>
         </TouchableOpacity></View>
@@ -853,7 +853,7 @@ const styles = StyleSheet.create({
 
   addTemplateBudget: {
     padding: 7,
-    backgroundColor: 'purple',
+    backgroundColor: '#3A4D72',
     borderRadius: 5,
     color: 'white',
     marginHorizontal: 47,

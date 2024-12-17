@@ -70,7 +70,7 @@ export default function ProfileScreen({ setIsLoggedIn }) {
         <View><TouchableOpacity>
           <Icon2 name="question" 
             size={25} 
-            color={'purple'} 
+            color={'#3A4D72'} 
             paddingLeft={20}
             onPress={toggleHelpModal}/>
           {/* <Text onPress={toggleHelpModal}>Info</Text> */}

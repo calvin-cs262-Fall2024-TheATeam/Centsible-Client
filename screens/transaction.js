@@ -391,7 +391,7 @@ export default function TransactionScreen({ navigation }) {
         <View><TouchableOpacity>
           <Icon name="question" 
             size={25} 
-            color={'purple'} 
+            color={'#3A4D72'} 
             paddingLeft={20}
             onPress={toggleHelpModal}/>
         </TouchableOpacity></View>
