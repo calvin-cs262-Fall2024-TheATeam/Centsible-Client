@@ -326,7 +326,7 @@ export default function ReportsScreen() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView>
+      <ScrollView style={styles.scrollView}>
         {/* ScrollView Container */}
         <View style={styles.box}>
           <View style={styles.chartContainer}>
@@ -663,7 +663,7 @@ const styles = StyleSheet.create({
     color: '#d0d0d0',
   },
   scrollableContent: {
-    maxHeight: 200,
+    maxHeight: 0,
   },
   dropdownButtonContainer: {
     width: '100%',
@@ -776,8 +776,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'center',
   },
-  ScrollView:
-  {
-    flex: 1,
+  scrollView: {
+    marginBottom: 60,
   },
 });
