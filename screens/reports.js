@@ -747,6 +747,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   scrollView: {
-    marginBottom: 60,
+    marginBottom: 10,
   },
 });
