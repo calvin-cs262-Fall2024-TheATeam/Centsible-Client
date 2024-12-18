@@ -443,7 +443,7 @@ export default function ReportsScreen() {
             </Text>
 
             <Text>
-              <Text style={styles.totalLabel}>Budget Total: </Text>
+              <Text style={styles.totalLabel}>Budgeted: </Text>
               <Text style={[styles.totalAmount, styles.totalCategoryExpense]}>
                 ${getBudgetTotal().toLocaleString()}
                 </Text>
