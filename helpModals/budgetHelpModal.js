@@ -80,7 +80,7 @@ const BudgetHelpModal = ({ visible, onClose }) => {
                                     <Text style={styles.bold}>To view reports from previous months:</Text>
                                 </Text>
                                 <Text style={styles.helpContentOrderedList}>
-                                    1. Tap on the <Text style={styles.bold}>purple bar</Text> at the top {'\n'}
+                                    1. Tap on the month displayed at the top {'\n'}
                                     2. Scroll to the desired month
                                 </Text>
                                 <Text style={styles.helpContentText}>
@@ -90,8 +90,8 @@ const BudgetHelpModal = ({ visible, onClose }) => {
                                     Locate the <Text style={styles.bold}>Income vs. Expenses</Text> at the top of the page.
                                 </Text>
                                 <Text style={styles.helpContentOrderedList}>
-                                    The <Text style={styles.bold}>blue</Text> represents your income for the month. {'\n'}
-                                    The <Text style={styles.bold}>red</Text> represents your expenses for the month.
+                                    The <Text style={styles.bold}>green</Text> represents your income for the month. {'\n'}
+                                    The <Text style={styles.bold}>blue</Text> represents your expenses for the month.
                                 </Text>
                                 <Text style={styles.helpContentText}>
                                     <Text style={styles.bold}>View your spending by category:</Text>
@@ -122,7 +122,7 @@ const BudgetHelpModal = ({ visible, onClose }) => {
                                     <Text style={styles.bold}>View transactions from previous months:</Text>
                                 </Text>
                                 <Text style={styles.helpContentOrderedList}>
-                                    1. Tap on the <Text style={styles.bold}>purple bar</Text> at the top {'\n'}
+                                    1. Tap on the month displayed at the top {'\n'}
                                     2. Scroll to the desired month
                                 </Text>
                                 <Text style={styles.helpContentText}>
@@ -136,7 +136,7 @@ const BudgetHelpModal = ({ visible, onClose }) => {
                                     <Text style={styles.bold}>Add your income:</Text>
                                 </Text>
                                 <Text style={styles.helpContentOrderedList}>
-                                    1. Tap the purple <Text style={styles.bold}>+</Text> in the upper right corner {'\n'}
+                                    1. Tap the <Text style={styles.bold}>+</Text> in the upper right corner {'\n'}
                                     2. Select <Text style={styles.bold}>Income</Text> {'\n'}
                                     3. Enter the appropriate <Text style={styles.bold}>date</Text> and <Text style={styles.bold}>amount</Text> {'\n'}
                                     4. Add an option <Text style={styles.bold}>description</Text> {'\n'}
@@ -146,7 +146,7 @@ const BudgetHelpModal = ({ visible, onClose }) => {
                                     <Text style={styles.bold}>Add an expense:</Text>
                                 </Text>
                                 <Text style={styles.helpContentOrderedList}>
-                                    1. Tap the purple <Text style={styles.bold}>+</Text> in the upper right corner {'\n'}
+                                    1. Tap the <Text style={styles.bold}>+</Text> in the upper right corner {'\n'}
                                     2. Select <Text style={styles.bold}>Income</Text> {'\n'}
                                     3. Enter the appropriate <Text style={styles.bold}>date</Text> and <Text style={styles.bold}>amount</Text> {'\n'}
                                     4. Add an optional <Text style={styles.bold}>description</Text> {'\n'}
