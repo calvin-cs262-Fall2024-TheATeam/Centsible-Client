@@ -60,10 +60,20 @@ export default function ReportsScreen() {
   const [helpModalVisible, setHelpModalVisible] = useState(false);
   const navigation = useNavigation(); // Get navigation via hook
 
-  const [categoryBudget, setCategoryBudget] = useState({
-    totalAmount: 0,
-    progress: 0,
-  });
+  const categoryBudgets = {
+    Transportation: 130,
+    Housing: 360,
+    Education: 250,
+    Entertainment: 35,
+    Food: 105,
+    Personal: 90,
+  };
+
+  const getBudgetTotal = () => {
+    // Check if the selected category has a hardcoded budget value
+    return categoryBudgets[selectedCategory] || 0; // Default to 0 if no budget is set for the category
+  };
+  
 
   const toggleHelpModal = () => {
     setHelpModalVisible(!helpModalVisible);
@@ -233,9 +243,6 @@ export default function ReportsScreen() {
 
         const categorySpent = transactions .filter((transaction) => transaction.categoryId === category.id)
         .reduce((spent, transaction) => spent + parseFloat(transaction.amount), 0);
-
-        const progress = totalAmount ? (categorySpent / totalAmount) * 100 : 100;
-        setCategoryBudget({ totalAmount, categorySpent, progress });
       }
     }
   };
@@ -296,6 +303,7 @@ export default function ReportsScreen() {
       return sum + parseFloat(subcategory.monthlydollaramount || 0); // Assuming category has a 'monthlydollaramount' field
     }, 0);
   };
+
 
   return (
     <View style={styles.container}>
@@ -437,7 +445,7 @@ export default function ReportsScreen() {
             <Text>
               <Text style={styles.totalLabel}>Budget Total: </Text>
               <Text style={[styles.totalAmount, styles.totalCategoryExpense]}>
-                ${getTotalAmount().toLocaleString()}
+                ${getBudgetTotal().toLocaleString()}
                 </Text>
             </Text>
 

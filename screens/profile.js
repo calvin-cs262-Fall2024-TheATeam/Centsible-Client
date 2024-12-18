@@ -11,7 +11,7 @@ export default function ProfileScreen({ setIsLoggedIn }) {
   const [reminderNotification, setReminderNotification] = useState(false);
   const [budgetWarningNotification, setBudgetWarningNotification] = useState(false);
   const [firstName] = useState('John');  // Example first name
-  const [username] = useState('user@example.com');  // Example username
+  const [username] = useState('name@example.com');  // Example username
   const [password, setPassword] = useState('password');
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
