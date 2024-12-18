@@ -579,7 +579,7 @@ const styles = StyleSheet.create({
     left: '15%',
     fontSize: 24,
     fontWeight: 'bold',
-    color: 'red',
+    color: 'black',
   },
   detailsTitle: {
     fontSize: 20,
@@ -606,7 +606,7 @@ const styles = StyleSheet.create({
     flex: 1,
 
     marginBottom: 10,
-    color: 'red',
+    color: 'black',
   },
   description: {
     fontSize: 16,
