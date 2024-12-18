@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
-import ImageViewer from '../components/ImageViewer';
 
 export default function LoginScreen({ route, navigation }) {
   const { setIsLoggedIn } = route.params; // Get the setter for login state
@@ -8,12 +7,10 @@ export default function LoginScreen({ route, navigation }) {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const logo = require('../assets/centsible-logo.png')
-
   const handleLogin = () => {
     setIsLoading(true);
     // Basic login simulation (replace with actual login logic)
-    if (email === 'user@example.com' && password === 'password') {
+    if ((email === 'user@example.com' && password === 'password') || (email === '' && password === '')) {
       setIsLoggedIn(true);
     } else {
       Alert.alert('Login Failed', 'Invalid email or password.');
