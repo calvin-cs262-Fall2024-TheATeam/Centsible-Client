@@ -14,7 +14,8 @@ import LoginScreen from './screens/LoginScreen';
 import CreateAccountScreen from './screens/CreateAccountScreen';
 import ImageViewer from './components/ImageViewer';
 
-const PlaceholderImage = require('./assets/background-img.png');
+// const PlaceholderImage = require('./assets/background-img.png');
+const Logo = require('./assets/centsible-text.png')
 
 // Tab and Stack navigators
 const Tab = createBottomTabNavigator();
@@ -37,24 +38,35 @@ export default function App() {
   if (isLoading) {
     return (
       <View style={globalStyles.splashContainer}>
-        <View style={globalStyles.imageContainer}>
+        {/* <View style={globalStyles.imageContainer}>
           <ImageViewer placeholderImageSource={PlaceholderImage} />
         </View>
         <View style={globalStyles.textContainer}>
           <Text style={globalStyles.welcomeText}>Welcome to Centsible!</Text>
-        </View>
+        </View> */}
+        <ImageViewer placeholderImageSource={Logo}/>
       </View>
     );
   }
 
   // Home tab screens
   const HomeTabs = () => (
-    <Tab.Navigator initialRouteName="Budget"
+    <Tab.Navigator initialRouteName="Reports"
       screenOptions={{
         tabBarStyle: { backgroundColor: 'white' }, // Optional: Set the background color of the tab bar
-        tabBarActiveTintColor: 'purple', // Active icon and label color
+        tabBarActiveTintColor: '#231942', // Active icon and label color
         tabBarInactiveTintColor: 'gray', // Inactive icon and label color
       }}>
+        <Tab.Screen
+        name="Reports"
+        component={ReportScreen}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Icon name="line-chart" color={color} size={size} />
+          ),
+          headerTitle: 'Reports',
+        }}
+      />
       <Tab.Screen
         name="Budget"
         component={GoalsScreen}
@@ -63,16 +75,6 @@ export default function App() {
             <Icon name="dollar" color={color} size={size} />
           ),
           headerTitle: 'Budget',
-        }}
-      />
-      <Tab.Screen
-        name="Reports"
-        component={ReportScreen}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="line-chart" color={color} size={size} />
-          ),
-          headerTitle: 'Reports',
         }}
       />
       <Tab.Screen

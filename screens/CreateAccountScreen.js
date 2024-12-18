@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: 'bold',
     fontStyle: 'italic',
-    color: 'purple',
+    color: '#231942',
     marginBottom: 16,
     textAlign: 'center',
   },

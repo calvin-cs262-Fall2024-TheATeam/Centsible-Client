@@ -43,23 +43,32 @@ const TransactionModal = (
             const selectedMonth = date.getMonth() + 1;  // getMonth() returns 0-based month, so add 1
             const selectedYear = date.getFullYear();  // getFullYear() returns the full year (e.g., 2024)
 
+            console.log(`Selected Month: ${selectedMonth}, Selected Year: ${selectedYear}`);
+
             if (selectedMonth === lastFetchedMonth && selectedYear === lastFetchedYear) {
                 return;  // Skip fetching if categories for this month/year already exist
             }
 
             const response = await fetch(`https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/monthBudget/1/${selectedMonth}/${selectedYear}`);
             if (response.ok) {
-                const data = await response.json();
+                const responseData = await response.json();
+                console.log('Response data:', responseData);  // Log the full response for inspection
 
-                setCategories(data.map(item => ({
-                    id: item.id, // ID for the category
-                    name: item.categoryname // Name for the category
-                })));
-                setLastFetchedMonth(selectedMonth);
-                setLastFetchedYear(selectedYear);
+                if (Array.isArray(responseData.data)) {
+                    // Access the categories and map over them
+                    setCategories(responseData.data.map(item => ({
+                        id: item.id,
+                        name: item.categoryname
+                    })));
+                    setLastFetchedMonth(selectedMonth);
+                    setLastFetchedYear(selectedYear);
+                } else {
+                    console.error('Error: `data` is not an array', responseData);
+                }
             } else {
-                console.error('Failed to fetch categories:', response.status);
-                // Handle failure here (maybe show an error message to the user)
+                console.error("API call failed with status:", response.status);
+                const errorText = await response.text();
+                console.error("Error message:", errorText);
             }
         } catch (error) {
             console.error('Error fetching categories:', error);
@@ -95,7 +104,6 @@ const TransactionModal = (
                                 resetForm();  // Reset the form
                             }}
                             color="red"
-                            style={globalStyles.cancelTransaction}
                         />
                         <Text style={globalStyles.transactionHeaderText}>Add a transaction</Text>
 
@@ -116,7 +124,7 @@ const TransactionModal = (
                                     onClose(); // Close the modal after adding the transaction
                                 }
                             }}
-                            color="purple"
+                            color="#231942"
                         />
 
                         {/* TO FIX: Add button but as touchable opacity. 

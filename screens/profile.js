@@ -1,14 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useLayoutEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Switch } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import ChangePassword from './changePassword';
+import BudgetHelpModal from '../helpModals/budgetHelpModal'
+import { useNavigation } from '@react-navigation/native';
+import Icon2 from 'react-native-vector-icons/FontAwesome'; 
 
 export default function ProfileScreen({ setIsLoggedIn }) {
   const [isNotificationsEnabled, setIsNotificationsEnabled] = useState(false);
   const [reminderNotification, setReminderNotification] = useState(false);
   const [budgetWarningNotification, setBudgetWarningNotification] = useState(false);
   const [firstName] = useState('John');  // Example first name
-  const [username] = useState('user@example.com');  // Example username
+  const [username] = useState('name@example.com');  // Example username
   const [password, setPassword] = useState('password');
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -53,8 +56,38 @@ export default function ProfileScreen({ setIsLoggedIn }) {
     setIsPasswordVisible(prevState => !prevState);
   };
 
+  // For help modal
+  const [helpModalVisible, setHelpModalVisible] = useState(false);
+  const navigation = useNavigation(); // Get navigation via hook
+
+  const toggleHelpModal = () => {
+    setHelpModalVisible(!helpModalVisible);
+  };
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => (
+        <View><TouchableOpacity>
+          <Icon2 name="question" 
+            size={25} 
+            color={'#3A4D72'} 
+            paddingLeft={20}
+            onPress={toggleHelpModal}/>
+          {/* <Text onPress={toggleHelpModal}>Info</Text> */}
+        </TouchableOpacity></View>
+      ),
+    });
+  }, [navigation, toggleHelpModal]);
+
   return (
     <View style={styles.container}>
+
+      {/* Modal for budget help */}
+      <BudgetHelpModal
+        visible={helpModalVisible}
+        onClose={toggleHelpModal}
+      />
+      
       <View style={styles.infoBox}>
         {/* First Name Box */}
         <View style={[styles.rowDisplay, styles.rowWithBorder]}>
@@ -100,7 +133,7 @@ export default function ProfileScreen({ setIsLoggedIn }) {
           <Switch
             value={isNotificationsEnabled}
             onValueChange={toggleNotifications}
-            trackColor={{ false: '#767577', true: '#9b59b6' }}
+            trackColor={{ false: '#767577', true: '#4e3a72' }}
             thumbColor={isNotificationsEnabled ? '#ffffff' : '#ffffff'}
             style={styles.switch}
           />
@@ -115,7 +148,7 @@ export default function ProfileScreen({ setIsLoggedIn }) {
               <Switch
                 value={reminderNotification}
                 onValueChange={toggleReminderNotification}
-                trackColor={{ false: '#767577', true: '#9b59b6' }}
+                trackColor={{ false: '#767577', true: '#4e3a72' }}
               />
             </View>
 
@@ -125,7 +158,7 @@ export default function ProfileScreen({ setIsLoggedIn }) {
               <Switch
                 value={budgetWarningNotification}
                 onValueChange={toggleBudgetWarningNotification}
-                trackColor={{ false: '#767577', true: '#9b59b6' }}
+                trackColor={{ false: '#767577', true: '#4e3a72' }}
               />
             </View>
           </>
@@ -152,7 +185,7 @@ styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    backgroundColor: '#e8d0f4',
+    backgroundColor: 'white',
   },
   rowDisplay: {
     flexDirection: 'row',
@@ -162,10 +195,14 @@ styles = StyleSheet.create({
   },
   rowWithBorder: {
     borderBottomWidth: 1, // Horizontal line
-    borderBottomColor: '#ddd', // Light gray border
+    borderBottomColor: '#231942', // Light gray border
   },
   infoBox: {
-    backgroundColor: 'white',
+    backgroundColor: '#F5F5F5',
+    marginBottom: 15,
+    borderColor: '#231942',
+    borderWidth: 1,
+    marginTop: 2,
     paddingLeft: 10,
     paddingRight: 10,
     borderRadius: 8,
@@ -189,17 +226,19 @@ styles = StyleSheet.create({
     paddingRight: 5,
   },
   notificationBox: {
-    backgroundColor: 'white',
+    backgroundColor: '#F5F5F5',
     marginVertical: 10,
     borderRadius: 8,
     width: '95%',
     paddingHorizontal: 7,
+    borderColor: '#231942',
+    borderWidth: 1,
     paddingTop: 13,
     paddingBottom: 4,
   },
   notificationText: {
     fontSize: 18,
-    color: '#333',
+    color: '#231942',
     paddingLeft: 5,
     flex: 1,
   },
@@ -212,7 +251,7 @@ styles = StyleSheet.create({
   },
   checkboxLabel: {
     fontSize: 16,
-    color: '#333',
+    color: '#231942',
     marginLeft: 20,
     flex: 1,
     fontWeight: 300,
@@ -221,14 +260,16 @@ styles = StyleSheet.create({
     marginLeft: 0,
   },
   logoutButtonContainer: {
-    backgroundColor: 'white',
+    backgroundColor: '#F5F5F5',
+    borderColor: '#231942',
+    borderWidth: 1,
     padding: 13,
     borderRadius: 8,
     width: '95%',
   },
   buttonText: {
     fontSize: 18,
-    color: 'purple',
+    color: '#231942',
     paddingLeft: 5,
   },
   passwordContainer: {
