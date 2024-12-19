@@ -10,7 +10,7 @@ export default function LoginScreen({ route, navigation }) {
   const handleLogin = () => {
     setIsLoading(true);
     // Basic login simulation (replace with actual login logic)
-    if (email === 'user@example.com' && password === 'password') {
+    if ((email === 'name@example.com' && password === 'password') || (email === '' && password === '')) {
       setIsLoggedIn(true);
     } else {
       Alert.alert('Login Failed', 'Invalid email or password.');
@@ -20,6 +20,9 @@ export default function LoginScreen({ route, navigation }) {
 
   return (
     <View style={styles.container}>
+
+      {/* <ImageViewer placeholderImageSource={logo}/> */}
+      
       <Text style={styles.title}>Centsible</Text>
 
       <TextInput
@@ -58,7 +61,7 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: 'bold',
     fontStyle: 'italic',
-    color: 'purple',
+    color: '#231942',
     marginBottom: 24,
     textAlign: 'center',
   },
@@ -72,7 +75,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   createAccountText: {
-    color: 'purple',
+    color: '#231942',
     marginTop: 20,
     fontWeight: 'bold',
     textAlign: 'center',

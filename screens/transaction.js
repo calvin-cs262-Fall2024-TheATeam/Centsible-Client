@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useLayoutEffect } from 'react';
 import {
   View, Text, Animated, TouchableHighlight, TouchableOpacity, Alert
 } from 'react-native';
@@ -6,6 +6,9 @@ import TransactionModal from '../transactionComponents/transactionModal'; // Imp
 import { SwipeListView } from 'react-native-swipe-list-view';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import React, { memo } from 'react';
+import BudgetHelpModal from '../helpModals/budgetHelpModal'
+import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 export default function TransactionScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
@@ -375,8 +378,36 @@ export default function TransactionScreen({ navigation }) {
     });
   }, [navigation]);
 
+  const [helpModalVisible, setHelpModalVisible] = useState(false);
+
+  const toggleHelpModal = () => {
+    setHelpModalVisible(!helpModalVisible);
+  };
+
+  // Icon for help modal
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => (
+        <View><TouchableOpacity>
+          <Icon name="question" 
+            size={25} 
+            color={'#3A4D72'} 
+            paddingLeft={20}
+            onPress={toggleHelpModal}/>
+        </TouchableOpacity></View>
+      ),
+    });
+  }, [navigation, toggleHelpModal]);
+
   return (
     <View style={styles.container}>
+
+      {/* Modal for budget help */}
+      <BudgetHelpModal
+        visible={helpModalVisible}
+        onClose={toggleHelpModal}
+      />
+      
       {/* Balance Section */}
       <View style={styles.balanceContainer}>
         <Text style={styles.balanceText}>Current Balance:</Text>
@@ -424,7 +455,7 @@ export default function TransactionScreen({ navigation }) {
 const styles = {
   //entire screen 
   container: {
-    backgroundColor: '#e8d0f4',
+    backgroundColor: 'white',
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center'
@@ -434,15 +465,19 @@ const styles = {
   transactionTableContainer: {
     paddingHorizontal: 10,
     flex: 1,
-    marginTop: 12,
-    marginBottom: 12, // Add some bottom margin
+    marginTop: 20,
+    marginBottom: 12, 
+    width: '95%',
   },
   rowFrontVisible: {
-    backgroundColor: '#FFF',
-    borderRadius: 5,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 8,
     marginBottom: 10,
     padding: 15,
     width: '100%', // Full width for the item
+    borderColor: '#231942',
+    borderWidth: 1,
+    marginHorizontal: 0,
   },
   itemContainer: {
     flexDirection: 'row',
@@ -473,14 +508,13 @@ const styles = {
     textAlign: 'right',
     fontSize: 16,
   },
-
   //styles for when you swipe on a transaction
   rowBack: {
     alignItems: 'center',
     backgroundColor: '#DDD',
     flexDirection: 'row',
     marginBottom: 5,
-    borderRadius: 5,
+    borderRadius: 8,
     height: 50,
   },
   trashBtn: {
@@ -493,8 +527,8 @@ const styles = {
     paddingRight: 17,
     backgroundColor: 'red',
     right: 0,
-    borderTopRightRadius: 5,
-    borderBottomRightRadius: 5,
+    borderTopRightRadius: 8,
+    borderBottomRightRadius: 8,
     height: 50,
   },
   trash: {
@@ -506,7 +540,7 @@ const styles = {
   //add transaction button
   addButton: {
     padding: 2,
-    backgroundColor: 'purple',
+    backgroundColor: '#231942',
     borderRadius: 5,
     marginRight: 16,
   },
@@ -514,7 +548,7 @@ const styles = {
   //current balance
   balanceContainer: {
     padding: 10,
-    backgroundColor: 'purple',
+    backgroundColor: '#231942',
     justifyContent: 'space-between',
     alignItems: 'center',
     width: '100%',

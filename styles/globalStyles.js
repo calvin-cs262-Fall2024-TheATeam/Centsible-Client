@@ -3,9 +3,9 @@ import { StyleSheet } from 'react-native';
 export const globalStyles = StyleSheet.create({
   splashContainer: {
     flex: 1,
-    backgroundColor: 'purple',
+    backgroundColor: 'white',
     alignItems: 'center',
-    justifyContent: 'flex-start', // Align items at the start
+    justifyContent: 'center', // Align items at the start
   },
   imageContainer: {
     flex: 0.8, // Adjust this to control image height
@@ -49,7 +49,7 @@ export const globalStyles = StyleSheet.create({
     textAlign: 'center',
   },
   modalContainer: {
-    backgroundColor: '#e8d0f4',
+    backgroundColor: 'white',
     flex: 1,
     alignItems: 'center',
     justifyContent: 'flex-start',
@@ -66,8 +66,8 @@ export const globalStyles = StyleSheet.create({
     width: '96%',
     padding: 10,
     borderWidth: 1,
-    borderColor: '#ccc',
-    backgroundColor: 'white',
+    borderColor: '#231942',
+    backgroundColor: '#f0f0f0',
     borderRadius: 5,
     marginTop: 15,
   },
@@ -81,15 +81,15 @@ export const globalStyles = StyleSheet.create({
   },
 
   tabStyle: {
-    backgroundColor: 'white',
-    borderColor: 'gray',
+    backgroundColor: '#f0f0f0',
+    borderColor: '#231942',
     padding: 3,
     height: 35,
   },
 
   // expense/income seg control tab
   activeTabStyle: {
-    backgroundColor: 'purple',
+    backgroundColor: '#231942',
     borderColor: 'purple',
   },
 
@@ -170,7 +170,7 @@ export const globalStyles = StyleSheet.create({
   closeCategoryModal: {
     marginTop: 10,
     padding: 10,
-    backgroundColor: 'purple',
+    backgroundColor: '#231942',
     borderRadius: 5,
     alignItems: 'center',
   },
