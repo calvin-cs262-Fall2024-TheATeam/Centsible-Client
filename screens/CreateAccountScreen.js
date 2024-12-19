@@ -3,15 +3,18 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
+
+
 
 const API_URL = "https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/registerUser";
 
-const RegisterScreen = ({ navigation }) => {
+const RegisterScreen = () => {
   const [email, setEmail] = useState('');
   const [firstName, setFirstName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const navigation = useNavigation();
 
   // Registration Function
   const registerUserClient = async () => {
@@ -37,8 +40,7 @@ const RegisterScreen = ({ navigation }) => {
         // Store the user ID in AsyncStorage
         await AsyncStorage.setItem("userId", String(data.id));
 
-        // Navigate to the next screen
-        navigation.navigate("ReportsScreen");
+        navigation.navigate('Reports');
 
       } else if (response.status === 401) {
         console.log(data.message);
