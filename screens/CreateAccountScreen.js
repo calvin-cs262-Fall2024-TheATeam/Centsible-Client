@@ -11,6 +11,7 @@ const RegisterScreen = ({ navigation }) => {
   const [firstName, setFirstName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   // Registration Function
   const registerUserClient = async () => {

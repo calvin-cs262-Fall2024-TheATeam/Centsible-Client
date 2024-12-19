@@ -7,31 +7,58 @@ export default function LoginScreen({ route, navigation }) {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     setIsLoading(true);
-    // Basic login simulation (replace with actual login logic)
-    if ((email === 'name@example.com' && password === 'password') || (email === '' && password === '')) {
-      setIsLoggedIn(true);
-    } else {
-      Alert.alert('Login Failed', 'Invalid email or password.');
+
+    // Basic validation before sending request
+    if (!email || !password) {
+      Alert.alert('Validation Error', 'Please enter both email and password.');
+      setIsLoading(false);
+      return;
     }
+
+    try {
+      // Send login request to the backend API using fetch
+      const response = await fetch('https://centsible-gahyafbxhwd7atgy.eastus2-01.azurewebsites.net/loginUser', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }), 
+      });
+
+      if (response.ok) {
+        // On successful login (status code 200)
+       const result = await response.json();
+       setIsLoggedIn(true);
+        Alert.alert('Login Successful', 'You have logged in successfully!');
+  
+      } else {
+        // Handle specific error statuses (e.g., invalid email/password)
+        if (response.status === 400) {
+          const errorData = await response.json();  
+          Alert.alert('Login Failed', data.message ||'Invalid email or password.');
+        } else if (response.status == 401) {
+          Alert.alert('Login Failed', 'Invalid email or password.');
+        }
+      }
+    } catch (error) {
+      Alert.alert('Login Failed', 'An error occurred. Please try again later.'); 
+  } finally {
     setIsLoading(false);
-  };
+  }
 
   return (
     <View style={styles.container}>
-
-      {/* <ImageViewer placeholderImageSource={logo}/> */}
-      
       <Text style={styles.title}>Centsible</Text>
 
       <TextInput
         style={styles.input}
-        placeholder="Email"
+        placeholder="Username"
         value={email}
         onChangeText={setEmail}
         autoCapitalize="none"
-        keyboardType="email-address"
+        keyboardType="default"
       />
       <TextInput
         style={styles.input}
@@ -47,6 +74,7 @@ export default function LoginScreen({ route, navigation }) {
       <TouchableOpacity onPress={() => navigation.navigate('CreateAccount')}>
         <Text style={styles.createAccountText}>Don't have an account? Create one</Text>
       </TouchableOpacity>
+
     </View>
   );
 }
@@ -81,3 +109,4 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
+}
