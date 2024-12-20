@@ -4,7 +4,7 @@ This is the client application for our CS262 Centsible project.
 Our data service for this application is hosted on Azure.
 
 Project Repo: [Centsible-Project](https://github.com/calvin-cs262-Fall2024-TheATeam/Centsible-Project)
-Service Repo:[Centsible-Service](https://github.com/calvin-cs262-Fall2024-TheATeam/Centsible-Service)
+<br />Service Repo:[Centsible-Service](https://github.com/calvin-cs262-Fall2024-TheATeam/Centsible-Service)
 
 
 ## Expo
